@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Link from "next/link";
 // shadcn/ui component imports
@@ -51,10 +51,11 @@ export default function LoginPage() {
       role:selectedRole,
       redirect: false, // Don't auto-redirect, we'll handle it manually
     });
-
+   console.log(result)
+  
     // Check if login failed
     if (result?.error) {
-      toast.error("Invalid email, password, or role mismatch.");
+      toast.error(result?.error);
     } else {
       // Login successful - fetch the user's session to get their role
       const res = await fetch("/api/auth/session");

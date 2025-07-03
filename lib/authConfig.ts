@@ -34,9 +34,16 @@ export const authConfig: NextAuthOptions = {
         const user = await prisma.user.findUnique({
           where: { email },
         });
-
+        
         if (!user || !user.password) {
+
           throw new Error("No user found or password not set.");
+
+        }
+        // check if user email is verified or not 
+        if(!user.emailVerified){
+          console.log("hello")
+           throw new Error("Please verify your email before login");
         }
         const isValid = await bcrypt.compare(password, user.password);
 
