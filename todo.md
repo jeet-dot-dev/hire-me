@@ -11,4 +11,9 @@
 
 ### Day 2
 - [x] Set up **Resend** for email verification 
-- [ ] Set up **Resend** for password reset
+
+### Day 3 
+ - [ ] Set up **Resend** for password reset
+ - [ ] Zod validation 
+ - [ ] Write reuseable components 
+ - [ ] handle edgecases of email varification and password reset
