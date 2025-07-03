@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import Cookies from "js-cookie";
+import EmailVerificationNotice from "../Email/ui/EmailVerificationNotice"; // ✅ import added
+
 // shadcn/ui component imports
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,17 +19,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-// Sonner toast import
 import { toast } from "sonner";
 
-// Define the two possible user roles
 type Role = "CANDIDATE" | "RECRUITER";
 
 export default function SignupComp() {
-  // State for tracking which role the user selected (starts as null)
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [showVerificationNotice, setShowVerificationNotice] = useState(false);
+  const [emailToCheck, setEmailToCheck] = useState("");
 
-  // State for form inputs
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -35,51 +35,39 @@ export default function SignupComp() {
     confirmPassword: "",
   });
 
-  // State for loading and error handling
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Next.js router for programmatic navigation
   const router = useRouter();
 
-  // Function to handle role selection (CANDIDATE or RECRUITER)
   const handleRoleSelection = (role: Role) => {
-    setSelectedRole(role); // Set the selected role
-    setError(""); // Clear any existing errors when switching roles
+    setSelectedRole(role);
+    setError("");
   };
 
-  // Function to handle OAuth registration (Google or GitHub)
   const handleOAuthRegister = (provider: "google" | "github") => {
-    // Make sure user selected a role first
     if (!selectedRole) {
       toast.error("Please select a role first.");
       return;
     }
 
-    // Store the selected role in a short-lived cookie (6 hours max)
-    // This helps the OAuth callback know what role the user intended
     Cookies.set("oauth_role", selectedRole, { expires: 0.1 });
-
-    // Initiate OAuth flow with the selected provider
     signIn(provider);
   };
 
-  // Function to handle form submission for credentials-based registration
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
-    if (!selectedRole) return; // Exit if no role selected
+    e.preventDefault();
+    if (!selectedRole) return;
 
-    // Validate password confirmation
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match");
       return;
     }
 
-    setLoading(true); // Show loading state
-    setError(""); // Clear any existing errors
+    setLoading(true);
+    setError("");
 
     try {
-      // Send registration request to API
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,17 +80,11 @@ export default function SignupComp() {
       });
 
       if (response.ok) {
-        // Registration successful - automatically sign in the user
-        toast.success("Account created successfully!");
-        await signIn("credentials", {
-          redirect: true,
-          email: formData.email,
-          password: formData.password,
-          role: selectedRole,
-          callbackUrl: "/dashboard",
-        });
+        toast.success("Account created! Please verify your email.");
+        setEmailToCheck(formData.email);
+        setShowVerificationNotice(true);
+        return; // ✅ stop here and show verification UI
       } else {
-        // Registration failed - show error message
         const data = await response.json();
         toast.error(data.error || "Registration failed");
       }
@@ -110,25 +92,43 @@ export default function SignupComp() {
       console.log(error);
       toast.error("Something went wrong");
     } finally {
-      setLoading(false); // Hide loading state
+      setLoading(false);
     }
   };
 
-  // Function to go back to role selection screen
   const goBack = () => {
-    setSelectedRole(null); // Reset role selection
-    // Clear all form data
+    setSelectedRole(null);
     setFormData({
       name: "",
       email: "",
       password: "",
       confirmPassword: "",
     });
-    setError(""); // Clear errors
+    setError("");
   };
 
-  // Step 1: Role Selection Screen
-  // Show this when no role is selected yet
+  // ✅ Step 0: Show email verification UI if user just registered
+  if (showVerificationNotice) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black px-4 pt-5">
+        <EmailVerificationNotice
+          email={emailToCheck}
+          onVerified={async () => {
+            toast.success("Email verified! Logging in...");
+            await signIn("credentials", {
+              email: formData.email,
+              password: formData.password,
+              role:selectedRole,
+              redirect: true,
+              callbackUrl: "/dashboard",
+            });
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Step 1: Role selection
   if (!selectedRole) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black px-4">
@@ -142,40 +142,31 @@ export default function SignupComp() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Button to select CANDIDATE role */}
             <Button
               onClick={() => handleRoleSelection("CANDIDATE")}
               variant="outline"
-              className="w-full h-auto px-6 py-4 bg-transparent border-2 text-white hover:bg-[#18181a] cursor-pointer  transition-all group"
+              className="w-full h-auto px-6 py-4 bg-transparent border-2 text-white hover:bg-[#18181a]"
             >
               <div className="text-center w-full">
-                <h3 className="text-lg font-semibold  text-white mb-1">
+                <h3 className="text-lg font-semibold text-white mb-1">
                   Register as Candidate
                 </h3>
-                <p className="text-sm text-zinc-600">
-                  I&apos;m looking for a job
-                </p>
+                <p className="text-sm text-zinc-600">I&apos;m looking for a job</p>
               </div>
             </Button>
-
-            {/* Button to select RECRUITER role */}
             <Button
               onClick={() => handleRoleSelection("RECRUITER")}
               variant="outline"
-              className="w-full h-auto px-6 py-4 bg-transparent border-2text-left cursor-pointer  hover:bg-[#18181a] transition-all group"
+              className="w-full h-auto px-6 py-4 bg-transparent border-2 text-white hover:bg-[#18181a]"
             >
               <div className="text-center w-full">
                 <h3 className="text-lg font-semibold text-white mb-1">
                   Register as Recruiter
                 </h3>
-                <p className="text-sm text-zinc-200">
-                  I want to hire talent
-                </p>
+                <p className="text-sm text-zinc-600">I want to hire talent</p>
               </div>
             </Button>
           </CardContent>
-
-          {/* Link to Login Page */}
           <CardContent className="pt-0">
             <p className="text-center text-sm text-zinc-400">
               Already have an account?{" "}
@@ -189,13 +180,11 @@ export default function SignupComp() {
     );
   }
 
-  // Step 2: Registration Form Screen
-  // Show this after user has selected a role
+  // Step 2: Registration Form
   return (
     <div className="min-h-screen flex items-center justify-center bg-black px-4 pt-5">
       <Card className="max-w-md w-full bg-zinc-900 border-zinc-800">
         <CardHeader>
-          {/* Back button to return to role selection */}
           <Button
             onClick={goBack}
             variant="ghost"
@@ -203,73 +192,50 @@ export default function SignupComp() {
           >
             ← Back to role selection
           </Button>
-
-          {/* Header showing selected role and title */}
           <div className="text-center space-y-2">
             <CardTitle className="text-zinc-400">
               Create your {selectedRole.toLowerCase()} account
             </CardTitle>
           </div>
         </CardHeader>
-
         <CardContent className="space-y-6">
-          {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name Input Field */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-zinc-200">
-                Full Name
-              </Label>
+              <Label htmlFor="name" className="text-zinc-200">Full Name</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="John Doe"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
                 required
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:ring-zinc-600"
               />
             </div>
-
-            {/* Email Input Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-zinc-200">
-                Email address
-              </Label>
+              <Label htmlFor="email" className="text-zinc-200">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="john.doe@example.com"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:ring-zinc-600"
               />
             </div>
-
-            {/* Password Input Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-zinc-200">
-                Password
-              </Label>
+              <Label htmlFor="password" className="text-zinc-200">Password</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••••••"
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
                 required
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:ring-zinc-600"
               />
             </div>
-
-            {/* Confirm Password Input Field */}
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-zinc-200">
                 Confirm Password
@@ -277,24 +243,23 @@ export default function SignupComp() {
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="••••••••••••"
                 value={formData.confirmPassword}
                 onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
+                  setFormData({
+                    ...formData,
+                    confirmPassword: e.target.value,
+                  })
                 }
                 required
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-zinc-600 focus:ring-zinc-600"
               />
             </div>
-
-            {/* Submit Button with role-based styling */}
             <Button
               type="submit"
               disabled={loading}
               className={`w-full ${
                 selectedRole === "RECRUITER"
-                  ? "bg-green-600 hover:bg-green-700 disabled:bg-green-300"
-                  : "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300"
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-blue-600 hover:bg-blue-700"
               } text-white`}
             >
               {loading
@@ -303,7 +268,6 @@ export default function SignupComp() {
             </Button>
           </form>
 
-          {/* Separator between form and OAuth registration */}
           <div className="relative">
             <Separator className="bg-zinc-700" />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -311,33 +275,24 @@ export default function SignupComp() {
             </div>
           </div>
 
-          {/* OAuth Registration Buttons */}
           <div className="space-y-3">
-            {/* Google OAuth Button */}
             <Button
               onClick={() => handleOAuthRegister("google")}
               disabled={loading}
               variant="outline"
-              className="w-full flex items-center justify-center bg-white text-black border-white hover:bg-zinc-200"
+              className="w-full bg-white text-black"
             >
-
               Sign up with Google
             </Button>
-
-            {/* GitHub OAuth Button */}
             <Button
               onClick={() => handleOAuthRegister("github")}
               disabled={loading}
               variant="outline"
-              className="w-full flex items-center justify-center bg-zinc-800 text-white border-zinc-700 hover:bg-zinc-700"
+              className="w-full bg-zinc-800 text-white"
             >
-             
-                
               Sign up with GitHub
             </Button>
           </div>
-
-          {/* Link to Login Page */}
           <p className="text-center text-sm text-zinc-400">
             Already have an account?{" "}
             <Link href="/auth/login" className="text-white hover:underline">

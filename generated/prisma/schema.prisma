@@ -45,15 +45,16 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  password      String?
-  role          Role      @default(CANDIDATE)
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
+  id              String    @id @default(cuid())
+  name            String?
+  email           String?   @unique
+  password        String?
+  role            Role      @default(CANDIDATE)
+  emailVerifiedAt DateTime? @map("email_verified")
+  emailVerified   Boolean?  @default(false)
+  image           String?
+  accounts        Account[]
+  sessions        Session[]
 
   @@map("users")
 }

@@ -8,5 +8,7 @@
   - Recruiter
 - [X] Created full authentication flow
 - [X] Design Custom Login and Signup page using SadCn
-- [ ] Zod validation with Forms
-- [ ] Extra: Set up **Resend** for email verification and password reset
+
+### Day 2
+- [x] Set up **Resend** for email verification 
+- [ ] Set up **Resend** for password reset

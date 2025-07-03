@@ -5,7 +5,6 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Link from "next/link";
-import Image from "next/image";
 // shadcn/ui component imports
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +48,7 @@ export default function LoginPage() {
     const result = await signIn("credentials", {
       email,
       password,
+      role:selectedRole,
       redirect: false, // Don't auto-redirect, we'll handle it manually
     });
 
