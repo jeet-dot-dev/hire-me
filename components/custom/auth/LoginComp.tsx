@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Link from "next/link";
 // shadcn/ui component imports
@@ -51,7 +51,11 @@ export default function LoginPage() {
       role:selectedRole,
       redirect: false, // Don't auto-redirect, we'll handle it manually
     });
-   console.log(result)
+   console.log(result);
+
+   if(result?.error === "Please verify your email before login"){
+    router.push("/auth/verify-email");
+   }
   
     // Check if login failed
     if (result?.error) {

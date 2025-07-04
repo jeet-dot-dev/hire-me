@@ -61,6 +61,9 @@ const Page = () => {
                 </svg>
               </div>
               <p className="mt-4 text-green-600">{message}</p>
+               <a href="/auth/login" className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Login
+              </a>
             </div>
           )}
 
