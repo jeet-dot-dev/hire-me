@@ -86,6 +86,11 @@ export default function SignupComp() {
         return; // ✅ stop here and show verification UI
       } else {
         const data = await response.json();
+        if(data.error === "Account created but email is not varified "){
+          toast.error(data.error)
+          router.push("/auth/verify-email");
+          return 
+        }
         toast.error(data.error || "Registration failed");
       }
     } catch (error) {

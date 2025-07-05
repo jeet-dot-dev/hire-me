@@ -19,6 +19,13 @@ export async function POST(req: Request) {
       where: { email },
     });
 
+    if(!existingUser?.emailVerified){
+        return NextResponse.json(
+        { error: "Account created but email is not varified " },
+        { status: 400 }
+      );
+    }
+
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists with this email" },

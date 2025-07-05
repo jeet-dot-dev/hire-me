@@ -36,6 +36,7 @@ export async function GET(req: Request) {
       email: user.email || " ",
       name: user.name || "user",
       token,
+      kind : "verification"
     });
     return NextResponse.json({ message: "Verification email sent" });
   } catch (error) {
