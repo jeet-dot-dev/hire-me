@@ -15,3 +15,15 @@
 ### Day 3 
  - [x] Set up **Resend** for password reset
  - [x] handle edgecases of email varification and password reset
+
+
+### Day 4 – Candidate Profile Setup
+
+- [ ] 🔒 Protect candidate-only routes (auth guard)  
+- [ ] 👤 Build the Candidate Profile Page  
+- [ ] ⚙️ Add form to edit:
+     - Name  
+     - Bio  
+     - Location  
+     -  Social links (GitHub, LinkedIn, Portfolio)
+
