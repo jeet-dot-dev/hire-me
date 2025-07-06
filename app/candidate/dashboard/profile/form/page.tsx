@@ -1,8 +1,8 @@
-import ProfileForm from '@/components/custom/Candidate/Profile/ProfileForm'
+import { CandidateProfileForm } from '@/components/custom/Candidate/Profile/ProfileForm'
 import React from 'react'
 
 const page = () => {
-  return <ProfileForm/>
+  return <CandidateProfileForm/>
 }
 
 export default page

@@ -20,10 +20,5 @@
 ### Day 4 – Candidate Profile Setup
 
 - [x] 🔒 Protect candidate-only routes (auth guard)  
-- [ ] 👤 Build the Candidate Profile Page  
-- [ ] ⚙️ Add form to edit:
-     - Name  
-     - Bio  
-     - Location  
-     -  Social links (GitHub, LinkedIn, Portfolio)
-
+- [x] 👤 Build the Candidate Profile Form Page  
+- [x] 👤 Build the Candidate Dashboard Page  
