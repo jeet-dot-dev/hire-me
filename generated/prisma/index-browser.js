@@ -153,6 +153,42 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image'
 };
 
+exports.Prisma.CandidateScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  about: 'about',
+  ProfilePic: 'ProfilePic',
+  resumeUrl: 'resumeUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.EducationScalarFieldEnum = {
+  id: 'id',
+  candidateId: 'candidateId',
+  degree: 'degree',
+  institution: 'institution',
+  startYear: 'startYear',
+  endYear: 'endYear',
+  grade: 'grade',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SkillScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  candidateId: 'candidateId'
+};
+
+exports.Prisma.SocialLinkScalarFieldEnum = {
+  id: 'id',
+  platform: 'platform',
+  url: 'url',
+  candidateId: 'candidateId'
+};
+
 exports.Prisma.VerificationTokenScalarFieldEnum = {
   identifier: 'identifier',
   token: 'token',
@@ -186,10 +222,22 @@ exports.Role = exports.$Enums.Role = {
   RECRUITER: 'RECRUITER'
 };
 
+exports.SocialPlatform = exports.$Enums.SocialPlatform = {
+  GITHUB: 'GITHUB',
+  LINKEDIN: 'LINKEDIN',
+  PORTFOLIO: 'PORTFOLIO',
+  TWITTER: 'TWITTER',
+  DEVFOLIO: 'DEVFOLIO'
+};
+
 exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
+  Candidate: 'Candidate',
+  Education: 'Education',
+  Skill: 'Skill',
+  SocialLink: 'SocialLink',
   VerificationToken: 'VerificationToken',
   PasswordResetToken: 'PasswordResetToken'
 };

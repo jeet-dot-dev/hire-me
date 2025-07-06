@@ -19,7 +19,7 @@
 
 ### Day 4 – Candidate Profile Setup
 
-- [ ] 🔒 Protect candidate-only routes (auth guard)  
+- [x] 🔒 Protect candidate-only routes (auth guard)  
 - [ ] 👤 Build the Candidate Profile Page  
 - [ ] ⚙️ Add form to edit:
      - Name  

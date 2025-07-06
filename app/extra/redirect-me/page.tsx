@@ -18,7 +18,7 @@ export default async function RedirectPage() {
   if (role === "RECRUITER") {
     return redirect("/recruiter/dashboard");
   } else if (role === "CANDIDATE") {
-    return redirect("/candidate/dashboard");
+    return redirect("/");
   } else {
     return redirect("/login");
   }
