@@ -4,14 +4,16 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const { data: session, status } = useSession();          // auth state
+  const { data: session, status } = useSession(); // auth state
   const router = useRouter();
-
+  type roleType = "candidate" | "recruiter";
+  const [role, SetRole] = useState<roleType>("candidate");
   /** ────────── handlers ────────── */
-  const handleSignIn = () => router.push("/auth/login");        // or signIn()
-  const handleSignUp = () => router.push("/auth/register");     // registration page
+  const handleSignIn = () => router.push("/auth/login"); // or signIn()
+  const handleSignUp = () => router.push("/auth/register"); // registration page
   const handleLogout = () => signOut({ callbackUrl: "/" }); // back to landing
 
   const isAuthenticated = status === "authenticated";
@@ -55,6 +57,17 @@ const Navbar = () => {
 };
 
 export default function Home() {
+  const { data: session, status } = useSession(); // auth state
+  const router = useRouter();
+  type roleType = "candidate" | "recruiter";
+  const [role, SetRole] = useState<roleType>("candidate");
+  const isAuthenticated = status === "authenticated";
+  useEffect(() => {
+    if (!session) return;
+    const Role = session?.user?.role;
+    if (!Role) return;
+    SetRole(Role.toLocaleLowerCase() as roleType);
+  }, [session]);
   return (
     <div className="min-h-screen bg-black">
       <Navbar />
@@ -62,6 +75,14 @@ export default function Home() {
         <div className="text-center text-white space-y-2">
           <h1 className="text-4xl font-bold">Welcome</h1>
           <p className="text-gray-400">Your content goes here</p>
+          {isAuthenticated && (
+            <div
+              className="mt-5 px-4 py-3 bg-[#2a2a2c] rounded-2xl cursor-pointer"
+              onClick={() => router.push(`${role}/dashboard`)}
+            >
+              Go to Dashboard
+            </div>
+          )}
         </div>
       </main>
     </div>

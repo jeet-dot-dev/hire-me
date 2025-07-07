@@ -22,3 +22,9 @@
 - [x] 🔒 Protect candidate-only routes (auth guard)  
 - [x] 👤 Build the Candidate Profile Form Page  
 - [x] 👤 Build the Candidate Dashboard Page  
+
+### Day 5 – Candidate Profile Backend
+
+- [x] Backend for upload profile
+- [x] Handle Edge cases 
+
