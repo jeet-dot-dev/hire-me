@@ -28,3 +28,12 @@
 - [x] Backend for upload profile
 - [x] Handle Edge cases 
 
+### Day 6 – Candidate Profile Frontend
+
+- [x] Fixes some minor issues
+- [x] Build the profile page 
+
+### Day 7 – Candidate Profile Edit Frontend and Backend
+
+- [ ] Build candidate edit page frontend and backend 
+- [ ] Stop creating another profile if created one 

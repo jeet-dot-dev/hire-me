@@ -20,7 +20,9 @@ export async function POST(req: NextRequest) {
    // console.log(body?.skills)
     /* ───── 2️⃣  Auth guard ───── */
     const session = await auth();
+     console.log(session?.user)
     if (!session?.user?.id || session.user.role !== "CANDIDATE")
+       
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     /* ───── 3️⃣  Zod validation ───── */

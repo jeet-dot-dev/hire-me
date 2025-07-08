@@ -99,52 +99,63 @@ export function CandidateProfileForm() {
   };
 
   /* ───────────────────────────── save handler ─────────────────────────────── */
-  const handleSave = async () => {
-    if (!validateForm()) {
-      toast.error("Please fill in all required fields.");
-      return;
+const handleSave = async () => {
+  if (!validateForm()) {
+    toast.error("Please fill in all required fields.");
+    return;
+  }
+
+  if (profile.profilePicture && profile.profilePicture.size > MAX_IMAGE_SIZE) {
+    toast.error("Profile photo must be ≤ 1 MB.");
+    return;
+  }
+
+  if (profile.resume && profile.resume.size > MAX_PDF_SIZE) {
+    toast.error("Resume PDF must be ≤ 5 MB.");
+    return;
+  }
+
+  setIsSaving(true);
+  const toastId = toast.loading("Uploading your files…");
+
+  try {
+    // 1️⃣ Upload files
+    let profilePictureKey: string | undefined;
+    let resumeKey: string | undefined;
+
+    if (profile.profilePicture) {
+      profilePictureKey = await uploadToR2(profile.profilePicture, "image");
+    }
+    if (profile.resume) {
+      resumeKey = await uploadToR2(profile.resume, "pdf");
     }
 
-    // size checks
-    if (profile.profilePicture && profile.profilePicture.size > MAX_IMAGE_SIZE) {
-      toast.error("Profile photo must be ≤ 1 MB.");
-      return;
-    }
-    if (profile.resume && profile.resume.size > MAX_PDF_SIZE) {
-      toast.error("Resume PDF must be ≤ 5 MB.");
-      return;
-    }
+    // 2️⃣ Update toast for saving step
+    toast.loading("Saving profile…", { id: toastId });
 
-    setIsSaving(true);
-    const uploadId = toast.loading("Uploading your files…");
-    try {
-      // 1️⃣ upload files if any
-      let profilePictureKey: string | undefined;
-      let resumeKey: string | undefined;
-      if (profile.profilePicture) {
-        profilePictureKey = await uploadToR2(profile.profilePicture, "image");
-      }
-      if (profile.resume) {
-        resumeKey = await uploadToR2(profile.resume, "pdf");
-      }
-      toast.success("Files uploaded ✔", { id: uploadId });
+    await axios.post("/api/candidate/profile", {
+      ...profile,
+      profilePicture: profilePictureKey,
+      resume: resumeKey,
+    });
 
-      // 2️⃣ save profile
-      const saveId = toast.loading("Saving profile…");
-      await axios.post("/api/candidate/profile", {
-        ...profile,
-        profilePicture: profilePictureKey,
-        resume: resumeKey,
-      });
-      toast.success("Profile saved!", { id: saveId });
-      router.push("/candidate/dashboard/profile")
-    } catch (err: any) {
-      toast.dismiss(uploadId);
-      toast.error(err?.response?.data?.error || err?.message || "Failed to save profile.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    // ✅ Success
+    toast.success("Profile saved successfully!", { id: toastId });
+    router.push("/candidate/dashboard/profile");
+
+  } catch (err: any) {
+    const errorMsg =
+      err?.response?.data?.error ||
+      err?.message ||
+      "Something went wrong while saving your profile.";
+
+    // 🔴 Error (replace toast in place)
+    toast.error(errorMsg, { id: toastId });
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
   /* ─────────────────────────────────── UI ─────────────────────────────────── */
   return (
