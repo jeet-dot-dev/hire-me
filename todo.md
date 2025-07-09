@@ -35,5 +35,5 @@
 
 ### Day 7 – Candidate Profile Edit Frontend and Backend
 
-- [ ] Build candidate edit page frontend and backend 
-- [ ] Stop creating another profile if created one 
+- [x] Build candidate edit page frontend and backend using reusable component 
+- [x] Stop creating another profile if created one 
