@@ -1,11 +1,12 @@
 import { CandidateProfilePage } from "@/components/custom/Candidate/Profile/CandidateProfilePage";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export default async function page() {
   const session = await auth();
   if(!session || !session.user){
-    return <div className="text-white p-10">Unauthorized</div>;
+    return redirect('/auth/login');
   }
   const userId = session?.user?.id;
   const candidate = await prisma.candidate.findUnique({

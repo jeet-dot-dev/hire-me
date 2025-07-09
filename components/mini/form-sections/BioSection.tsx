@@ -11,7 +11,7 @@ interface BioSectionProps {
   firstName: string;
   lastName: string;
   about: string;
-  profilePicture?: File;
+  profilePicture?: string | File | undefined;
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
   onAboutChange: (value: string) => void;
@@ -34,8 +34,8 @@ export function BioSection({
   errors,
 }: BioSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-
+  const [imagePreview, setImagePreview] = useState<string | File | undefined>(profilePicture);
+  //console.log(imagePreview)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -85,7 +85,7 @@ export function BioSection({
             className="hidden"
           />
           {profilePicture && (
-            <p className="text-sm text-muted-foreground">{profilePicture.name}</p>
+            <p className="text-sm text-muted-foreground">{profilePicture instanceof File && profilePicture.name}</p>
           )}
         </div>
 

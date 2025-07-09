@@ -9,7 +9,7 @@ export interface Education {
 
 export interface SocialLink {
   id: string;
-  platform: 'GitHub' | 'LinkedIn' | 'Portfolio' | 'Twitter' | 'DevFolio';
+  platform: 'GITHUB' | 'LINKEDIN' | 'PORTFOLIO' | 'TWITTER' | 'DEVFOLIO';
   url: string;
 }
 
@@ -17,9 +17,9 @@ export interface CandidateProfile {
   firstName: string;
   lastName: string;
   about?: string;
-  profilePicture?: File;
+  profilePicture?: File | string | undefined;
   education: Education[];
   skills: string[];
   socialLinks: SocialLink[];
-  resume?: File;
+  resume?: File | string | undefined;
 }

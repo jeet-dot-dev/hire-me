@@ -22,6 +22,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type platformtypes =
   | "GITHUB"
@@ -69,10 +70,9 @@ type skillsTypes = {
 
 export function CandidateProfilePage({ candidate }: candidatePropType) {
   console.log(candidate);
-
+   const router = useRouter();
   const handleEditProfile = () => {
-    // Navigate to profile form - in a real app this would use Next.js router
-    console.log("Navigate to /candidate/profile-form");
+     router.push("/candidate/dashboard/profile/form")
   };
 
   const getSocialIcon = (platform: string) => {
@@ -85,7 +85,7 @@ export function CandidateProfilePage({ candidate }: candidatePropType) {
         return Globe;
       case "TWITTER":
         return Twitter;
-      case "DEVFOLIO":
+      case "DEVFOLIO":  
         return Globe;
       default:
         return Globe;

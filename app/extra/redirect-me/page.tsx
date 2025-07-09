@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authConfig } from "@/lib/authConfig";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 export default async function RedirectPage() {
   const session = await getServerSession(authConfig);
@@ -15,10 +16,16 @@ export default async function RedirectPage() {
     return redirect("/login");
   }
 
+ 
+
   if (role === "RECRUITER") {
     return redirect("/recruiter/dashboard");
   } else if (role === "CANDIDATE") {
-    return redirect("/");
+     const isHaveProfile = await prisma.candidate.findUnique({where  : {userId : session.user.id}});
+     if(isHaveProfile){
+        return redirect("/candidate/dashboard/profile");
+     }
+    return redirect("/candidate/dashboard/profile/form")
   } else {
     return redirect("/login");
   }
