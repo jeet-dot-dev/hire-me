@@ -37,3 +37,6 @@
 
 - [x] Build candidate edit page frontend and backend using reusable component 
 - [x] Stop creating another profile if created one 
+
+### Day 8 Recruiter Profile Page
+- [x] recruiter and job schema design
