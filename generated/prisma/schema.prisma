@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// ===============================
+// 🚀 Prisma Generator & Datasource
+// ===============================
 
 generator client {
   provider = "prisma-client-js"
@@ -12,6 +10,73 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// ===============================
+// 🔁 Enums
+// ===============================
+
+enum Role {
+  CANDIDATE
+  RECRUITER
+}
+
+enum JobType {
+  Remote
+  Onside
+  Hybrid
+}
+
+enum Status {
+  active
+  close
+}
+
+enum JobLevel {
+  INTERN
+  ENTRY
+  MID
+  SENIOR
+  LEAD
+}
+
+enum ApplicationStatus {
+  Pending
+  Accepted
+  Rejected
+}
+
+enum SocialPlatform {
+  GITHUB
+  LINKEDIN
+  PORTFOLIO
+  TWITTER
+  DEVFOLIO
+}
+
+// ===============================
+// 👥 User & Authentication Models
+// ===============================
+
+model User {
+  id              String    @id @default(cuid())
+  name            String?
+  email           String?   @unique
+  password        String?
+  role            Role      @default(CANDIDATE)
+  emailVerifiedAt DateTime? @map("email_verified")
+  emailVerified   Boolean?  @default(false)
+  image           String?
+
+  // Auth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Role-based profiles
+  candidateProfile Candidate?
+  recruiterProfile Recruiter?
+
+  @@map("users")
 }
 
 model Account {
@@ -39,80 +104,10 @@ model Session {
   sessionToken String   @unique @map("session_token")
   userId       String   @map("user_id")
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
-}
-
-model User {
-  id               String     @id @default(cuid())
-  name             String?
-  email            String?    @unique
-  password         String?
-  role             Role       @default(CANDIDATE)
-  emailVerifiedAt  DateTime?  @map("email_verified")
-  emailVerified    Boolean?   @default(false)
-  image            String?
-  accounts         Account[]
-  sessions         Session[]
-  candidateProfile Candidate?
-
-  @@map("users")
-}
-
-model Candidate {
-  id     String @id @default(uuid())
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
-
-  firstName  String
-  lastName   String
-  about      String?
-  ProfilePic String? //url uploaded to r2
-  resumeUrl  String? //url uploaded to r2
-
-  education Education[]
-  skills    Skill[]
-  socials   SocialLink[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Education {
-  id          String    @id @default(uuid())
-  candidate   Candidate @relation(fields: [candidateId], references: [id])
-  candidateId String
-
-  degree      String
-  institution String
-  startYear   Int      @db.SmallInt
-  endYear     Int?     @db.SmallInt
-  grade       String?
-  createdAt   DateTime @default(now())
-}
-
-model Skill {
-  id          String    @id @default(uuid())
-  name        String
-  candidate   Candidate @relation(fields: [candidateId], references: [id])
-  candidateId String
-}
-
-model SocialLink {
-  id          String         @id @default(uuid())
-  platform    SocialPlatform
-  url         String
-  candidate   Candidate      @relation(fields: [candidateId], references: [id])
-  candidateId String
-}
-
-enum SocialPlatform {
-  GITHUB
-  LINKEDIN
-  PORTFOLIO
-  TWITTER
-  DEVFOLIO
 }
 
 model VerificationToken {
@@ -134,7 +129,110 @@ model PasswordResetToken {
   @@unique([email, token])
 }
 
-enum Role {
-  CANDIDATE
-  RECRUITER
+// ===============================
+// 🧑‍💼 Recruiter Side Models
+// ===============================
+
+model Recruiter {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  jobs Job[]
+}
+
+model Job {
+  id          String    @id @default(uuid())
+  recruiterId String
+  recruiter   Recruiter @relation(fields: [recruiterId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  expireAt    DateTime?
+
+  // Job details
+  jobTitle             String    @db.VarChar(100)
+  companyName          String    @db.VarChar(100)
+  location             String    @db.VarChar(100)
+  salary               String?   @db.VarChar(100)
+  jobType              JobType
+  description          String
+  skillsRequired       String[]
+  interviewDuration    Int
+  interviewInstruction String?
+  tags                 String[]
+  status               Status
+  industry             String?
+  jobLevel             JobLevel?
+  experienceNeeded     Int?
+  contact              String?
+  shareLink            String?
+
+  // Relation to Application
+  jobApplication JobApplication?
+}
+
+// ===============================
+// 🧑‍🎓 Candidate Side Models
+// ===============================
+
+model Candidate {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  firstName  String
+  lastName   String
+  about      String?
+  ProfilePic String? // R2 URL
+  resumeUrl  String? // R2 URL
+
+  education Education[]
+  skills    Skill[]
+  socials   SocialLink[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  JobApplication JobApplication?
+}
+
+model JobApplication {
+  id          String @id @default(uuid())
+  jobId       String @unique
+  candidateId String @unique
+
+  job       Job        @relation(fields: [jobId], references: [id])
+  candidate Candidate? @relation(fields: [candidateId], references: [id])
+
+  createdAt DateTime          @default(now())
+  status    ApplicationStatus
+  feedback  String?           @db.VarChar(500)
+}
+
+model Education {
+  id          String    @id @default(uuid())
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+
+  degree      String
+  institution String
+  startYear   Int      @db.SmallInt
+  endYear     Int?     @db.SmallInt
+  grade       String?
+  createdAt   DateTime @default(now())
+}
+
+model Skill {
+  id          String    @id @default(uuid())
+  name        String
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+}
+
+model SocialLink {
+  id          String         @id @default(uuid())
+  platform    SocialPlatform
+  url         String
+  candidateId String
+  candidate   Candidate      @relation(fields: [candidateId], references: [id])
 }

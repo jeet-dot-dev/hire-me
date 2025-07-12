@@ -2,18 +2,14 @@ import DashboardLayout from "@/components/generic/DashboardLayout"; // this is t
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
-// function delay(ms: number) {
-//   return new Promise((resolve) => setTimeout(resolve, ms));
-// }
-
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  //await delay(10000); // ⏳ artificial 3-second delay
-
   const session = await auth();
 
   if (!session) redirect("/auth/login");
 
-  const role = session.user.role as "RECRUITER" | "CANDIDATE";
+  // Fetch role from your DB if not already in session
+  const role = session.user.role; // or fetch from DB using session.user.email
+  
 
   return (
     <DashboardLayout role={role}>

@@ -120,6 +120,17 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  password: 'password',
+  role: 'role',
+  emailVerifiedAt: 'emailVerifiedAt',
+  emailVerified: 'emailVerified',
+  image: 'image'
+};
+
 exports.Prisma.AccountScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -142,15 +153,47 @@ exports.Prisma.SessionScalarFieldEnum = {
   expires: 'expires'
 };
 
-exports.Prisma.UserScalarFieldEnum = {
+exports.Prisma.VerificationTokenScalarFieldEnum = {
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires'
+};
+
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
   id: 'id',
-  name: 'name',
   email: 'email',
-  password: 'password',
-  role: 'role',
-  emailVerifiedAt: 'emailVerifiedAt',
-  emailVerified: 'emailVerified',
-  image: 'image'
+  token: 'token',
+  expires: 'expires',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RecruiterScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId'
+};
+
+exports.Prisma.JobScalarFieldEnum = {
+  id: 'id',
+  recruiterId: 'recruiterId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  expireAt: 'expireAt',
+  jobTitle: 'jobTitle',
+  companyName: 'companyName',
+  location: 'location',
+  salary: 'salary',
+  jobType: 'jobType',
+  description: 'description',
+  skillsRequired: 'skillsRequired',
+  interviewDuration: 'interviewDuration',
+  interviewInstruction: 'interviewInstruction',
+  tags: 'tags',
+  status: 'status',
+  industry: 'industry',
+  jobLevel: 'jobLevel',
+  experienceNeeded: 'experienceNeeded',
+  contact: 'contact',
+  shareLink: 'shareLink'
 };
 
 exports.Prisma.CandidateScalarFieldEnum = {
@@ -163,6 +206,15 @@ exports.Prisma.CandidateScalarFieldEnum = {
   resumeUrl: 'resumeUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobApplicationScalarFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  candidateId: 'candidateId',
+  createdAt: 'createdAt',
+  status: 'status',
+  feedback: 'feedback'
 };
 
 exports.Prisma.EducationScalarFieldEnum = {
@@ -189,20 +241,6 @@ exports.Prisma.SocialLinkScalarFieldEnum = {
   candidateId: 'candidateId'
 };
 
-exports.Prisma.VerificationTokenScalarFieldEnum = {
-  identifier: 'identifier',
-  token: 'token',
-  expires: 'expires'
-};
-
-exports.Prisma.PasswordResetTokenScalarFieldEnum = {
-  id: 'id',
-  email: 'email',
-  token: 'token',
-  expires: 'expires',
-  createdAt: 'createdAt'
-};
-
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -222,6 +260,31 @@ exports.Role = exports.$Enums.Role = {
   RECRUITER: 'RECRUITER'
 };
 
+exports.JobType = exports.$Enums.JobType = {
+  Remote: 'Remote',
+  Onside: 'Onside',
+  Hybrid: 'Hybrid'
+};
+
+exports.Status = exports.$Enums.Status = {
+  active: 'active',
+  close: 'close'
+};
+
+exports.JobLevel = exports.$Enums.JobLevel = {
+  INTERN: 'INTERN',
+  ENTRY: 'ENTRY',
+  MID: 'MID',
+  SENIOR: 'SENIOR',
+  LEAD: 'LEAD'
+};
+
+exports.ApplicationStatus = exports.$Enums.ApplicationStatus = {
+  Pending: 'Pending',
+  Accepted: 'Accepted',
+  Rejected: 'Rejected'
+};
+
 exports.SocialPlatform = exports.$Enums.SocialPlatform = {
   GITHUB: 'GITHUB',
   LINKEDIN: 'LINKEDIN',
@@ -231,15 +294,18 @@ exports.SocialPlatform = exports.$Enums.SocialPlatform = {
 };
 
 exports.Prisma.ModelName = {
+  User: 'User',
   Account: 'Account',
   Session: 'Session',
-  User: 'User',
+  VerificationToken: 'VerificationToken',
+  PasswordResetToken: 'PasswordResetToken',
+  Recruiter: 'Recruiter',
+  Job: 'Job',
   Candidate: 'Candidate',
+  JobApplication: 'JobApplication',
   Education: 'Education',
   Skill: 'Skill',
-  SocialLink: 'SocialLink',
-  VerificationToken: 'VerificationToken',
-  PasswordResetToken: 'PasswordResetToken'
+  SocialLink: 'SocialLink'
 };
 
 /**
