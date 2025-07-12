@@ -1,14 +1,20 @@
 "use client";
 import AdditionalInformationSection from "@/components/mini/job-form-sections/AdditionalInformationSection";
 import BasicInformationSection from "@/components/mini/job-form-sections/BasicInformationSection";
+import { InterviewDetailsSection } from "@/components/mini/job-form-sections/InterviewDetailsSection";
+import JobDescriptionSection from "@/components/mini/job-form-sections/JobDescriptionSection";
+import TagsSection from "@/components/mini/job-form-sections/TagsSection";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { JobFormData } from "@/zod/job";
-import { Briefcase } from "lucide-react";
+import { ArrowLeft, Briefcase, MoveLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
 const CreateJobForm = () => {
+  const router = useRouter()
   const [formData, setFormData] = useState<JobFormData>({
     jobTitle: "",
     companyName: "",
@@ -186,44 +192,93 @@ This is a ${formData.jobType.replace("_", " ").toLowerCase()} position offering 
   };
 
   return (
-    <div className="dark">
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-full mx-auto">
-          <Card className="bg-card/60 backdrop-blur-md border-border/20 shadow-2xl rounded-2xl">
-            <CardHeader className="p-6 border-b border-border/30">
-              <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
-                <Briefcase className="w-6 h-6 text-primary" />
-                Create Job Posting
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Fill in the details to create a new job posting
-              </p>
-            </CardHeader>
-            <CardContent className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Basic Information */}
-                <BasicInformationSection
-                  formData={formData}
-                  updateFormData={updateFormData}
-                  newSkill={newSkill}
-                  setNewSkill={setNewSkill}
-                  addSkill={addSkill}
-                  removeSkill={removeSkill}
-                />
-                <Separator className="bg-border/30" />
-                {/* Additional Information */}
-                <AdditionalInformationSection
-                  formData={formData}
-                  updateFormData={updateFormData}
-                />
-                <Separator className="bg-border/30" />
-                {/* Job Description */}
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+<div className="dark">
+  <div className="min-h-screen bg-background p-4">
+    <div className="max-w-full mx-auto">
+      <Card className="bg-card/60 backdrop-blur-md border-border/20 shadow-2xl rounded-2xl relative">
+        <ArrowLeft 
+        onClick={()=>router.push("/recruiter/dashboard/jobs")}
+        className="absolute top-4 left-4 w-6 h-6 text-muted-foreground cursor-pointer hover:text-foreground z-10 transition-colors" />
+        <CardHeader className="p-6 border-b border-border/30 pl-12">
+          <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Briefcase className="w-6 h-6 text-primary" />
+            Create Job Posting
+          </CardTitle>
+          <p className="text-muted-foreground">
+            Fill in the details to create a new job posting
+          </p>
+        </CardHeader>
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Basic Information */}
+            <BasicInformationSection
+              formData={formData}
+              updateFormData={updateFormData}
+              newSkill={newSkill}
+              setNewSkill={setNewSkill}
+              addSkill={addSkill}
+              removeSkill={removeSkill}
+            />
+            <Separator className="bg-border/30" />
+            {/* Additional Information */}
+            <AdditionalInformationSection
+              formData={formData}
+              updateFormData={updateFormData}
+            />
+            <Separator className="bg-border/30" />
+            {/* Job Description */}
+            <JobDescriptionSection
+              formData={formData}
+              updateFormData={updateFormData}
+              descriptionMode={descriptionMode}
+              setDescriptionMode={setDescriptionMode}
+              handleAIGenerate={handleAIGenerate}
+            />
+            <Separator className="bg-border/30" />
+            <TagsSection
+              formData={formData}
+              updateFormData={updateFormData}
+              newTag={newTag}
+              setNewTag={setNewTag}
+              addTag={addTag}
+              removeTag={removeTag}
+              handleAIGenerate={handleAIGenerate}
+            />
+            <Separator className="bg-border/30" />
+            {/* Interview Details */}
+            <InterviewDetailsSection
+              formData={formData}
+              updateFormData={updateFormData}
+              handleAIGenerate={handleAIGenerate}
+            />
+
+            <Separator className="bg-border/30" />
+            {/* Submit Button */}
+            <div className="flex justify-end pt-4">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="min-w-[160px] bg-primary hover:bg-primary/90"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Briefcase className="w-4 h-4 mr-2" />
+                    Create Job Post
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
+  </div>
+</div>
   );
 };
 

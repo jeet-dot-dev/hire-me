@@ -40,3 +40,17 @@
 
 ### Day 8 Recruiter Profile Page
 - [x] recruiter and job schema design
+
+### Day 9 Recruiter Profile Page
+- [x] Zod schema for job form 
+- [x] Reusable dashboard component
+- [x] Custom job form with reuseable components
+- [ ] make a separate backend for ai generation
+- [ ] write the backend for creating job form 
+- [ ] rewrite the form component for edit 
+- [ ] rewrite the backend for edit 
+- [ ] make a route for deleting job listings 
+- [ ] show the jobs to candidate
+- [ ] add filter and search 
+- [ ] add a wishlist btn to save the job form 
+- [ ] add custom editor to edit the job description

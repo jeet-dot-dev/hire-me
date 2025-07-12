@@ -6,6 +6,7 @@ import { LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
+
 const Navbar = () => {
   const { data: session, status } = useSession(); // auth state
   const router = useRouter();
@@ -52,6 +53,7 @@ const Navbar = () => {
           </div>
         )}
       </div>
+  
     </nav>
   );
 };
