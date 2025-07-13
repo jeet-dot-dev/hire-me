@@ -7,9 +7,9 @@
   //   "nodejs_compat"
   // ],
   "vars": {
-    "APP_URL": " http://localhost:3000 ",
-    "OPENAI_API_KEY": "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",
-    "GEMINI_API_KEY":"AIzaSyA7tK69Fggyymyx_LkIktdvabQ_AqWHibw"
+    "APP_URL": "",
+    "OPENAI_API_KEY": "",
+    "GEMINI_API_KEY":""
   }
   // "kv_namespaces": [
   //   {

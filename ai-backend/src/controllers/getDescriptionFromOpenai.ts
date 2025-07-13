@@ -51,6 +51,7 @@ const getDescriptionFromOpenai = async (c: Context) => {
 
     //const Rawresult = await callOpenAI(prompt, c.env.OPENAI_API_KEY);
     const Rawresult = await callGemini(prompt, c.env.GEMINI_API_KEY);
+    //console.log(c.env.GEMINI_API_KEY)
 
     const result = cleanMarkdownResponse(Rawresult);
 
@@ -65,5 +66,7 @@ const getDescriptionFromOpenai = async (c: Context) => {
     );
   }
 };
+
+
 
 export default getDescriptionFromOpenai;
