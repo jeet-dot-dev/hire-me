@@ -29,32 +29,6 @@ This project is part of my **#learnInPublic challenge** to build a major project
 | Emails       | Resend (for email verification + reset)|
 
 
- ### DB Diagram
 
-User
-├── 1️⃣1 Account
-├── 1️⃣1 Session
-├── 1️⃣1 Candidate (if role = CANDIDATE)
-└── 1️⃣1 Recruiter (if role = RECRUITER)
 
-Recruiter
-└── 1️⃣* Job
 
-Candidate
-├── 1️⃣* Education
-├── 1️⃣* Skill
-├── 1️⃣* SocialLink
-└── 1️⃣1 JobApplication
-
-Job
-└── 1️⃣1 JobApplication
-
-JobApplication
-├── 1️⃣1 Job
-└── 1️⃣1 Candidate
-
-VerificationToken
-└── Unique on (identifier, token)
-
-PasswordResetToken
-└── Unique on (email, token)
