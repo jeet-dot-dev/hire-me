@@ -7,6 +7,7 @@ const app = new Hono<{
   Bindings: {
     OPENAI_API_KEY: string;
     APP_URL: string;
+    GEMINI_API_KEY:string
   };
 }>();
 

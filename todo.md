@@ -45,7 +45,7 @@
 - [x] Zod schema for job form 
 - [x] Reusable dashboard component
 - [x] Custom job form with reuseable components
-- [ ] make a separate backend for ai generation
+- [x] make a separate backend for ai generation
 - [ ] write the backend for creating job form 
 - [ ] rewrite the form component for edit 
 - [ ] rewrite the backend for edit 
