@@ -44,8 +44,12 @@
 ### Day 9 Recruiter Profile Page
 - [x] Zod schema for job form 
 - [x] Reusable dashboard component
-- [x] Custom job form with reuseable components
+
+### Day 10 Job form ai logic 
 - [x] make a separate backend for ai generation
+
+
+- [ ] Custom job form with reuseable components
 - [ ] write the backend for creating job form 
 - [ ] rewrite the form component for edit 
 - [ ] rewrite the backend for edit 
