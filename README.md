@@ -9,7 +9,7 @@ This is a **monorepo** containing two apps:
 ### 1. Clone the repo
 
 ```bash
-git clone git@github.com:jeet-dot-dev/hire-me.git
+git clone https://github.com/jeet-dot-dev/hire-me.git
 cd hire-me
 
 
