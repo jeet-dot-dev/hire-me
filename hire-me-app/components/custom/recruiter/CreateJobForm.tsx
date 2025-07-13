@@ -36,9 +36,8 @@ const CreateJobForm = () => {
   const [newSkill, setNewSkill] = useState("");
   const [newTag, setNewTag] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [descriptionMode, setDescriptionMode] = useState<"edit" | "generate">(
-    "generate"
-  );
+  const [descriptionLoading , setDescriptionLoading] = useState(false);
+    const [tagsLoading , setTagsLoading] = useState(false);
 
   // clean obj
   const cleanObject = <T extends object>(obj: T): Partial<T> => {
@@ -124,16 +123,13 @@ const CreateJobForm = () => {
   };
 
   const handleAIGenerate = (
-    field: "description" | "interviewInstruction" | "tags"
+    field: "description" | "tags"
   ) => {
     if (field === "description") {
       generateDescription();
       return;
     } else if (field === "tags") {
       generateTags();
-      return;
-    } else if (field === "interviewInstruction") {
-      generateInterviewInstruction();
       return;
     }
 
@@ -169,6 +165,7 @@ const CreateJobForm = () => {
   
   // Optional: Set loading state for the description field
   updateFormData({ description: "Generating..." });
+  setDescriptionLoading(true)
 
   try {
     const res = await axios.post(
@@ -183,7 +180,7 @@ const CreateJobForm = () => {
       updateFormData({ 
         description: res.data.result 
       });
-      
+      setDescriptionLoading(false)
       toast.success("Job description generated successfully!");
     } else {
       throw new Error("No description received from AI");
@@ -205,9 +202,65 @@ const CreateJobForm = () => {
   }
 };
 
-  const generateTags = async () => {};
+const generateTags = async () => {
+  const isReady = isBasicInfo();
+  if (!isReady) {
+    toast.error("Please fill in basic job information first");
+    return;
+  }
 
-  const generateInterviewInstruction = async () => {};
+  const rawContext = {
+    jobTitle: formData.jobTitle,
+    companyName: formData.companyName,
+    location: formData.location,
+    salary: formData.salary,
+    jobType: formData.jobType,
+    skillsRequired: formData.skillsRequired,
+    expireAt: formData.expireAt,
+    industry: formData.industry,
+    jobLevel: formData.jobLevel,
+    experienceNeeded: formData.experienceNeeded,
+    contact: formData.contact,
+  };
+
+  const contextData = cleanObject(rawContext);
+
+  toast.success("Generating job tags...");
+  setTagsLoading(true);
+
+  try {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_AI_BACKEND_API}/api/v1/getTags`,
+      contextData
+    );
+
+    console.log("AI Response:", res.data);
+
+    if (res.data.result && Array.isArray(res.data.result)) {
+      updateFormData({ tags: res.data.result });
+      toast.success("Job tags generated successfully!");
+    } else {
+      throw new Error("Invalid tags format received from AI");
+    }
+
+  } catch (error) {
+    console.error("Error generating tags:", error);
+
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || error.message;
+      toast.error(`Failed to generate tags: ${errorMessage}`);
+    } else {
+      toast.error("Failed to generate job tags. Please try again.");
+    }
+    
+    // Optional: Set empty array as fallback
+    updateFormData({ tags: [] });
+  } finally {
+    setTagsLoading(false);
+  }
+};
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,9 +331,8 @@ const CreateJobForm = () => {
                 <JobDescriptionSection
                   formData={formData}
                   updateFormData={updateFormData}
-                  descriptionMode={descriptionMode}
-                  setDescriptionMode={setDescriptionMode}
                   handleAIGenerate={handleAIGenerate}
+                  descriptionLoading={descriptionLoading}
                 />
                 <Separator className="bg-border/30" />
                 <TagsSection
@@ -291,13 +343,14 @@ const CreateJobForm = () => {
                   addTag={addTag}
                   removeTag={removeTag}
                   handleAIGenerate={handleAIGenerate}
+                  tagsLoading={tagsLoading}
                 />
                 <Separator className="bg-border/30" />
                 {/* Interview Details */}
                 <InterviewDetailsSection
                   formData={formData}
                   updateFormData={updateFormData}
-                  handleAIGenerate={handleAIGenerate}
+  
                 />
 
                 <Separator className="bg-border/30" />
