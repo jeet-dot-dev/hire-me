@@ -2,13 +2,14 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "ai-backend",
   "main": "src/index.ts",
-  "compatibility_date": "2025-07-13"
+  "compatibility_date": "2025-07-13",
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
+  "vars": {
+    "APP_URL": " http://localhost:3000 ",
+    "OPENAI_API_KEY": "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"
+  }
   // "kv_namespaces": [
   //   {
   //     "binding": "MY_KV_NAMESPACE",

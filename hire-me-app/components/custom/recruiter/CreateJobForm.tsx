@@ -8,13 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { JobFormData } from "@/zod/job";
-import { ArrowLeft, Briefcase, MoveLeft } from "lucide-react";
+import axios from "axios";
+import { ArrowLeft, Briefcase } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
 const CreateJobForm = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [formData, setFormData] = useState<JobFormData>({
     jobTitle: "",
     companyName: "",
@@ -38,6 +39,19 @@ const CreateJobForm = () => {
   const [descriptionMode, setDescriptionMode] = useState<"edit" | "generate">(
     "generate"
   );
+
+  // clean obj
+  const cleanObject = <T extends object>(obj: T): Partial<T> => {
+    const cleaned = Object.fromEntries(
+      Object.entries(obj).filter(([_, value]) => {
+        if (Array.isArray(value)) return value.length > 0;
+        if (typeof value === "string") return value.trim().length > 0;
+        return value !== null && value !== undefined;
+      })
+    );
+
+    return cleaned as Partial<T>;
+  };
 
   // helper func
   const updateFormData = (updates: Partial<JobFormData>) => {
@@ -76,91 +90,124 @@ const CreateJobForm = () => {
     });
   };
 
-  const handleAIGenerate = (
-    field: "description" | "interviewInstruction" | "tags"
-  ) => {
-    if (field === "description") {
-      generateDescription();
-      return;
-    }
-
-    toast.success("AI generation for ${field} would be implemented here.");
-  };
-
-  const generateDescription = () => {
-    // Check if basic information is complete
+  // func to know is basic info is there or not
+  const isBasicInfo = () => {
     const basicInfoComplete =
       formData.jobTitle.trim() &&
       formData.companyName.trim() &&
       formData.location.trim() &&
       formData.skillsRequired.length > 0;
-
-    // Check if additional information has some data
     const additionalInfoHasData =
       formData.industry ||
       formData.jobLevel ||
       formData.experienceNeeded ||
-      formData.contact;
+      formData.contact || 
+      formData.salary;
 
     if (!basicInfoComplete) {
       toast.error(
         "Please fill in Job Title, Company Name, Location, and add at least one skill for better AI generation results."
       );
-      return;
+      return false;
     }
 
     if (!additionalInfoHasData) {
       toast.error(
         "For better results, please fill in additional information like Industry, Job Level, or Experience Needed."
       );
+      return false;
+    }
+
+    if (basicInfoComplete && additionalInfoHasData) {
+      return true;
+    }
+  };
+
+  const handleAIGenerate = (
+    field: "description" | "interviewInstruction" | "tags"
+  ) => {
+    if (field === "description") {
+      generateDescription();
+      return;
+    } else if (field === "tags") {
+      generateTags();
+      return;
+    } else if (field === "interviewInstruction") {
+      generateInterviewInstruction();
       return;
     }
 
-    // If all data is available, proceed with AI generation
-    const contextData = {
-      // Basic Information
-      jobTitle: formData.jobTitle,
-      companyName: formData.companyName,
-      location: formData.location,
-      salary: formData.salary,
-      jobType: formData.jobType,
-      skillsRequired: formData.skillsRequired,
-      expireAt: formData.expireAt,
+    toast.success("AI generation for ${field} would be implemented here.");
+  };
 
-      // Additional Information
-      industry: formData.industry,
-      jobLevel: formData.jobLevel,
-      experienceNeeded: formData.experienceNeeded,
-      contact: formData.contact,
-    };
+  const generateDescription = async () => {
+  const isReady = isBasicInfo();
+  if (!isReady) return;
 
-    // Here you would call your AI service with the contextData
-    console.log("Generating description with context:", contextData);
+  // Build raw context from form data
+  const rawContext = {
+    jobTitle: formData.jobTitle,
+    companyName: formData.companyName,
+    location: formData.location,
+    salary: formData.salary,
+    jobType: formData.jobType,
+    skillsRequired: formData.skillsRequired,
+    expireAt: formData.expireAt,
+    industry: formData.industry,
+    jobLevel: formData.jobLevel,
+    experienceNeeded: formData.experienceNeeded,
+    contact: formData.contact,
+  };
 
-    toast.success(
-      "AI is generating a job description based on your provided information..."
+  // ✅ Clean it using your reusable utility
+  const contextData = cleanObject(rawContext);
+
+  console.log("Generating description with context:", contextData);
+
+  // Show loading state
+  toast.success("Generating job description...");
+  
+  // Optional: Set loading state for the description field
+  updateFormData({ description: "Generating..." });
+
+  try {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_AI_BACKEND_API}/api/v1/getDescription`,
+      contextData
     );
 
-    // Simulate AI generation (replace with actual AI call)
-    setTimeout(() => {
-      const generatedDescription = `We are looking for a talented ${formData.jobTitle} to join our team at ${formData.companyName} in ${formData.location}. 
+    console.log("AI Response:", res.data);
 
-Key Requirements:
-${formData.skillsRequired.map((skill) => `• ${skill}`).join("\n")}
+    // ✅ Update the form with the generated description
+    if (res.data.result) {
+      updateFormData({ 
+        description: res.data.result 
+      });
+      
+      toast.success("Job description generated successfully!");
+    } else {
+      throw new Error("No description received from AI");
+    }
 
-${formData.experienceNeeded ? `Experience: ${formData.experienceNeeded}+ years` : ""}
-${formData.jobLevel ? `Level: ${formData.jobLevel}` : ""}
-${formData.industry ? `Industry: ${formData.industry}` : ""}
+  } catch (error) {
+    console.error("Error generating description:", error);
+    
+    // ✅ Clear the loading state and show error
+    updateFormData({ description: "" });
+    
+    // Better error handling
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.error || error.message;
+      toast.error(`Failed to generate description: ${errorMessage}`);
+    } else {
+      toast.error("Failed to generate job description. Please try again.");
+    }
+  }
+};
 
-This is a ${formData.jobType.replace("_", " ").toLowerCase()} position offering competitive compensation${formData.salary ? ` (${formData.salary})` : ""}.`;
+  const generateTags = async () => {};
 
-      updateFormData({ description: generatedDescription });
-
-      toast(
-        "AI has successfully generated a job description. You can edit it further if needed."
-      );
-    }, 2000);
-  };
+  const generateInterviewInstruction = async () => {};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,93 +239,94 @@ This is a ${formData.jobType.replace("_", " ").toLowerCase()} position offering 
   };
 
   return (
-<div className="dark">
-  <div className="min-h-screen bg-background p-4">
-    <div className="max-w-full mx-auto">
-      <Card className="bg-card/60 backdrop-blur-md border-border/20 shadow-2xl rounded-2xl relative">
-        <ArrowLeft 
-        onClick={()=>router.push("/recruiter/dashboard/jobs")}
-        className="absolute top-4 left-4 w-6 h-6 text-muted-foreground cursor-pointer hover:text-foreground z-10 transition-colors" />
-        <CardHeader className="p-6 border-b border-border/30 pl-12">
-          <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Briefcase className="w-6 h-6 text-primary" />
-            Create Job Posting
-          </CardTitle>
-          <p className="text-muted-foreground">
-            Fill in the details to create a new job posting
-          </p>
-        </CardHeader>
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Basic Information */}
-            <BasicInformationSection
-              formData={formData}
-              updateFormData={updateFormData}
-              newSkill={newSkill}
-              setNewSkill={setNewSkill}
-              addSkill={addSkill}
-              removeSkill={removeSkill}
+    <div className="dark">
+      <div className="min-h-screen bg-background p-4">
+        <div className="max-w-full mx-auto">
+          <Card className="bg-card/60 backdrop-blur-md border-border/20 shadow-2xl rounded-2xl relative">
+            <ArrowLeft
+              onClick={() => router.push("/recruiter/dashboard/jobs")}
+              className="absolute top-4 left-4 w-6 h-6 text-muted-foreground cursor-pointer hover:text-foreground z-10 transition-colors"
             />
-            <Separator className="bg-border/30" />
-            {/* Additional Information */}
-            <AdditionalInformationSection
-              formData={formData}
-              updateFormData={updateFormData}
-            />
-            <Separator className="bg-border/30" />
-            {/* Job Description */}
-            <JobDescriptionSection
-              formData={formData}
-              updateFormData={updateFormData}
-              descriptionMode={descriptionMode}
-              setDescriptionMode={setDescriptionMode}
-              handleAIGenerate={handleAIGenerate}
-            />
-            <Separator className="bg-border/30" />
-            <TagsSection
-              formData={formData}
-              updateFormData={updateFormData}
-              newTag={newTag}
-              setNewTag={setNewTag}
-              addTag={addTag}
-              removeTag={removeTag}
-              handleAIGenerate={handleAIGenerate}
-            />
-            <Separator className="bg-border/30" />
-            {/* Interview Details */}
-            <InterviewDetailsSection
-              formData={formData}
-              updateFormData={updateFormData}
-              handleAIGenerate={handleAIGenerate}
-            />
+            <CardHeader className="p-6 border-b border-border/30 pl-12">
+              <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+                <Briefcase className="w-6 h-6 text-primary" />
+                Create Job Posting
+              </CardTitle>
+              <p className="text-muted-foreground">
+                Fill in the details to create a new job posting
+              </p>
+            </CardHeader>
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Basic Information */}
+                <BasicInformationSection
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  newSkill={newSkill}
+                  setNewSkill={setNewSkill}
+                  addSkill={addSkill}
+                  removeSkill={removeSkill}
+                />
+                <Separator className="bg-border/30" />
+                {/* Additional Information */}
+                <AdditionalInformationSection
+                  formData={formData}
+                  updateFormData={updateFormData}
+                />
+                <Separator className="bg-border/30" />
+                {/* Job Description */}
+                <JobDescriptionSection
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  descriptionMode={descriptionMode}
+                  setDescriptionMode={setDescriptionMode}
+                  handleAIGenerate={handleAIGenerate}
+                />
+                <Separator className="bg-border/30" />
+                <TagsSection
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  newTag={newTag}
+                  setNewTag={setNewTag}
+                  addTag={addTag}
+                  removeTag={removeTag}
+                  handleAIGenerate={handleAIGenerate}
+                />
+                <Separator className="bg-border/30" />
+                {/* Interview Details */}
+                <InterviewDetailsSection
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  handleAIGenerate={handleAIGenerate}
+                />
 
-            <Separator className="bg-border/30" />
-            {/* Submit Button */}
-            <div className="flex justify-end pt-4">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="min-w-[160px] bg-primary hover:bg-primary/90"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    Create Job Post
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+                <Separator className="bg-border/30" />
+                {/* Submit Button */}
+                <div className="flex justify-end pt-4">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="min-w-[160px] bg-primary hover:bg-primary/90"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Briefcase className="w-4 h-4 mr-2" />
+                        Create Job Post
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   );
 };
 
