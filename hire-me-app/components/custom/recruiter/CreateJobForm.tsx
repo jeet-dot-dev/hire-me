@@ -181,7 +181,7 @@ const CreateJobForm = () => {
         setDescriptionLoading(false);
         toast.success("Job description generated successfully!");
       } else {
-        throw new Error("No description received from AI");
+        toast.error("Error generating description! try again later");
       }
     } catch (error) {
       console.error("Error generating description:", error);
@@ -232,7 +232,7 @@ const CreateJobForm = () => {
       );
 
       console.log("AI Response:", res.data);
-      router.push("/recruiter/dashboard/jobs");
+      
 
       if (res.data.result && Array.isArray(res.data.result)) {
         updateFormData({ tags: res.data.result });
@@ -257,33 +257,50 @@ const CreateJobForm = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (
-      !formData.jobTitle.trim() ||
-      !formData.companyName.trim() ||
-      !formData.location.trim()
-    ) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
+  if (!formData.jobTitle.trim()) {
+    toast.error("Please enter a job title.");
+    return;
+  }
 
-    setIsSubmitting(true);
+  if (!formData.companyName.trim()) {
+    toast.error("Please enter a company name.");
+    return;
+  }
 
-    try {
-      await axios.post("/api/recruiter/job/create", formData);
+  if (!formData.location.trim()) {
+    toast.error("Please enter a location.");
+    return;
+  }
 
-      toast.success("Your job posting has been created and is now live.");
+  if (!formData.description.trim()) {
+    toast.error("Please enter a job description.");
+    return;
+  }
 
-      console.log("Job posted:", formData);
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to create job posting. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  if (formData.tags.length < 1) {
+    toast.error("Please add at least one tag.");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    await axios.post("/api/recruiter/job/create", formData);
+    toast.success("Your job posting has been created and is now live.");
+    router.push("/recruiter/dashboard/jobs");
+    
+    //console.log("Job posted:", formData);
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to create job posting. Please try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="dark">

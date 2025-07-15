@@ -145,6 +145,7 @@ model Job {
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
   expireAt           DateTime?
+  isDelete           Boolean    @default(false)
 
   // Job details
   jobTitle           String     @db.VarChar(100)

@@ -4,11 +4,11 @@ import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { Plus } from "lucide-react";
-import { JobFormData } from "@/zod/job";
+import {  JobFormDataUI } from "@/zod/job";
 import JobCard from "@/components/generic/job/JobCard";
 
 export type RecruiterJobCompProp = {
-   jobs : JobFormData[] ,
+   jobs : JobFormDataUI[] ,
    role : "RECRUITER" | "CANDIDATE"
 }
 

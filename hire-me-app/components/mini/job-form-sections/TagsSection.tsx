@@ -30,8 +30,7 @@ const TagsSection = ({
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
         <Tag className="w-5 h-5 text-primary" />
-        Tags
-      </h3>
+        Tags* <p className="text-sm text-white/50">(Add atleast one tag)</p>      </h3>
 
       <div className="space-y-4">
         <div className="flex gap-2">
