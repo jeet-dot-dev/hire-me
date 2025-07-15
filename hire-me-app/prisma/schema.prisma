@@ -23,14 +23,11 @@ enum Role {
 
 enum JobType {
   Remote
-  Onside
+  Onsite
   Hybrid
 }
 
-enum Status {
-  active
-  close
-}
+
 
 enum JobLevel {
   INTERN
@@ -160,7 +157,7 @@ model Job {
   interviewDuration  Int
   interviewInstruction String?
   tags               String[]
-  status             Status
+  status             Boolean @default(true)
   industry           String?
   jobLevel           JobLevel?
   experienceNeeded   Int?

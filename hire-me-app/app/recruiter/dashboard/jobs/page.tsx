@@ -1,12 +1,33 @@
-import RecruiterJobComp from '@/components/custom/recruiter/RecruiterJobComp'
-import React from 'react'
+import RecruiterJobComp from "@/components/custom/recruiter/RecruiterJobComp";
+import React from "react";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-const page = () => {
+const page = async () => {
+  const session = await auth();
+
+  if (!session?.user) {
+    return redirect("/auth/login");
+  }
+
+  const { id: userId, role } = session.user;
+  const recruiter = await prisma.recruiter.findUnique({ where: { userId } });
+
+  if (!recruiter) {
+    return <div className="text-red-500 text-center mt-10">Recruiter profile not found.</div>;
+  }
+
+  const jobs = await prisma.job.findMany({
+    where: { recruiterId: recruiter.id },
+    take: 10,
+  });
+
   return (
     <div>
-      <RecruiterJobComp/> 
+      <RecruiterJobComp jobs={jobs} role={role} />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

@@ -31,10 +31,9 @@ interface BasicInformationSectionProps {
   removeSkill: (skill: string) => void;
 }
 enum JobType {
-  FULL_TIME = "FULL_TIME",
-  PART_TIME = "PART_TIME",
-  REMOTE = "REMOTE",
-  INTERNSHIP = "INTERNSHIP",
+  Remote = "Remote",
+  Onsite = "Onsite",
+  Hybrid = "Hybrid",
 }
 
 const BasicInformationSection = ({
@@ -123,9 +122,9 @@ const BasicInformationSection = ({
             className="bg-background/60 border-border/40 text-foreground"
           />
         </div>
-        {/* Jobe Type  */}
+        {/* Job Type  */}
         <div className="space-y-2">
-          <Label className="text-foreground">Jobe Type *</Label>
+          <Label className="text-foreground">Job Type *</Label>
           <Select
             value={formData.jobType}
             onValueChange={(value) =>
@@ -136,10 +135,9 @@ const BasicInformationSection = ({
               <SelectValue placeholder="Select job type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={JobType.FULL_TIME}>Full Time </SelectItem>
-              <SelectItem value={JobType.PART_TIME}>Part Time</SelectItem>
-              <SelectItem value={JobType.REMOTE}>Remote</SelectItem>
-              <SelectItem value={JobType.INTERNSHIP}>Internship</SelectItem>
+              <SelectItem value={JobType.Hybrid}>Hybrid</SelectItem>
+              <SelectItem value={JobType.Onsite}>Onsite</SelectItem>
+              <SelectItem value={JobType.Remote}>Remote</SelectItem>
             </SelectContent>
           </Select>
         </div>

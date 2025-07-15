@@ -48,9 +48,9 @@
 ### Day 10 Job form ai logic 
 - [x] make a separate backend for ai generation
 
-
+### Day 11 Job Backend
 - [ ] Custom job form with reuseable components
-- [ ] write the backend for creating job form 
+- [X] write the backend for creating job form 
 - [ ] rewrite the form component for edit 
 - [ ] rewrite the backend for edit 
 - [ ] make a route for deleting job listings 

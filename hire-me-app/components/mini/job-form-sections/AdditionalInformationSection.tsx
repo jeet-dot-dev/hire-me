@@ -12,9 +12,11 @@ interface AdditionalInformationSectionProps {
 }
 
 export enum JobLevel {
-  JUNIOR = 'JUNIOR',
+  INTERN = 'INTERN',
+  ENTRY = 'ENTRY',
   MID = 'MID',
-  SENIOR = 'SENIOR'
+  SENIOR = 'SENIOR',
+  LEAD = 'LEAD'
 }
 
 const AdditionalInformationSection = ({formData,
@@ -51,9 +53,11 @@ const AdditionalInformationSection = ({formData,
               <SelectValue placeholder="Select job level" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={JobLevel.JUNIOR}>Junior</SelectItem>
+              <SelectItem value={JobLevel.INTERN}>Intern</SelectItem>
+              <SelectItem value={JobLevel.ENTRY}>Entry Level</SelectItem>
               <SelectItem value={JobLevel.MID}>Mid Level</SelectItem>
               <SelectItem value={JobLevel.SENIOR}>Senior</SelectItem>
+              <SelectItem value={JobLevel.LEAD}>Lead</SelectItem>
             </SelectContent>
           </Select>
         </div>

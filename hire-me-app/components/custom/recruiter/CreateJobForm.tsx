@@ -21,14 +21,14 @@ const CreateJobForm = () => {
     companyName: "",
     location: "",
     salary: "",
-    jobType: "FULL_TIME",
+    jobType: "Remote",
     description: "",
     skillsRequired: [],
     interviewDuration: 10,
     interviewInstruction: "",
     tags: [],
     industry: "",
-    jobLevel: "JUNIOR",
+    jobLevel: "INTERN",
     experienceNeeded: undefined,
     contact: "",
     expireAt: undefined,
@@ -36,8 +36,8 @@ const CreateJobForm = () => {
   const [newSkill, setNewSkill] = useState("");
   const [newTag, setNewTag] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [descriptionLoading , setDescriptionLoading] = useState(false);
-    const [tagsLoading , setTagsLoading] = useState(false);
+  const [descriptionLoading, setDescriptionLoading] = useState(false);
+  const [tagsLoading, setTagsLoading] = useState(false);
 
   // clean obj
   const cleanObject = <T extends object>(obj: T): Partial<T> => {
@@ -100,7 +100,7 @@ const CreateJobForm = () => {
       formData.industry ||
       formData.jobLevel ||
       formData.experienceNeeded ||
-      formData.contact || 
+      formData.contact ||
       formData.salary;
 
     if (!basicInfoComplete) {
@@ -122,9 +122,7 @@ const CreateJobForm = () => {
     }
   };
 
-  const handleAIGenerate = (
-    field: "description" | "tags"
-  ) => {
+  const handleAIGenerate = (field: "description" | "tags") => {
     if (field === "description") {
       generateDescription();
       return;
@@ -137,130 +135,127 @@ const CreateJobForm = () => {
   };
 
   const generateDescription = async () => {
-  const isReady = isBasicInfo();
-  if (!isReady) return;
+    const isReady = isBasicInfo();
+    if (!isReady) return;
 
-  // Build raw context from form data
-  const rawContext = {
-    jobTitle: formData.jobTitle,
-    companyName: formData.companyName,
-    location: formData.location,
-    salary: formData.salary,
-    jobType: formData.jobType,
-    skillsRequired: formData.skillsRequired,
-    expireAt: formData.expireAt,
-    industry: formData.industry,
-    jobLevel: formData.jobLevel,
-    experienceNeeded: formData.experienceNeeded,
-    contact: formData.contact,
+    // Build raw context from form data
+    const rawContext = {
+      jobTitle: formData.jobTitle,
+      companyName: formData.companyName,
+      location: formData.location,
+      salary: formData.salary,
+      jobType: formData.jobType,
+      skillsRequired: formData.skillsRequired,
+      expireAt: formData.expireAt,
+      industry: formData.industry,
+      jobLevel: formData.jobLevel,
+      experienceNeeded: formData.experienceNeeded,
+      contact: formData.contact,
+    };
+
+    // ✅ Clean it using your reusable utility
+    const contextData = cleanObject(rawContext);
+
+    console.log("Generating description with context:", contextData);
+
+   
+    
+
+    // Optional: Set loading state for the description field
+    updateFormData({ description: "Generating..." });
+    setDescriptionLoading(true);
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_AI_BACKEND_API}/api/v1/getDescription`,
+        contextData
+      );
+
+      console.log("AI Response:", res.data);
+
+      // ✅ Update the form with the generated description
+      if (res.data.result) {
+        updateFormData({
+          description: res.data.result,
+        });
+        setDescriptionLoading(false);
+        toast.success("Job description generated successfully!");
+      } else {
+        throw new Error("No description received from AI");
+      }
+    } catch (error) {
+      console.error("Error generating description:", error);
+
+      // ✅ Clear the loading state and show error
+      updateFormData({ description: "" });
+
+      // Better error handling
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.error || error.message;
+        toast.error(`Failed to generate description: ${errorMessage}`);
+      } else {
+        toast.error("Failed to generate job description. Please try again.");
+      }
+    }
   };
 
-  // ✅ Clean it using your reusable utility
-  const contextData = cleanObject(rawContext);
-
-  console.log("Generating description with context:", contextData);
-
-  // Show loading state
-  toast.success("Generating job description...");
-  
-  // Optional: Set loading state for the description field
-  updateFormData({ description: "Generating..." });
-  setDescriptionLoading(true)
-
-  try {
-    const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_AI_BACKEND_API}/api/v1/getDescription`,
-      contextData
-    );
-
-    console.log("AI Response:", res.data);
-
-    // ✅ Update the form with the generated description
-    if (res.data.result) {
-      updateFormData({ 
-        description: res.data.result 
-      });
-      setDescriptionLoading(false)
-      toast.success("Job description generated successfully!");
-    } else {
-      throw new Error("No description received from AI");
+  const generateTags = async () => {
+    const isReady = isBasicInfo();
+    if (!isReady) {
+      toast.error("Please fill in basic job information first");
+      return;
     }
 
-  } catch (error) {
-    console.error("Error generating description:", error);
-    
-    // ✅ Clear the loading state and show error
-    updateFormData({ description: "" });
-    
-    // Better error handling
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.error || error.message;
-      toast.error(`Failed to generate description: ${errorMessage}`);
-    } else {
-      toast.error("Failed to generate job description. Please try again.");
+    const rawContext = {
+      jobTitle: formData.jobTitle,
+      companyName: formData.companyName,
+      location: formData.location,
+      salary: formData.salary,
+      jobType: formData.jobType,
+      skillsRequired: formData.skillsRequired,
+      expireAt: formData.expireAt,
+      industry: formData.industry,
+      jobLevel: formData.jobLevel,
+      experienceNeeded: formData.experienceNeeded,
+      contact: formData.contact,
+    };
+
+    const contextData = cleanObject(rawContext);
+
+   
+    setTagsLoading(true);
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_AI_BACKEND_API}/api/v1/getTags`,
+        contextData
+      );
+
+      console.log("AI Response:", res.data);
+      router.push("/recruiter/dashboard/jobs");
+
+      if (res.data.result && Array.isArray(res.data.result)) {
+        updateFormData({ tags: res.data.result });
+        toast.success("Job tags generated successfully!");
+      } else {
+        throw new Error("Invalid tags format received from AI");
+      }
+    } catch (error) {
+      console.error("Error generating tags:", error);
+
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.error || error.message;
+        toast.error(`Failed to generate tags: ${errorMessage}`);
+      } else {
+        toast.error("Failed to generate job tags. Please try again.");
+      }
+
+      // Optional: Set empty array as fallback
+      updateFormData({ tags: [] });
+    } finally {
+      setTagsLoading(false);
     }
-  }
-};
-
-const generateTags = async () => {
-  const isReady = isBasicInfo();
-  if (!isReady) {
-    toast.error("Please fill in basic job information first");
-    return;
-  }
-
-  const rawContext = {
-    jobTitle: formData.jobTitle,
-    companyName: formData.companyName,
-    location: formData.location,
-    salary: formData.salary,
-    jobType: formData.jobType,
-    skillsRequired: formData.skillsRequired,
-    expireAt: formData.expireAt,
-    industry: formData.industry,
-    jobLevel: formData.jobLevel,
-    experienceNeeded: formData.experienceNeeded,
-    contact: formData.contact,
   };
-
-  const contextData = cleanObject(rawContext);
-
-  toast.success("Generating job tags...");
-  setTagsLoading(true);
-
-  try {
-    const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_AI_BACKEND_API}/api/v1/getTags`,
-      contextData
-    );
-
-    console.log("AI Response:", res.data);
-
-    if (res.data.result && Array.isArray(res.data.result)) {
-      updateFormData({ tags: res.data.result });
-      toast.success("Job tags generated successfully!");
-    } else {
-      throw new Error("Invalid tags format received from AI");
-    }
-
-  } catch (error) {
-    console.error("Error generating tags:", error);
-
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.error || error.message;
-      toast.error(`Failed to generate tags: ${errorMessage}`);
-    } else {
-      toast.error("Failed to generate job tags. Please try again.");
-    }
-    
-    // Optional: Set empty array as fallback
-    updateFormData({ tags: [] });
-  } finally {
-    setTagsLoading(false);
-  }
-};
-
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -277,8 +272,7 @@ const generateTags = async () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await axios.post("/api/recruiter/job/create", formData);
 
       toast.success("Your job posting has been created and is now live.");
 
@@ -350,7 +344,6 @@ const generateTags = async () => {
                 <InterviewDetailsSection
                   formData={formData}
                   updateFormData={updateFormData}
-  
                 />
 
                 <Separator className="bg-border/30" />
