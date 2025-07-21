@@ -17,7 +17,11 @@ const RecruiterJobComp = ({jobs,role}:RecruiterJobCompProp) => {
   const router = useRouter();
   return (
     <div>
-      <div className="flex justify-end items-center w-full p-4">
+      <div className="flex justify-between items-center w-full p-4">
+       <div>
+         <h2 className="text-3xl font-semibold text-gray-100 font-mono">Job Listings</h2>
+        <p className="text-lg text-muted-foreground font-mono">Manage your Job Listings here </p>
+       </div>
         <Button
           variant={"outline"}
           size={"lg"}

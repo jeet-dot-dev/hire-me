@@ -4,6 +4,30 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Scrollbar customization */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #1f1f1f transparent;
+  
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  cursor: pointer;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #1f1f1f;
+  border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  
+}
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
