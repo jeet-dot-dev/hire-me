@@ -27,7 +27,7 @@ const page = async () => {
     recruiterId: recruiter.id,
     isDelete: false,
   },
-  take: 10,
+  take: 12,
   orderBy: {
     createdAt: "desc",
   },

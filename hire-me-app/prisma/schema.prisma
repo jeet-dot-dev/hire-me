@@ -191,6 +191,8 @@ model Candidate {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  wishListedJobs String[]
+
   JobApplication JobApplication?
 }
 

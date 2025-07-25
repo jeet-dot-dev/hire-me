@@ -2,7 +2,7 @@
 "use client";
 
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import { Search, FileUser } from "lucide-react";
+import { Search, FileUser, Bookmark } from "lucide-react";
 import {
   IconArrowLeft,
   IconBrandTabler,  
@@ -30,8 +30,9 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
  const candidateLinks = [
     { label: "Dashboard", href: "/candidate/dashboard", icon: <IconBrandTabler className="h-5 w-5" /> },
     { label: "Profile", href: "/candidate/dashboard/profile", icon: <IconUserBolt className="h-5 w-5" /> },
-    { label: "Jobs", href: "/candidate/dashboard/jobs", icon: <Search className="h-5 w-5" /> },
-    { label: "My Application", href: "/candidate/dashboard/application", icon: <FileUser className="h-5 w-5" /> },
+    { label: "Open Roles", href: "/candidate/dashboard/jobs", icon: <Search className="h-5 w-5" /> },
+    { label: "My Journey", href: "/candidate/dashboard/application", icon: <FileUser className="h-5 w-5" /> },
+     { label: "My Picks", href: "/candidate/dashboard/wishlist", icon: <Bookmark className="h-5 w-5" /> },
   ];
 
     const recruiterLinks = [
@@ -49,13 +50,13 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
               <a href="#" className="text-white font-bold text-xl mb-4">Hire-me</a>
               <div className="flex flex-col gap-2">
                 {links.map((link, idx) => (
-                  <SidebarLink key={idx} link={link} />
+                  <SidebarLink key={idx} link={link} className="text-muted-foreground" />
                 ))}
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-neutral-800"
+                  className="flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer text-white hover:text-muted-foreground"
                 >
-                  <IconArrowLeft className="h-5 w-5" />
+                  <IconArrowLeft className="h-5 w-5 hover:text-muted-foreground" />
                   Logout
                 </button>
               </div>

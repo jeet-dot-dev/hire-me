@@ -39,6 +39,7 @@ import { useRouter } from "next/navigation";
 const JobCard = ({ jobs, role }: RecruiterJobCompProp) => {
   const [isList, setIsList] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
   const filterOptions = [
     {
       label: "None",
@@ -190,62 +191,63 @@ const handleRefresh = async () => {
               : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
           }
         >
-          {isList && (
-            <div className="w-full">
-              {/* Horizontal scroll container */}
-              <div className="overflow-x-auto border border-gray-700/50 rounded-lg bg-black/30 backdrop-blur-sm custom-scrollbar">
-                <div className="min-w-[1200px]">
-                  {" "}
-                  {/* Minimum width to ensure all columns are visible */}
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-gray-700/50 hover:bg-transparent ">
-                        <TableHead className="text-gray-200 text-left font-semibold min-w-[200px] ml-2">
-                          Job Title
-                        </TableHead>
-                        <TableHead className="text-gray-200 font-semibold min-w-[150px]">
-                          Company
-                        </TableHead>
-                        <TableHead className="text-gray-200 font-semibold min-w-[150px]">
-                          Location
-                        </TableHead>
-                        <TableHead className="text-gray-200 font-semibold min-w-[100px] ">
-                          Level
-                        </TableHead>
-                        <TableHead className="text-gray-200 font-semibold min-w-[100px]">
-                          Type
-                        </TableHead>
-                        <TableHead className="text-gray-200 font-semibold text-center min-w-[120px]">
-                          Expire Date
-                        </TableHead>
-                        <TableHead className="text-gray-200 font-semibold min-w-[100px]">
-                          Status
-                        </TableHead>
-                        <TableHead className="text-gray-200 font-semibold text-center min-w-[200px]">
-                          Actions
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {jobData.map((job, index) => (
-                        <JobCardUi
-                          key={job.id || index}
-                          job={job}
-                          role={userRole}
-                          styleType={isList}
-                        />
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
+      {isList && (
+  <div className="w-full">
+    <div className="border border-gray-700/50 rounded-lg bg-black/30 backdrop-blur-sm">
+      {/* Scrollable table container with max height */}
+      <div className="max-h-[600px] overflow-y-auto overflow-x-auto custom-scrollbar">
+        <div className="min-w-[1200px]">
+          <Table>
+            <TableHeader className="sticky top-0 bg-black/30 backdrop-blur-sm z-10">
+              <TableRow className="border-gray-700/50 hover:bg-transparent">
+                <TableHead className="text-gray-200 text-left font-semibold min-w-[200px] ml-2">
+                  Job Title
+                </TableHead>
+                <TableHead className="text-gray-200 font-semibold min-w-[150px]">
+                  Company
+                </TableHead>
+                <TableHead className="text-gray-200 font-semibold min-w-[150px]">
+                  Location
+                </TableHead>
+                <TableHead className="text-gray-200 font-semibold min-w-[100px]">
+                  Level
+                </TableHead>
+                <TableHead className="text-gray-200 font-semibold min-w-[100px]">
+                  Type
+                </TableHead>
+                <TableHead className="text-gray-200 font-semibold text-center min-w-[120px]">
+                  Expire Date
+                </TableHead>
+                <TableHead className="text-gray-200 font-semibold min-w-[100px]">
+                  Status
+                </TableHead>
+                <TableHead className="text-gray-200 font-semibold text-center min-w-[200px]">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {jobData.map((job, index) => (
+                <JobCardUi
+                  key={job.id || index}
+                  job={job}
+                  role={userRole}
+                  styleType={isList}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    </div>
 
-              {/* Scroll hint for small screens */}
-              <p className="text-xs text-gray-400 mt-2 text-center lg:hidden">
-                ← Scroll horizontally to view all columns →
-              </p>
-            </div>
-          )}
+    {/* Scroll hint for small screens */}
+    <p className="text-xs text-gray-400 mt-2 text-center lg:hidden">
+      ← Scroll horizontally to view all columns →
+    </p>
+  </div>
+)}
+
 
           {!isList &&
             jobData.map((job, index) => (

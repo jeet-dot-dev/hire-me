@@ -38,7 +38,8 @@ export const jobSchemaUI = z.object({
   contact: z.string().optional().nullable(),
   expireAt: z.coerce.date().optional().nullable(),
   status : z.boolean().default(true).optional(),
-   createdAt: z.coerce.date()
+  isDelete : z.boolean().default(false).optional(),
+  createdAt: z.coerce.date()
 });
 
 

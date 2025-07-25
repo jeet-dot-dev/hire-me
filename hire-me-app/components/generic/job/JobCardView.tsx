@@ -54,13 +54,40 @@ const JobCardView = ({
   handleWishlist,
 }: Props) => {
   return (
-    <div className="w-full">
-      <Card className="bg-[#0f0f0f] backdrop-blur-3xl border border-gray-800/50 hover:border-gray-700/50 transition-all duration-300 group hover:bg-black/10">
+    <div className="w-full relative">
+      <Card
+        className={`bg-[#0f0f0f] backdrop-blur-3xl border ${
+          !job.status || job.isDelete
+            ? "opacity-50 grayscale"
+            : "border-gray-800/50 hover:border-gray-700/50"
+        } transition-all duration-300 group hover:bg-black/10`}
+      >
+        {/* Status Overlay */}
+        {(!job.status || job.isDelete) && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-lg z-10">
+            <div className="text-center">
+              <Badge
+                variant={job.isDelete ? "destructive" : "secondary"}
+                className="text-sm px-4 py-2 font-medium"
+              >
+                {job.isDelete ? "Expired" : "Currently Unavailable"}
+              </Badge>
+            </div>
+          </div>
+        )}
+
         <CardHeader className="flex justify-between items-start max-h-[100px]">
           <CardTitle className="flex justify-start items-start flex-col gap-2">
-            <p className="text-lg font-semibold">{job.jobTitle}</p>
+            <p className="text-lg font-semibold truncate">
+              {job.jobTitle.length > 15
+                ? job.jobTitle.slice(0, 15) + "..."
+                : job.jobTitle}
+            </p>
+
             <p className="text-muted-foreground text-sm truncate">
-              {job.companyName} Pvt.Lim
+              {job.companyName.length > 20
+                ? job.companyName.slice(0, 20) + "..."
+                : job.companyName}
             </p>
           </CardTitle>
 
@@ -96,10 +123,10 @@ const JobCardView = ({
               </DropdownMenu>
             </div>
           ) : (
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center z-20 relative">
               {isWishlisted ? (
                 <BookmarkCheck
-                  className="w-5 h-5 text-yellow-400 cursor-pointer"
+                  className="w-5 h-5  cursor-pointer"
                   onClick={handleWishlist}
                 />
               ) : (
@@ -116,8 +143,13 @@ const JobCardView = ({
         <CardContent className="flex flex-col justify-center items-start gap-2">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm truncate">
-              {job.location}, {job.jobType}
+            <span
+              className="text-sm truncate"
+              title={`${job.location}, ${job.jobType}`}
+            >
+              {`${job.location}, ${job.jobType}`.length > 30
+                ? `${job.location}, ${job.jobType}`.slice(0, 30) + "..."
+                : `${job.location}, ${job.jobType}`}
             </span>
           </div>
 
@@ -132,17 +164,38 @@ const JobCardView = ({
               </div>
             )}
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm">{job.salary || "N/A"}</span>
+              {/* <DollarSign className="w-4 h-4 text-muted-foreground" /> */}
+              <span className="text-muted-foreground">sal :</span>
+              <span className="text-sm truncate" title={job.salary || "N/A"}>
+                {(job.salary || "N/A").length > 20
+                  ? (job.salary || "N/A").slice(0, 20) + "..."
+                  : job.salary || "N/A"}
+              </span>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-1 pt-2">
-            {job.skillsRequired.slice(0, 4).map((skill, index) => (
-              <Badge variant="secondary" key={index}>
-                {skill.charAt(0).toUpperCase() + skill.slice(1)}
-              </Badge>
-            ))}
+            {job.skillsRequired.slice(0, 2).map((skill, index) => {
+              const capitalizedSkill =
+                skill.charAt(0).toUpperCase() + skill.slice(1);
+              const displaySkill =
+                capitalizedSkill.length > 10
+                  ? capitalizedSkill.slice(0, 10) + "..."
+                  : capitalizedSkill;
+
+              return (
+                <Badge
+                  variant="secondary"
+                  key={index}
+                  className="max-w-[100px] truncate text-ellipsis whitespace-nowrap"
+                  title={capitalizedSkill}
+                >
+                  {displaySkill}
+                </Badge>
+              );
+            })}
+
+            <p className="text-muted-foreground">...</p>
           </div>
         </CardContent>
 
@@ -172,10 +225,14 @@ const JobCardView = ({
           )}
 
           <div className="btns flex justify-end items-center gap-2">
-            <Button className="cursor-pointer">
+            <Button
+              disabled={!job.status || job.isDelete}
+              className="cursor-pointer"
+            >
               <Eye />
               <span>View</span>
             </Button>
+
             <Button variant="outline" className="cursor-pointer">
               {role === "CANDIDATE" ? (
                 "Apply"

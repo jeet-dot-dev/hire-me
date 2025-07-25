@@ -3,11 +3,9 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import CandidateJobComp from "@/components/custom/Candidate/jobs/CandidateJobComp";
-import { Select } from "@radix-ui/react-select";
 
 const page = async () => {
   const session = await auth();
-
   if (!session?.user) return redirect("/auth/login");
 
   const { id: userId, role } = session.user;
@@ -24,95 +22,71 @@ const page = async () => {
     );
   }
 
- const skills = await prisma.skill.findMany({
-  where : {candidateId : candidate.id},
-  select : {
-    name : true 
-  }
+  // Get skills as string array
+  const skills = await prisma.skill.findMany({
+    where: { candidateId: candidate.id },
+    select: { name: true },
+  });
+  const skillString = skills.map((skill) => skill.name);
 
-}) ;
-
-const skillString = skills.map((skill)=>skill.name)
-
- 
+  // Shared select structure
+ const jobSelect = {
+    id: true,
+    jobTitle: true,
+    companyName: true,
+    location: true,
+    salary: true,
+    jobType: true,
+    description: true,
+    skillsRequired: true,
+    interviewDuration: true,
+    interviewInstruction: true,
+    tags: true,
+    industry: true,
+    jobLevel: true,
+    experienceNeeded: true,
+    contact: true,
+    expireAt: true,
+    createdAt: true,
+    updatedAt: true,
+    status: true,
+      isDelete:true
+  };
 
   // 1. All Jobs
   const jobs = await prisma.job.findMany({
-    where: { isDelete: false ,  status: true },
-    take: 10,
+    where: { isDelete: false, status: true },
     orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      jobTitle: true,
-      companyName: true,
-      location: true,
-      salary: true,
-      jobType: true,
-      description: true,
-      skillsRequired: true,
-      interviewDuration: true,
-      interviewInstruction: true,
-      tags: true,
-      industry: true,
-      jobLevel: true,
-      experienceNeeded: true,
-      contact: true,
-      expireAt: true,
-      createdAt: true,
-      updatedAt: true,
-      status: true,
-    },
+    take: 12,
+    select: jobSelect,
   });
 
-  // 2. Recommended Jobs (matching candidate skills)
+  // 2. Recommended Jobs
   const recommendedJobs = await prisma.job.findMany({
     where: {
       isDelete: false,
       status: true,
       skillsRequired: {
-        hasSome: skillString|| [], // array overlap
+        hasSome: skillString,
       },
     },
-    take: 5,
-    orderBy: {
-      createdAt: "desc",
-    },
-    select: {
-      id: true,
-      jobTitle: true,
-      companyName: true,
-      location: true,
-      salary: true,
-      jobType: true,
-      description: true,
-      skillsRequired: true,
-      interviewDuration: true,
-      interviewInstruction: true,
-      tags: true,
-      industry: true,
-      jobLevel: true,
-      experienceNeeded: true,
-      contact: true,
-      expireAt: true,
-      createdAt: true,
-      updatedAt: true,
-      status: true,
-    },
+    orderBy: { createdAt: "desc" },
+    take: 6,
+    select: jobSelect,
   });
 
-  // 3. Recently Posted Jobs (e.g., last 7 days)
+  // 3. Recently Posted Jobs (last 7 days)
   const recentJobs = await prisma.job.findMany({
     where: {
       isDelete: false,
-       status: true,
+      status: true,
       createdAt: {
-        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // last 7 days
+        gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       },
     },
-    take: 5,
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
+    take: 6,
+    select: jobSelect,
   });
 
   return (
@@ -122,6 +96,8 @@ const skillString = skills.map((skill)=>skill.name)
         recommendedJobs={recommendedJobs}
         recentJobs={recentJobs}
         role={role}
+        wishListedJobs={candidate.wishListedJobs}
+           isWishlistPage={false}
       />
     </div>
   );
