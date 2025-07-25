@@ -52,10 +52,19 @@
 ### Day 11 Job Backend
 - [X] write the backend for creating job form 
 - [x] show job listings in recruiter side 
+
+### Day 12 Job Backend
+- [x] add a wishlist btn to save the job form 
+- [x] add custom editor to edit the job description
+- [x] show the jobs to candidate
+- [x] Design the candidate job explorer and wishlist page 
+
 - [ ] rewrite the form component for edit 
 - [ ] rewrite the backend for edit 
 - [ ] make a route for deleting job listings 
-- [ ] show the jobs to candidate
+- [ ] page to view the jobs
+- [ ] page to share the jobs
+- [ ] infinite loading 
 - [ ] add filter and search 
-- [ ] add a wishlist btn to save the job form 
-- [ ] add custom editor to edit the job description
+- [ ] UI responsiveness
+- [ ] Add loaders 
