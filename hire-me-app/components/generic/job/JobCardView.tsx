@@ -21,7 +21,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { JobFormDataUI } from "@/zod/job";
 import { toast } from "sonner";
@@ -45,6 +50,8 @@ const JobCardView = ({
   showConfirmDialog,
   setShowConfirmDialog,
   confirmDeactivate,
+  isWishlisted,
+  handleWishlist,
 }: Props) => {
   return (
     <div className="w-full">
@@ -62,12 +69,16 @@ const JobCardView = ({
               {job.status ? (
                 <Power
                   className="text-green-600 w-4 h-4 cursor-pointer"
-                  onClick={() => toast.info("Please change your status in List view")}
+                  onClick={() =>
+                    toast.info("Please change your status in List view")
+                  }
                 />
               ) : (
                 <PowerOff
                   className="text-red-600 w-4 h-4 cursor-pointer"
-                  onClick={() => toast.info("Please change your status in List view")}
+                  onClick={() =>
+                    toast.info("Please change your status in List view")
+                  }
                 />
               )}
               <DropdownMenu>
@@ -75,16 +86,29 @@ const JobCardView = ({
                   <EllipsisVertical className="w-4 h-4 cursor-pointer hover:text-white/60" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-[#212121] text-white">
-                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">Edit</DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">Delete</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">
+                    Delete
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           ) : (
-            <div className="flex gap-2">
-              <Bookmark />
-              <BookmarkCheck />
-              <Link />
+            <div className="flex gap-2 items-center">
+              {isWishlisted ? (
+                <BookmarkCheck
+                  className="w-5 h-5 text-yellow-400 cursor-pointer"
+                  onClick={handleWishlist}
+                />
+              ) : (
+                <Bookmark
+                  className="w-5 h-5 text-muted-foreground cursor-pointer"
+                  onClick={handleWishlist}
+                />
+              )}
+              <Link className="w-5 h-5 text-muted-foreground cursor-pointer" />
             </div>
           )}
         </CardHeader>
@@ -92,7 +116,9 @@ const JobCardView = ({
         <CardContent className="flex flex-col justify-center items-start gap-2">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm truncate">{job.location}, {job.jobType}</span>
+            <span className="text-sm truncate">
+              {job.location}, {job.jobType}
+            </span>
           </div>
 
           <div className="flex gap-10">
@@ -100,7 +126,8 @@ const JobCardView = ({
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">
-                  {job.jobLevel.charAt(0).toUpperCase() + job.jobLevel.slice(1).toLowerCase()}
+                  {job.jobLevel.charAt(0).toUpperCase() +
+                    job.jobLevel.slice(1).toLowerCase()}
                 </span>
               </div>
             )}
@@ -122,44 +149,45 @@ const JobCardView = ({
         <Separator className="mt-2" />
 
         <CardFooter className="flex justify-between items-center">
-  {job.expireAt ? (
-    <div className="expire flex gap-2 justify-start items-center">
-      <CalendarDays className="w-4 h-4 text-muted-foreground" />
-      {new Date(job.expireAt) > new Date() ? (
-        <span className="text-[12px] text-muted-foreground">
-          Expires: {new Date(job.expireAt).toLocaleDateString()}
-        </span>
-      ) : (
-        <Badge className="px-3 py-4" variant="destructive">
-          Expired
-        </Badge>
-      )}
-    </div>
-  ) : (
-    <div className="expire flex gap-2 justify-start items-center">
-      <CalendarDays className="w-4 h-4 text-muted-foreground" />
-      <span className="text-[12px] text-muted-foreground">Expires: N/A</span>
-    </div>
-  )}
+          {job.expireAt ? (
+            <div className="expire flex gap-2 justify-start items-center">
+              <CalendarDays className="w-4 h-4 text-muted-foreground" />
+              {new Date(job.expireAt) > new Date() ? (
+                <span className="text-[12px] text-muted-foreground">
+                  Expires: {new Date(job.expireAt).toLocaleDateString()}
+                </span>
+              ) : (
+                <Badge className="px-3 py-4" variant="destructive">
+                  Expired
+                </Badge>
+              )}
+            </div>
+          ) : (
+            <div className="expire flex gap-2 justify-start items-center">
+              <CalendarDays className="w-4 h-4 text-muted-foreground" />
+              <span className="text-[12px] text-muted-foreground">
+                Expires: N/A
+              </span>
+            </div>
+          )}
 
-  <div className="btns flex justify-end items-center gap-2">
-    <Button className="cursor-pointer">
-      <Eye />
-      <span>View</span>
-    </Button>
-    <Button variant="outline" className="cursor-pointer">
-      {role === "CANDIDATE" ? (
-        "Apply"
-      ) : (
-        <span className="flex justify-center items-center gap-2">
-          <Link className="w-3 h-3 text-muted-foreground" />
-          Share
-        </span>
-      )}
-    </Button>
-  </div>
-</CardFooter>
-
+          <div className="btns flex justify-end items-center gap-2">
+            <Button className="cursor-pointer">
+              <Eye />
+              <span>View</span>
+            </Button>
+            <Button variant="outline" className="cursor-pointer">
+              {role === "CANDIDATE" ? (
+                "Apply"
+              ) : (
+                <span className="flex justify-center items-center gap-2">
+                  <Link className="w-3 h-3 text-muted-foreground" />
+                  Share
+                </span>
+              )}
+            </Button>
+          </div>
+        </CardFooter>
       </Card>
 
       {/* Confirmation Dialog */}
@@ -168,10 +196,13 @@ const JobCardView = ({
           <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-2xl max-w-md w-full mx-4">
             <div className="flex items-center mb-4">
               <AlertCircle className="w-6 h-6 text-yellow-400 mr-2" />
-              <h3 className="text-lg font-semibold text-white">Confirm Deactivation</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Confirm Deactivation
+              </h3>
             </div>
             <p className="text-gray-300 mb-6">
-              Are you sure you want to deactivate this job posting? This will make it invisible to candidates.
+              Are you sure you want to deactivate this job posting? This will
+              make it invisible to candidates.
             </p>
             <div className="flex space-x-3">
               <Button

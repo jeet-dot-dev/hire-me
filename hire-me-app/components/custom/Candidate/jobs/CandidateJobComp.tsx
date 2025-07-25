@@ -26,7 +26,7 @@ export type CandidateJobCompProp = {
   jobs: JobFormDataUI[];
   role: "RECRUITER" | "CANDIDATE";
   recentJobs:JobFormDataUI[];
-  recommendedJobs:JobFormDataUI
+  recommendedJobs:JobFormDataUI[]
 
 };
 
