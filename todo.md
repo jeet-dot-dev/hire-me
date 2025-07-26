@@ -59,8 +59,9 @@
 - [x] show the jobs to candidate
 - [x] Design the candidate job explorer and wishlist page 
 
-- [ ] rewrite the form component for edit 
-- [ ] rewrite the backend for edit 
+### Day 13 Job Backend
+- [x] rewrite the form component for edit 
+- [x] rewrite the backend for edit 
 - [ ] make a route for deleting job listings 
 - [ ] page to view the jobs
 - [ ] page to share the jobs

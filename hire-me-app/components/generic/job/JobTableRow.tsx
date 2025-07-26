@@ -4,6 +4,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import JobStatusChange from "@/components/custom/recruiter/JobStatusChange";
+import { useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipProvider,
@@ -42,6 +43,7 @@ const JobTableRow = ({
   handleWishlist,
   isWishlisted,
 }: Props) => {
+  const router = useRouter();
   return (
   <TableRow className="transition-colors border-gray-700/50">
   <TableCell className="font-semibold text-white max-w-[200px] truncate">
@@ -137,6 +139,7 @@ const JobTableRow = ({
                   variant="ghost"
                   size="sm"
                   className="icon-btn text-white hover:text-white hover:bg-gray-700/50 cursor-pointer"
+                  onClick={()=>router.push(`/recruiter/dashboard/jobs/${job.id}/edit`)}
                 >
                   <Edit className="w-4 h-4" />
                 </Button>

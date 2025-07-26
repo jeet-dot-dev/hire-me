@@ -14,25 +14,14 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
-const CreateJobForm = () => {
+type CreateJobFormProp = {
+  job : JobFormData ,
+  type : "Create" | "Edit"
+}
+
+const CreateJobForm = ({job,type}:CreateJobFormProp) => {
   const router = useRouter();
-  const [formData, setFormData] = useState<JobFormData>({
-    jobTitle: "",
-    companyName: "",
-    location: "",
-    salary: "",
-    jobType: "Remote",
-    description: "",
-    skillsRequired: [],
-    interviewDuration: 10,
-    interviewInstruction: "",
-    tags: [],
-    industry: "",
-    jobLevel: "INTERN",
-    experienceNeeded: undefined,
-    contact: "",
-    expireAt: undefined,
-  });
+  const [formData, setFormData] = useState<JobFormData>(job);
   const [newSkill, setNewSkill] = useState("");
   const [newTag, setNewTag] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -256,7 +245,6 @@ const CreateJobForm = () => {
       setTagsLoading(false);
     }
   };
-
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
@@ -288,18 +276,32 @@ const handleSubmit = async (e: React.FormEvent) => {
   setIsSubmitting(true);
 
   try {
-    await axios.post("/api/recruiter/job/create", formData);
-    toast.success("Your job posting has been created and is now live.");
+    const endpoint =
+      type === "Edit"
+        ? `/api/recruiter/job/${formData.id}/edit`
+        : "/api/recruiter/job/create";
+
+   await axios.post(endpoint, formData);
+
+    toast.success(
+      type === "Edit"
+        ? "Your job posting has been updated."
+        : "Your job posting has been created and is now live."
+    );
+
     router.push("/recruiter/dashboard/jobs");
-    
-    //console.log("Job posted:", formData);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    toast.error("Failed to create job posting. Please try again.");
+
+    const backendMessage =
+      error?.response?.data?.error || "Something went wrong.";
+
+    toast.error(backendMessage);
   } finally {
     setIsSubmitting(false);
   }
 };
+
 
 
   return (
@@ -314,10 +316,10 @@ const handleSubmit = async (e: React.FormEvent) => {
             <CardHeader className="p-6 border-b border-border/30 pl-12">
               <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <Briefcase className="w-6 h-6 text-primary" />
-                Create Job Posting
+              { type === "Create" ? "  Create Job Posting" : "Edit Job Posting"}
               </CardTitle>
               <p className="text-muted-foreground">
-                Fill in the details to create a new job posting
+               {type === "Create" ? " Fill in the details to create a new job posting" : "Update the details of your job post"}
               </p>
             </CardHeader>
             <CardContent className="p-6">
@@ -369,17 +371,17 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="min-w-[160px] bg-primary hover:bg-primary/90"
+                    className="min-w-[160px] bg-primary hover:bg-primary/90 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Creating...
+                       {type === "Create" ? " Creating..." : "Updating..."}
                       </>
                     ) : (
                       <>
                         <Briefcase className="w-4 h-4 mr-2" />
-                        Create Job Post
+                        {type === "Create" ? "Create Job Post" : "Update Job Post"}
                       </>
                     )}
                   </Button>

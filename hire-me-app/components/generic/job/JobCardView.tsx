@@ -55,15 +55,16 @@ const JobCardView = ({
 }: Props) => {
   return (
     <div className="w-full relative">
-      <Card
-        className={`bg-[#0f0f0f] backdrop-blur-3xl border ${
-          !job.status || job.isDelete
-            ? "opacity-50 grayscale"
-            : "border-gray-800/50 hover:border-gray-700/50"
-        } transition-all duration-300 group hover:bg-black/10`}
-      >
+    <Card
+  className={`bg-[#0f0f0f] backdrop-blur-3xl border ${
+    role === "CANDIDATE" && (!job.status || job.isDelete)
+      ? "opacity-50 grayscale"
+      : "border-gray-800/50 hover:border-gray-700/50"
+  } transition-all duration-300 group hover:bg-black/10`}
+>
+
         {/* Status Overlay */}
-        {(!job.status || job.isDelete) && (
+        {(role==="CANDIDATE"&& !job.status || job.isDelete) && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-lg z-10">
             <div className="text-center">
               <Badge
@@ -226,7 +227,7 @@ const JobCardView = ({
 
           <div className="btns flex justify-end items-center gap-2">
             <Button
-              disabled={!job.status || job.isDelete}
+              disabled={role==="CANDIDATE"&& !job.status || job.isDelete}
               className="cursor-pointer"
             >
               <Eye />
