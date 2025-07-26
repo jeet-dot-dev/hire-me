@@ -10,7 +10,6 @@ import {
   Bookmark,
   BookmarkCheck,
   CalendarDays,
-  DollarSign,
   EllipsisVertical,
   Eye,
   Layers,
@@ -21,6 +20,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +30,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { JobFormDataUI } from "@/zod/job";
 import { toast } from "sonner";
+import DeleteJobDialog from "@/components/custom/recruiter/DeleteJobDialog";
 
 type Props = {
   job: JobFormDataUI;
@@ -53,18 +54,18 @@ const JobCardView = ({
   isWishlisted,
   handleWishlist,
 }: Props) => {
+  const router = useRouter();
   return (
     <div className="w-full relative">
-    <Card
-  className={`bg-[#0f0f0f] backdrop-blur-3xl border ${
-    role === "CANDIDATE" && (!job.status || job.isDelete)
-      ? "opacity-50 grayscale"
-      : "border-gray-800/50 hover:border-gray-700/50"
-  } transition-all duration-300 group hover:bg-black/10`}
->
-
+      <Card
+        className={`bg-[#0f0f0f] backdrop-blur-3xl border ${
+          role === "CANDIDATE" && (!job.status || job.isDelete)
+            ? "opacity-50 grayscale"
+            : "border-gray-800/50 hover:border-gray-700/50"
+        } transition-all duration-300 group hover:bg-black/10`}
+      >
         {/* Status Overlay */}
-        {(role==="CANDIDATE"&& !job.status || job.isDelete) && (
+        {((role === "CANDIDATE" && !job.status) || job.isDelete) && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-lg z-10">
             <div className="text-center">
               <Badge
@@ -114,11 +115,23 @@ const JobCardView = ({
                   <EllipsisVertical className="w-4 h-4 cursor-pointer hover:text-white/60" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-[#212121] text-white">
-                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">
+                  <DropdownMenuItem
+                    className="hover:bg-white/10 cursor-pointer"
+                    onClick={() =>
+                      router.push(`/recruiter/dashboard/jobs/${job.id}/edit`)
+                    }
+                  >
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">
-                    Delete
+                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer"
+                   onSelect={(e) => e.preventDefault()}
+                  >
+                    <DeleteJobDialog
+                      jobTitle={job.jobTitle}
+                      jobId={job.id}
+                    >
+                      <div className="w-full text-left">Delete</div>
+                    </DeleteJobDialog>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -227,7 +240,7 @@ const JobCardView = ({
 
           <div className="btns flex justify-end items-center gap-2">
             <Button
-              disabled={role==="CANDIDATE"&& !job.status || job.isDelete}
+              disabled={(role === "CANDIDATE" && !job.status) || job.isDelete}
               className="cursor-pointer"
             >
               <Eye />

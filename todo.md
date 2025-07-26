@@ -62,7 +62,7 @@
 ### Day 13 Job Backend
 - [x] rewrite the form component for edit 
 - [x] rewrite the backend for edit 
-- [ ] make a route for deleting job listings 
+- [x] make a route for deleting job listings 
 - [ ] page to view the jobs
 - [ ] page to share the jobs
 - [ ] infinite loading 
