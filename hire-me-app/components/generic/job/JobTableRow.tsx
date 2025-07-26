@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Link2, Eye, Edit, Trash2, Heart, Send } from "lucide-react";
 import { JobFormDataUI } from "@/zod/job";
 import DeleteJobDialog from "@/components/custom/recruiter/DeleteJobDialog";
+import ShareJobDialog from "./share/ShareJobDialog";
 
 type Props = {
   job: JobFormDataUI;
@@ -109,13 +110,15 @@ const JobTableRow = ({
               <>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
+                 <ShareJobDialog jobId={job.id}>
+                     <Button
                       variant="ghost"
                       size="sm"
                       className="icon-btn text-white hover:text-white hover:bg-gray-700/50 cursor-pointer"
                     >
                       <Link2 className="w-4 h-4" />
                     </Button>
+                 </ShareJobDialog>
                   </TooltipTrigger>
                   <TooltipContent>Share</TooltipContent>
                 </Tooltip>
@@ -126,6 +129,7 @@ const JobTableRow = ({
                       variant="ghost"
                       size="sm"
                       className="icon-btn text-white hover:text-white hover:bg-gray-700/50 cursor-pointer"
+                      onClick={()=>router.push(`/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`)}
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -172,6 +176,7 @@ const JobTableRow = ({
                       variant="ghost"
                       size="sm"
                       className="text-blue-400 hover:bg-blue-500/10"
+                      onClick={()=>router.push(`/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`)}
                     >
                       <Eye className="w-4 h-4" />
                     </Button>

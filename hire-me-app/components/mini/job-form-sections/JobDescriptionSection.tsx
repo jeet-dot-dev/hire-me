@@ -26,7 +26,7 @@ const JobDescriptionSection = ({
   const [showMarkdownInfo, setShowMarkdownInfo] = useState(true);
 
   // Function to fix markdown formatting if needed
-  const fixMarkdownFormatting = (text: string): string => {
+   const fixMarkdownFormatting = (text: string): string => {
     if (!text) return text;
 
     return (

@@ -63,8 +63,10 @@
 - [x] rewrite the form component for edit 
 - [x] rewrite the backend for edit 
 - [x] make a route for deleting job listings 
-- [ ] page to view the jobs
-- [ ] page to share the jobs
+- [x] make the view page 
+- [x] page to share the jobs
+
+### Day 14 Job Backend
 - [ ] infinite loading 
 - [ ] add filter and search 
 - [ ] UI responsiveness

@@ -31,6 +31,7 @@ import { Separator } from "@/components/ui/separator";
 import { JobFormDataUI } from "@/zod/job";
 import { toast } from "sonner";
 import DeleteJobDialog from "@/components/custom/recruiter/DeleteJobDialog";
+import ShareJobDialog from "./share/ShareJobDialog";
 
 type Props = {
   job: JobFormDataUI;
@@ -149,7 +150,9 @@ const JobCardView = ({
                   onClick={handleWishlist}
                 />
               )}
-              <Link className="w-5 h-5 text-muted-foreground cursor-pointer" />
+             <ShareJobDialog jobId={job.id}>
+               <Link className="w-5 h-5 text-muted-foreground cursor-pointer" />
+             </ShareJobDialog>
             </div>
           )}
         </CardHeader>
@@ -242,6 +245,7 @@ const JobCardView = ({
             <Button
               disabled={(role === "CANDIDATE" && !job.status) || job.isDelete}
               className="cursor-pointer"
+              onClick={()=>router.push(`/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`)}
             >
               <Eye />
               <span>View</span>
@@ -251,10 +255,12 @@ const JobCardView = ({
               {role === "CANDIDATE" ? (
                 "Apply"
               ) : (
-                <span className="flex justify-center items-center gap-2">
+               <ShareJobDialog jobId={job.id}>
+                 <span className="flex justify-center items-center gap-2">
                   <Link className="w-3 h-3 text-muted-foreground" />
                   Share
                 </span>
+               </ShareJobDialog>
               )}
             </Button>
           </div>
