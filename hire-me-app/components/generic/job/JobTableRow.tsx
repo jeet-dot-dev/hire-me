@@ -23,6 +23,7 @@ type Props = {
   formatDate: (date: string) => string;
   handleWishlist: () => void;
   isWishlisted: boolean;
+  index: number;
 };
 
 const JobTableRow = ({
@@ -34,10 +35,14 @@ const JobTableRow = ({
   formatDate,
   handleWishlist,
   isWishlisted,
+  index,
 }: Props) => {
   const router = useRouter();
   return (
     <TableRow className="transition-colors border-gray-700/50">
+      <TableCell className="text-gray-300 text-center w-12">
+        {(index || 0) + 1}
+      </TableCell>
       <TableCell className="font-semibold text-white max-w-[200px] truncate">
         {job.jobTitle}
       </TableCell>
@@ -110,15 +115,15 @@ const JobTableRow = ({
               <>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                 <ShareJobDialog jobId={job.id}>
-                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="icon-btn text-white hover:text-white hover:bg-gray-700/50 cursor-pointer"
-                    >
-                      <Link2 className="w-4 h-4" />
-                    </Button>
-                 </ShareJobDialog>
+                    <ShareJobDialog jobId={job.id}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="icon-btn text-white hover:text-white hover:bg-gray-700/50 cursor-pointer"
+                      >
+                        <Link2 className="w-4 h-4" />
+                      </Button>
+                    </ShareJobDialog>
                   </TooltipTrigger>
                   <TooltipContent>Share</TooltipContent>
                 </Tooltip>
@@ -129,7 +134,11 @@ const JobTableRow = ({
                       variant="ghost"
                       size="sm"
                       className="icon-btn text-white hover:text-white hover:bg-gray-700/50 cursor-pointer"
-                      onClick={()=>router.push(`/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`)}
+                      onClick={() =>
+                        router.push(
+                          `/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`
+                        )
+                      }
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -176,7 +185,11 @@ const JobTableRow = ({
                       variant="ghost"
                       size="sm"
                       className="text-blue-400 hover:bg-blue-500/10"
-                      onClick={()=>router.push(`/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`)}
+                      onClick={() =>
+                        router.push(
+                          `/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`
+                        )
+                      }
                     >
                       <Eye className="w-4 h-4" />
                     </Button>

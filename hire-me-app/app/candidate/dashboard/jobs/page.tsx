@@ -30,7 +30,7 @@ const page = async () => {
   const skillString = skills.map((skill) => skill.name);
 
   // Shared select structure
- const jobSelect = {
+  const jobSelect = {
     id: true,
     jobTitle: true,
     companyName: true,
@@ -50,7 +50,7 @@ const page = async () => {
     createdAt: true,
     updatedAt: true,
     status: true,
-      isDelete:true
+    isDelete: true,
   };
 
   // 1. All Jobs
@@ -97,7 +97,7 @@ const page = async () => {
         recentJobs={recentJobs}
         role={role}
         wishListedJobs={candidate.wishListedJobs}
-           isWishlistPage={false}
+        isWishlistPage={false}
       />
     </div>
   );

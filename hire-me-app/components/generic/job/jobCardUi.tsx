@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState } from "react";
 import { JobFormDataUI } from "@/zod/job";
 import JobTableRow from "./JobTableRow";
@@ -8,9 +8,10 @@ type JobCardUiProp = {
   job: JobFormDataUI;
   role: "RECRUITER" | "CANDIDATE";
   styleType: boolean;
+  index: number;
 };
 
-const JobCardUi = ({ job, role, styleType }: JobCardUiProp) => {
+const JobCardUi = ({ job, role, styleType, index }: JobCardUiProp) => {
   const [jobStatus, setJobStatus] = useState(job.status);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -54,6 +55,7 @@ const JobCardUi = ({ job, role, styleType }: JobCardUiProp) => {
         formatDate={formatDate}
         handleWishlist={handleWishlist}
         isWishlisted={isWishlisted}
+        index={index}
       />
     );
   }

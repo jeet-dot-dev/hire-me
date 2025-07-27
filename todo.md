@@ -67,7 +67,7 @@
 - [x] page to share the jobs
 
 ### Day 14 Job Backend
-- [ ] infinite loading 
-- [ ] add filter and search 
+- [x] infinite loading 
+- [ ] add search 
 - [ ] UI responsiveness
 - [ ] Add loaders 

@@ -25,11 +25,10 @@ import CandidateJobListings from "./CandidateJobListings";
 export type CandidateJobCompProp = {
   jobs: JobFormDataUI[];
   role: "RECRUITER" | "CANDIDATE";
-  recentJobs:JobFormDataUI[];
-  recommendedJobs:JobFormDataUI[];
-  wishListedJobs : string[];
-  isWishlistPage:boolean
-
+  recentJobs: JobFormDataUI[];
+  recommendedJobs: JobFormDataUI[];
+  wishListedJobs: string[];
+  isWishlistPage: boolean;
 };
 
 // Map icons to their respective Lucide components
@@ -80,7 +79,14 @@ const filterOptions = [
   },
 ] as const;
 
-const CandidateJobComp = ({ jobs, role,recommendedJobs,recentJobs,wishListedJobs,isWishlistPage }: CandidateJobCompProp) => {
+const CandidateJobComp = ({
+  jobs,
+  role,
+  recommendedJobs,
+  recentJobs,
+  wishListedJobs,
+  isWishlistPage,
+}: CandidateJobCompProp) => {
   const [selectedFilter, setSelectedFilter] = useState(filterOptions[0]);
 
   const handleSelect = (option: (typeof filterOptions)[0]) => {
@@ -95,10 +101,14 @@ const CandidateJobComp = ({ jobs, role,recommendedJobs,recentJobs,wishListedJobs
       <div className="flex justify-between items-center w-full p-4">
         <div>
           <h2 className="text-3xl font-semibold text-gray-100">
-           {isWishlistPage ? "  ✨ Wishlisted Roles" : "Fast-track your job hunt"}
+            {isWishlistPage
+              ? "  ✨ Wishlisted Roles"
+              : "Fast-track your job hunt"}
           </h2>
           <p className="text-lg text-muted-foreground">
-            {isWishlistPage ? " Explore the roles you've handpicked as favorites" : "Effortlessly browse and apply to roles that suit you best"}
+            {isWishlistPage
+              ? " Explore the roles you've handpicked as favorites"
+              : "Effortlessly browse and apply to roles that suit you best"}
           </p>
         </div>
       </div>
@@ -142,13 +152,14 @@ const CandidateJobComp = ({ jobs, role,recommendedJobs,recentJobs,wishListedJobs
           </DropdownMenu>
         </div>
         <div className="main">
-          <CandidateJobListings  jobs={jobs}
-        recommendedJobs={recommendedJobs}
-        recentJobs={recentJobs}
-        role={role}
-        wishListedJobs={wishListedJobs} 
-        isWishlistPage={isWishlistPage}
-        />
+          <CandidateJobListings
+            jobs={jobs}
+            recommendedJobs={recommendedJobs}
+            recentJobs={recentJobs}
+            role={role}
+            wishListedJobs={wishListedJobs}
+            isWishlistPage={isWishlistPage}
+          />
         </div>
       </div>
     </div>
