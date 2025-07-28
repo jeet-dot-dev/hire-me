@@ -68,6 +68,8 @@
 
 ### Day 14 Job Backend
 - [x] infinite loading 
-- [ ] add search 
+- [x] add search 
+
+### Day 15 Job Backend
 - [ ] UI responsiveness
 - [ ] Add loaders 

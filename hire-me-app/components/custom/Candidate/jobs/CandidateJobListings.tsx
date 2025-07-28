@@ -1,7 +1,17 @@
 import React from "react";
-import { CandidateJobCompProp } from "./CandidateJobComp";
 import { Separator } from "@/components/ui/separator";
 import RecomendedJobCardRenderComp from "./RecomendedJobCardRenderComp";
+import { JobFormDataUI } from "@/zod/job";
+
+ type CandidateJobListingsProp = {
+  jobs: JobFormDataUI[];
+  role: "RECRUITER" | "CANDIDATE";
+  recentJobs: JobFormDataUI[];
+  recommendedJobs: JobFormDataUI[];
+  wishListedJobs: string[];
+  isWishlistPage: boolean;
+  isFilterON : boolean
+  };
 
 const Section = ({
   title,
@@ -10,13 +20,15 @@ const Section = ({
   wishListedJobs,
   isWishlistPage,
   enableInfiniteScroll,
+  isFilterON
 }: {
   title: string;
-  jobs: CandidateJobCompProp["jobs"];
-  role: CandidateJobCompProp["role"];
+  jobs: CandidateJobListingsProp["jobs"];
+  role: CandidateJobListingsProp["role"];
   wishListedJobs: string[];
   isWishlistPage: boolean;
   enableInfiniteScroll: boolean;
+  isFilterON : boolean
 }) => {
   if (!jobs || jobs.length === 0) return null;
 
@@ -34,6 +46,7 @@ const Section = ({
         wishListedJobs={wishListedJobs}
         isWishlistPage={isWishlistPage}
         enableInfiniteScroll={enableInfiniteScroll}
+        isFilterON={isFilterON}
       />
     </div>
   );
@@ -46,31 +59,40 @@ const CandidateJobListings = ({
   recommendedJobs,
   wishListedJobs,
   isWishlistPage,
-}: CandidateJobCompProp) => {
+  isFilterON
+}: CandidateJobListingsProp) => {
   const noJobs =
     jobs.length === 0 &&
     recentJobs.length === 0 &&
     recommendedJobs.length === 0;
 
+    //console.log ("CandidateJobListings",isFilterON)
+
   return (
     <div className="w-full px-4">
       <section className="flex flex-col gap-6">
-        <Section
+       {!isFilterON && (
+         <Section
           title="Recommended Jobs For You"
           jobs={recommendedJobs}
           role={role}
           wishListedJobs={wishListedJobs}
           isWishlistPage={isWishlistPage}
           enableInfiniteScroll={false}
+          isFilterON={isFilterON}
         />
-        <Section
+       )}
+      {!isFilterON && (
+          <Section
           title="Recently Posted Jobs"
           jobs={recentJobs}
           role={role}
           wishListedJobs={wishListedJobs}
           isWishlistPage={isWishlistPage}
           enableInfiniteScroll={false}
+          isFilterON={isFilterON}
         />
+      )}
         <Section
           title="Explore Jobs"
           jobs={jobs}
@@ -78,6 +100,7 @@ const CandidateJobListings = ({
           wishListedJobs={wishListedJobs}
           isWishlistPage={isWishlistPage}
           enableInfiniteScroll={true}
+          isFilterON={isFilterON}
         />
 
         {noJobs && (

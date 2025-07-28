@@ -11,6 +11,7 @@ type RecomendedJobCardRenderCompProp = {
   wishListedJobs: string[];
   isWishlistPage: boolean;
   enableInfiniteScroll: boolean;
+  isFilterON: boolean;
 };
 
 const RecomendedJobCardRenderComp = ({
@@ -19,6 +20,7 @@ const RecomendedJobCardRenderComp = ({
   wishListedJobs,
   enableInfiniteScroll = false,
   isWishlistPage,
+  isFilterON,
 }: RecomendedJobCardRenderCompProp) => {
   const [wishlistedJobIds, setWishlistedJobIds] =
     useState<string[]>(wishListedJobs);
@@ -26,6 +28,8 @@ const RecomendedJobCardRenderComp = ({
   const [allJobs, setAllJobs] = useState<JobFormDataUI[]>(jobs);
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef<HTMLDivElement | null>(null);
+
+  console.log("hi i am renderd", allJobs.length);
 
   const fetchMoreJobs = useCallback(async () => {
     if (isWishlistPage) return;
@@ -50,9 +54,14 @@ const RecomendedJobCardRenderComp = ({
   }, [allJobs, isWishlistPage]);
 
   useEffect(() => {
-    if (!enableInfiniteScroll || isWishlistPage) return;
+    if (!isFilterON) {
+      setAllJobs(jobs);
+    }
+  }, [jobs, isFilterON]);
+
+  useEffect(() => {
+    if (!enableInfiniteScroll || isWishlistPage || isFilterON) return;
     const target = observerRef.current;
-    console.log(target); //  capture current value
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -68,7 +77,14 @@ const RecomendedJobCardRenderComp = ({
     return () => {
       if (target) observer.unobserve(target);
     };
-  }, [fetchMoreJobs, hasMore, enableInfiniteScroll, isWishlistPage]);
+  }, [
+    fetchMoreJobs,
+    hasMore,
+    enableInfiniteScroll,
+    isWishlistPage,
+    isFilterON,
+    jobs,
+  ]);
 
   const toggleWishlist = async (jobId: string) => {
     const toastId = toast.loading("Updating wishlist...");
@@ -114,7 +130,7 @@ const RecomendedJobCardRenderComp = ({
         ))}
       </div>
 
-      {hasMore && enableInfiniteScroll && !isWishlistPage && (
+      {hasMore && enableInfiniteScroll && !isWishlistPage && !isFilterON && (
         <div
           ref={observerRef}
           className="h-10 mt-4 flex items-center justify-center"
