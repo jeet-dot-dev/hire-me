@@ -32,6 +32,7 @@ import {
 import { JobFormDataUI } from "@/zod/job";
 import axios from "axios";
 import { useDebouncedEffect } from "@/hooks/useDebouncedEffect";
+import JobCardLoader from "@/components/scaleton-loaders/JobCardLoader";
 
 const filterOptions = [
   {
@@ -75,7 +76,7 @@ const iconMap = {
 } as const;
 
 const JobCard = ({ jobs, role }: RecruiterJobCompProp) => {
-  const [isList, setIsList] = useState(true);
+  const [isList, setIsList] = useState(false);
   const [originalJobs, setOriginalJobs] = useState<JobFormDataUI[]>(jobs);
   const [visibleJobs, setVisibleJobs] = useState<JobFormDataUI[]>(jobs);
   const [hasMore, setHasMore] = useState(true);
@@ -163,12 +164,12 @@ const JobCard = ({ jobs, role }: RecruiterJobCompProp) => {
       <div className="dark">
         <div className="space-y-4 bg-black/10 rounded-2xl min-h-screen p-6">
           <div className="header flex w-full max-w-full items-center gap-4 ">
-            <div className="relative w-full max-w-[90%] flex items-center gap-2 bg-[#1a1a1a] rounded-md px-3 py-2">
+            <div className="relative w-full max-w-[90%] flex items-center gap-2 bg-[#1a1a1a]  rounded-md px-3 py-2">
               {/* Search Input */}
               <Input
                 type="text"
                 placeholder={selectedFilter.placeholder}
-                className="flex-1 bg-transparent border-none outline-none shadow-none text-white placeholder:text-gray-400"
+                className="flex-1 bg-transparent border-none outline-none shadow-none text-white placeholder:text-muted-foreground"
                 value={searchTerm}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -208,7 +209,7 @@ const JobCard = ({ jobs, role }: RecruiterJobCompProp) => {
             <DropdownMenu>
               <DropdownMenuTrigger className="bg-[#262626] cursor-pointer px-3 py-1.5 rounded-md text-white flex items-center gap-2">
                 <Funnel className="w-4 h-4" />
-                <span className="text-sm font-semibold whitespace-nowrap overflow-hidden py-0.5 px-1 text-ellipsis">
+                <span className="text-sm font-semibold whitespace-nowrap overflow-hidden py-2 px-1 text-ellipsis">
                   {selectedFilter.label}
                 </span>
               </DropdownMenuTrigger>
@@ -235,7 +236,7 @@ const JobCard = ({ jobs, role }: RecruiterJobCompProp) => {
           </div>
 
           {isLoading ? (
-            <Loader className="mx-auto animate-spin" />
+           <JobCardLoader/>
           ) : visibleJobs.length === 0 ? (
             <p className="text-center text-muted-foreground">No jobs found</p>
           ) : (
@@ -324,9 +325,10 @@ const JobCard = ({ jobs, role }: RecruiterJobCompProp) => {
           ref={observerRef}
           className="h-10 mt-4 flex items-center justify-center"
         >
-          <span className="text-muted-foreground text-xs animate-pulse">
-            Loading more jobs...
-          </span>
+        <div className="flex items-center gap-2 text-sm text-white animate-pulse">
+           <Loader className="w-4 h-4 animate-spin text-white" />
+           <span>Loading more jobs...</span>
+         </div>
         </div>
       )}
     </>

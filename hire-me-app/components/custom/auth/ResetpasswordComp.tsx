@@ -7,6 +7,8 @@ import { useState } from "react";
 import { toast } from 'sonner';
 import axios from 'axios'
 import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
+import { motion } from "motion/react"
 
 const ResetPasswordComp = () => {
     const [email, setEmail] = useState<string>("")
@@ -16,7 +18,10 @@ const ResetPasswordComp = () => {
         e.preventDefault()
         setLoading(true)
         try {
-        
+          if(email === ""){
+            toast.error("Please enter a valid email");
+            return ;
+          }
             
             // In real app, this would be the actual API call:
             const response = await axios.post('/api/auth/forget-password', { email })
@@ -28,7 +33,7 @@ const ResetPasswordComp = () => {
             //alert("Password reset email sent successfully. Please check your inbox.");
             setEmail("")
         } catch (error) {
-            alert("Failed to send password reset email. Please try again.");
+            toast.error("Failed to send password reset email. Please try again.");
             console.error("Reset password error:", error)
         } finally {
             setLoading(false)
@@ -36,7 +41,12 @@ const ResetPasswordComp = () => {
     }
 
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="min-h-screen bg-black flex items-center justify-center p-4 bg-cover"
+          style={{
+        backgroundImage:
+          "url('https://pub-e8254eef37b34b8c92dffe1a5f1c9a49.r2.dev/Hire-me-assets/authBgImage.webp')",
+      }}
+        >
             <div className="w-full max-w-md space-y-6">
                 <div className="text-center space-y-2">
                     <h1 className="text-2xl font-semibold text-white">
@@ -67,18 +77,33 @@ const ResetPasswordComp = () => {
                 <Button 
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="w-full bg-white text-black hover:bg-gray-100 disabled:opacity-50"
+                    className="w-full bg-white text-black hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
                 >
                     {loading ? "Sending..." : "Send Reset Link"}
                 </Button>
                 
-                <button 
-                    type="button" 
-                    onClick={() => router.push("/auth/login")}
-                    className="w-full text-zinc-400 hover:text-zinc-300 transition-colors text-sm"
-                >
-                    Back to login
-                </button>
+               <button 
+  type="button" 
+  onClick={() => router.push("/auth/login")}
+  className="group w-full text-zinc-400 hover:text-zinc-300 transition-colors text-sm cursor-pointer"
+>
+  <div className="flex justify-center items-center gap-2">
+    <motion.div
+      variants={{
+        initial: { x: 0 },
+        hover: { x: -2 },
+      }}
+      initial="initial"
+      animate="initial"
+      whileHover="hover"
+      className="group-hover:translate-x-[-2px]  transition-transform duration-300"
+    >
+      <ArrowLeft className="w-4 h-4 group-hover:text-white text-muted-foreground" />
+    </motion.div>
+    <span>Back to login</span>
+  </div>
+</button>
+
             </div>
         </div>
     )

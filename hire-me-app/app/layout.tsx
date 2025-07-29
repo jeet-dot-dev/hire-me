@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { satoshi } from './fonts';
 import "./globals.css";
 import { Providers } from "./provider";
 
@@ -25,8 +26,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+  rel="preload"
+  as="image"
+  href="https://pub-e8254eef37b34b8c92dffe1a5f1c9a49.r2.dev/Hire-me-assets/authBgImage.webp"
+/>
+
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${satoshi.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

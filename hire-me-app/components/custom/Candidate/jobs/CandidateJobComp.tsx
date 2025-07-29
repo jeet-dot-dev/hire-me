@@ -24,6 +24,8 @@ import type { JobFormDataUI } from "@/zod/job";
 import CandidateJobListings from "./CandidateJobListings";
 import { useDebouncedEffect } from "@/hooks/useDebouncedEffect";
 import axios from "axios";
+import FullScreenLoader from "@/components/scaleton-loaders/FullScreenLoader";
+import JobCardLoader from "@/components/scaleton-loaders/JobCardLoader";
 
 export type CandidateJobCompProp = {
   jobs: JobFormDataUI[];
@@ -136,7 +138,7 @@ const CandidateJobComp = ({
   // }, [searchTerm, isFilterOn, filteredJobs, jobs]);
 
   return (
-    <div>
+    <div className="dark">
       <div className="flex justify-between items-center w-full p-4">
         <div>
           <h2 className="text-3xl font-semibold text-gray-100">
@@ -157,11 +159,11 @@ const CandidateJobComp = ({
       <div className="flex w-full max-w-full flex-col  gap-4 ">
         {!isWishlistPage && (
           <div className="header flex w-full max-w-full items-center gap-4 px-4">
-            <div className="relative w-full max-w-[90%]">
+            <div className="relative w-full max-w-[90%] text-white">
               <Input
                 type="text"
                 placeholder={selectedFilter.placeholder}
-                className="pr-8 placeholder:text-white"
+                className="pr-8 placeholder:text-muted-foreground"
                 value={searchTerm}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -187,7 +189,7 @@ const CandidateJobComp = ({
             </div>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="bg-[#262626] cursor-pointer px-3 py-1.5 rounded-md text-muted-foreground flex items-center gap-2">
+              <DropdownMenuTrigger className="bg-[#262626] cursor-pointer px-3 py-2 rounded-md text-muted-foreground flex items-center gap-2">
                 <Funnel className="w-4 h-4" />
                 <span className="text-sm font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
                   {selectedFilter.label}
@@ -217,9 +219,13 @@ const CandidateJobComp = ({
         )}
         <div className="main">
           {isLoading ? (
-            <Loader className="mx-auto animate-spin" />
+            <JobCardLoader />
           ) : isFilterOn && filteredJobs.length === 0 ? (
-            <p className="text-center text-muted-foreground">No jobs found</p>
+            <div className="flex items-center justify-center h-[50vh]">
+              <p className="text-white font-semibold animate-pulse text-lg">
+                Oops! No jobs found
+              </p>
+            </div>
           ) : (
             <CandidateJobListings
               jobs={filteredJobs}

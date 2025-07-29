@@ -41,10 +41,15 @@ const Page = () => {
 
 
   return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-cover"
+          style={{
+          backgroundImage:
+            "url('https://pub-e8254eef37b34b8c92dffe1a5f1c9a49.r2.dev/Hire-me-assets/authBgImage.webp')",
+        }}
+      >
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Email Verification</h2>
+          <h2 className="text-3xl font-bold text-white">Email Verification</h2>
           
           {status === "loading" && (
             <div className="mt-8">
@@ -75,7 +80,7 @@ const Page = () => {
                 </svg>
               </div>
               <p className="mt-4 text-red-600">{message}</p>
-              <a href="/auth/signup" className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              <a href="/auth/register" className="mt-4 inline-block bg-black/40 text-white px-4 py-2 rounded hover:bg-black/60">
                 Try Again
               </a>
             </div>

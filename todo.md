@@ -71,5 +71,5 @@
 - [x] add search 
 
 ### Day 15 Job Backend
-- [ ] UI responsiveness
-- [ ] Add loaders 
+- [x] UI responsiveness
+- [x] Add loaders 

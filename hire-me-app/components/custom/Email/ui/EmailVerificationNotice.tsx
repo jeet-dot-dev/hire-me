@@ -81,7 +81,7 @@ export default function EmailVerificationNotice({
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent  flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         {isVerified ? (
           <div className="text-center space-y-4">
@@ -147,7 +147,7 @@ export default function EmailVerificationNotice({
                 onClick={handleResend}
                 disabled={!canResend || isResending}
                 variant={canResend && !isResending ? "default" : "secondary"}
-                className={`w-full ${
+                className={`w-full cursor-pointer ${
                   canResend && !isResending
                     ? "bg-white text-black hover:bg-gray-100"
                     : "bg-zinc-800 text-zinc-400 cursor-not-allowed"

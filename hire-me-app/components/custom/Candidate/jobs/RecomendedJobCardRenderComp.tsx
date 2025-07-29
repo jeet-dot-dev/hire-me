@@ -2,6 +2,7 @@
 import JobCardView from "@/components/generic/job/JobCardView";
 import { JobFormDataUI } from "@/zod/job";
 import axios from "axios";
+import { Loader } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -135,9 +136,10 @@ const RecomendedJobCardRenderComp = ({
           ref={observerRef}
           className="h-10 mt-4 flex items-center justify-center"
         >
-          <span className="text-muted-foreground text-xs animate-pulse">
-            Loading more jobs...
-          </span>
+          <div className="flex items-center gap-2 text-sm text-white animate-pulse">
+            <Loader className="w-4 h-4 animate-spin text-white" />
+            <span>Loading more jobs...</span>
+          </div>
         </div>
       )}
     </>

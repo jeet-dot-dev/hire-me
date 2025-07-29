@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -71,7 +72,13 @@ const Page = () => {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div
+        className="min-h-screen bg-black bg-cover flex items-center justify-center p-4"
+        style={{
+          backgroundImage:
+            "url('https://pub-e8254eef37b34b8c92dffe1a5f1c9a49.r2.dev/Hire-me-assets/authBgImage.webp')",
+        }}
+      >
         <div className="w-full max-w-md space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-semibold text-white">
@@ -83,10 +90,7 @@ const Page = () => {
           </div>
 
           <Button
-            onClick={() =>
-          
-              router.push("/auth/reset-password")
-            }
+            onClick={() => router.push("/auth/reset-password")}
             className="w-full"
           >
             Request New Reset Link
@@ -97,8 +101,23 @@ const Page = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div
+      className="min-h-screen bg-black flex bg-cover items-center justify-center p-4"
+      style={{
+        backgroundImage:
+          "url('https://pub-e8254eef37b34b8c92dffe1a5f1c9a49.r2.dev/Hire-me-assets/authBgImage.webp')",
+      }}
+    >
       <div className="w-full max-w-md space-y-6">
+        <div className="absolute top-6 left-6">
+          <Link
+            href="/"
+            className="inline-flex items-center text-white hover:text-zinc-300 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            <span className="text-sm font-medium">Back to Home</span>
+          </Link>
+        </div>
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-semibold text-white">
             Set up a New Password
@@ -127,7 +146,7 @@ const Page = () => {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -157,7 +176,7 @@ const Page = () => {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3"
+                className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
@@ -179,18 +198,18 @@ const Page = () => {
         <Button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full bg-white text-black hover:bg-gray-100 disabled:opacity-50"
+          className="w-full bg-white text-black hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
         >
           {loading ? "Updating..." : "Update Password"}
         </Button>
 
-        <button
-          type="button"
+        <Button
+          variant="link"
           onClick={() => router.push("/auth/login")}
-          className="w-full text-zinc-400 hover:text-zinc-300 transition-colors text-sm"
+          className="w-full text-zinc-400 hover:text-zinc-300 transition-colors text-sm cursor-pointer"
         >
-          Back to login
-        </button>
+          ← Back to login
+        </Button>
       </div>
     </div>
   );
