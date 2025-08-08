@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-// 1️⃣ Map filter options to actual model fields
+// 1️Map filter options to actual model fields
 const filterFieldMap = {
   title: "jobTitle",
   company: "companyName",
@@ -27,11 +27,11 @@ export async function GET(req: Request) {
     const field =
       filterFieldMap[filterBy as keyof typeof filterFieldMap] || "jobTitle";
 
-    // 2️⃣ Classify types
+    // 2️Classify types
     const stringFields = ["jobTitle", "companyName", "location"];
     const arrayFields = ["skillsRequired", "tags"];
 
-    // 3️⃣ Build the where clause based on field type
+    // 3️Build the where clause based on field type
     let whereClause = {};
 
     if (stringFields.includes(field)) {
@@ -58,7 +58,7 @@ export async function GET(req: Request) {
       );
     }
 
-    // 4️⃣ Query DB
+    // 4️ Query DB
     const jobs = await prisma.job.findMany({
       where: whereClause,
       orderBy: {
@@ -68,7 +68,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ jobs });
   } catch (err) {
-    console.error("❌ API Crash:", err);
+    console.error(" API Crash:", err);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

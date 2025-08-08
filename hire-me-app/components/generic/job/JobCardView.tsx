@@ -32,6 +32,7 @@ import { JobFormDataUI } from "@/zod/job";
 import { toast } from "sonner";
 import DeleteJobDialog from "@/components/custom/recruiter/DeleteJobDialog";
 import ShareJobDialog from "./share/ShareJobDialog";
+import ApplyDialog from "./apply/ApplyDialog";
 
 type Props = {
   job: JobFormDataUI;
@@ -227,9 +228,9 @@ const JobCardView = ({
                   Expires: {new Date(job.expireAt).toLocaleDateString()}
                 </span>
               ) : (
-                <Badge className="px-3 py-4" variant="destructive">
-                  Expired
-                </Badge>
+                <span className="text-[12px] text-muted-foreground">
+                  Expires: {new Date(job.expireAt).toLocaleDateString()}
+                </span>
               )}
             </div>
           ) : (
@@ -253,7 +254,11 @@ const JobCardView = ({
 
             <Button variant="outline" className="cursor-pointer">
               {role === "CANDIDATE" ? (
-                "Apply"
+                <ApplyDialog job={job}>
+                  <span className=" flex justify-center items-center gap-2">
+                    Apply
+                  </span>
+                </ApplyDialog>
               ) : (
                <ShareJobDialog jobId={job.id}>
                  <span className="flex justify-center items-center gap-2">

@@ -166,7 +166,7 @@ model Job {
   shareLink          String?
 
   // Relation to Application
-  jobApplication     JobApplication?
+  jobApplication     JobApplication[]
 }
 
 // ===============================
@@ -193,13 +193,13 @@ model Candidate {
 
   wishListedJobs String[]
 
-  JobApplication JobApplication?
+  JobApplication JobApplication[]
 }
 
 model JobApplication {
   id           String     @id @default(uuid())
-  jobId        String     @unique
-  candidateId  String     @unique
+  jobId        String    
+  candidateId  String     
 
   job          Job        @relation(fields: [jobId], references: [id])
   candidate    Candidate? @relation(fields: [candidateId], references: [id])
@@ -207,6 +207,12 @@ model JobApplication {
   createdAt    DateTime   @default(now())
   status       ApplicationStatus
   feedback     String?    @db.VarChar(500)
+  resumeUrl    String  
+  resumeText   String?  
+  resumeOverview String? // Summary of the resume text
+  matchedSkills String[] // Skills that matched the job requirements
+  unmatchedSkills String[] // Skills that did not match the job requirements
+  score        Int?      // Score based on resume matching
 }
 
 model Education {

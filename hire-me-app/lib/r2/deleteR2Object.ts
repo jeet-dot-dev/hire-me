@@ -18,3 +18,18 @@ export const deleteR2Object = async (keys: string[]) => {
     return error;
   }
 };
+
+export const deleteR2ObjectSingle = async (key: string) => {
+  try {
+    await r2.send(
+      new DeleteObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: key,
+    })
+  );
+  return true;
+} catch (error) {
+  console.log(error);
+  return false;
+}
+}

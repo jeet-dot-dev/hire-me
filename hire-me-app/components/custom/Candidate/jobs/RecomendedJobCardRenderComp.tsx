@@ -30,7 +30,7 @@ const RecomendedJobCardRenderComp = ({
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  console.log("hi i am renderd", allJobs.length);
+  //console.log("hi i am renderd", allJobs.length);
 
   const fetchMoreJobs = useCallback(async () => {
     if (isWishlistPage) return;

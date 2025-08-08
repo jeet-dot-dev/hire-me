@@ -73,3 +73,9 @@
 ### Day 15 Job Backend
 - [x] UI responsiveness
 - [x] Add loaders 
+
+------------------------------------------------------- Half Project Complete --------------------------------------------------------
+
+### Day 16 Job Backend
+- [x] Build the apply page
+- [x] Get the resume score and matched skills using openai
