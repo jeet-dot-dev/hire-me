@@ -100,9 +100,11 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
       }
 
       const application = await appRes.json();
-      toast.success("Application submitted successfully!", { id: toastId });
+     // ✅ Preload the application page before redirecting
+      router.prefetch(`/application/${application.id}`);
       setUploading(false);
       router.push(`/application/${application.id}`);
+       toast.success("Application submitted successfully!", { id: toastId });
     } catch (err) {
       await deleteR2ObjectSingle(deleteKey);
       setUploading(false);
