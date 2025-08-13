@@ -9,19 +9,16 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Calendar, LaptopMinimal, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import InterviewCheckScreen from "./InterviewCheckScreen";
+import { JobFormDataUI } from "@/zod/job";
+import { ApplycationType } from "@/types/applicationType";
 
 type ResumeResultProp = {
-  score: number;
-  overview: string;
-  matchedSkills: string[];
-  unmatchedSkills: string[];
+  job : JobFormDataUI,
+  application : ApplycationType
 };
 
 export default function ResumeResult({
-  score,
-  overview,
-  matchedSkills,
-  unmatchedSkills,
+  job , application
 }: ResumeResultProp) {
   const [showComingSoon, setShowComingSoon] = useState(false);
   const [showInterviewCheck, setShowInterviewCheck] = useState(false);
@@ -34,22 +31,23 @@ export default function ResumeResult({
   const closeComingSoon = () => {
     setShowComingSoon(false);
   };
+ 
+const safeScore = application.score ?? 0;
+useEffect(() => {
+  const timer = setTimeout(() => {
+    const interval = setInterval(() => {
+      setAnimatedScore((prev) => {
+        if (prev >= safeScore) {
+          clearInterval(interval);
+          return safeScore;
+        }
+        return prev + 1;
+      });
+    }, 20);
+  }, 800);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const interval = setInterval(() => {
-        setAnimatedScore((prev) => {
-          if (prev >= score) {
-            clearInterval(interval);
-            return score;
-          }
-          return prev + 1;
-        });
-      }, 20);
-    }, 800);
-
-    return () => clearTimeout(timer);
-  }, [score]);
+  return () => clearTimeout(timer);
+}, [safeScore]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-400";
@@ -131,7 +129,7 @@ export default function ResumeResult({
         </motion.div>
       )}
 
-      {showInterviewCheck && <InterviewCheckScreen setShowInterviewCheck={setShowInterviewCheck}/>}
+      {showInterviewCheck && <InterviewCheckScreen setShowInterviewCheck={setShowInterviewCheck} job={job} application={application}/>}
 
       {/* Score Section */}
       <motion.div
@@ -150,7 +148,7 @@ export default function ResumeResult({
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <motion.span
-                className={`text-6xl font-bold bg-gradient-to-r from-current to-white bg-clip-text text-transparent ${getScoreColor(score)}`}
+                className={`text-6xl font-bold bg-gradient-to-r from-current to-white bg-clip-text text-transparent ${getScoreColor(application.score || 0)}`}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, type: "spring", bounce: 0.6 }}
@@ -159,12 +157,12 @@ export default function ResumeResult({
               </motion.span>
               <div className="text-right">
                 <div className="text-sm text-gray-400 mb-1">Performance</div>
-                <div className={`font-semibold ${getScoreColor(score)}`}>
-                  {score >= 80
+                <div className={`font-semibold ${getScoreColor(application.score || 0)}`}>
+                  {safeScore >= 80
                     ? "Excellent"
-                    : score >= 60
+                    :safeScore >= 60
                       ? "Good"
-                      : score >= 40
+                      :safeScore >= 40
                         ? "Fair"
                         : "Needs Improvement"}
                 </div>
@@ -176,7 +174,7 @@ export default function ResumeResult({
                 className="bg-zinc-800 h-4 overflow-hidden rounded-full"
               />
               <motion.div
-                className={`absolute top-0 left-0 h-4 rounded-full ${getProgressColor(score)} opacity-80`}
+                className={`absolute top-0 left-0 h-4 rounded-full ${getProgressColor(application.score || 0)} opacity-80`}
                 initial={{ width: "0%" }}
                 animate={{ width: `${animatedScore}%` }}
                 transition={{ delay: 0.8, duration: 1.2, ease: "easeInOut" }}
@@ -201,7 +199,7 @@ export default function ResumeResult({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-300">{overview}</p>
+            <p className="text-gray-300">{application.resumeOverview}</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -221,8 +219,8 @@ export default function ResumeResult({
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
-              {matchedSkills?.length > 0 ? (
-                matchedSkills.map((skill: string, index: number) => (
+              {application.matchedSkills?.length > 0 ? (
+                application.matchedSkills.map((skill: string, index: number) => (
                   <Badge
                     key={index}
                     variant="secondary"
@@ -251,8 +249,8 @@ export default function ResumeResult({
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
-              {unmatchedSkills?.length > 0 ? (
-                unmatchedSkills.map((skill: string, index: number) => (
+              {application.unmatchedSkills?.length > 0 ? (
+                application.unmatchedSkills.map((skill: string, index: number) => (
                   <Badge
                     key={index}
                     variant="secondary"

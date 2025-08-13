@@ -79,3 +79,7 @@
 ### Day 16 Job Backend
 - [x] Build the apply page
 - [x] Get the resume score and matched skills using openai
+
+### Day 17 Application UI 
+- [x] Rebuild the UI apply page
+- [x] Build the permission page for the interview 

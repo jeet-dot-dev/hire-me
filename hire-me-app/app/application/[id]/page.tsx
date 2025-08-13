@@ -11,6 +11,29 @@ type Props = {
   };
 };
 
+  const jobSelect = {
+    id: true,
+    jobTitle: true,
+    companyName: true,
+    location: true,
+    salary: true,
+    jobType: true,
+    description: true,
+    skillsRequired: true,
+    interviewDuration: true,
+    interviewInstruction: true,
+    tags: true,
+    industry: true,
+    jobLevel: true,
+    experienceNeeded: true,
+    contact: true,
+    expireAt: true,
+    createdAt: true,
+    updatedAt: true,
+    status: true,
+    isDelete: true,
+  };
+
 const Page = async ({ params }: Props) => {
   const { id } = await params;
 
@@ -32,10 +55,7 @@ const Page = async ({ params }: Props) => {
   // 2️⃣ Fetch the job
   const job = await prisma.job.findUnique({
     where: { id: application.jobId },
-    select: {
-      description: true,
-      skillsRequired: true,
-    },
+    select: jobSelect,
   });
 
   if (!job) {
@@ -52,10 +72,8 @@ const Page = async ({ params }: Props) => {
   ) {
     return (
       <ResumeResult
-        score={application.score}
-        overview={application.resumeOverview}
-        matchedSkills={application.matchedSkills}
-        unmatchedSkills={application.unmatchedSkills}
+        job={job}
+        application={application}
       />
     );
   }
@@ -100,10 +118,8 @@ const Page = async ({ params }: Props) => {
   // 6️⃣ Return fresh results
   return (
     <ResumeResult
-      score={analysisResult.score}
-      overview={analysisResult.resumeOverview}
-      matchedSkills={analysisResult.matchedSkills}
-      unmatchedSkills={analysisResult.unmatchedSkills}
+    job={job}
+    application={application}
     />
   );
 };
