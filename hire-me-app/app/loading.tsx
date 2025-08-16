@@ -35,7 +35,7 @@ export default function Loading() {
 
         {/* Job Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
+          {[...Array(9)].map((_, i) => (
             <div key={i} className="p-4 rounded-xl border bg-card space-y-4">
               <Skeleton className="h-5 w-[70%] rounded" />
               <Skeleton className="h-4 w-[50%] rounded" />

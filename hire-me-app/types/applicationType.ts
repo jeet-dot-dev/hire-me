@@ -1,4 +1,4 @@
-export type ApplycationType = {
+export type ApplicationType = {
     id: string;
     jobId: string;
     candidateId: string;

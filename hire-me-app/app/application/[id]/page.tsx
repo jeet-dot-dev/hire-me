@@ -105,7 +105,7 @@ const Page = async ({ params }: Props) => {
     );
   }
 
-  await prisma.jobApplication.update({
+ await prisma.jobApplication.update({
     where: { id },
     data: {
       score: analysisResult.score,
@@ -115,11 +115,15 @@ const Page = async ({ params }: Props) => {
     },
   });
 
+  // refetch the updated results 
+  const updatedApplication = await prisma.jobApplication.findUnique({
+  where: { id },
+});
   // 6️⃣ Return fresh results
   return (
     <ResumeResult
     job={job}
-    application={application}
+    application={updatedApplication!}
     />
   );
 };

@@ -10,11 +10,11 @@ import { ArrowLeft, Calendar, LaptopMinimal, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import InterviewCheckScreen from "./InterviewCheckScreen";
 import { JobFormDataUI } from "@/zod/job";
-import { ApplycationType } from "@/types/applicationType";
+import { ApplicationType } from "@/types/applicationType";
 
 type ResumeResultProp = {
   job : JobFormDataUI,
-  application : ApplycationType
+  application : ApplicationType
 };
 
 export default function ResumeResult({

@@ -21,14 +21,14 @@ import { toast } from "sonner";
 import Lottie from "lottie-react";
 import voiceAnimation from "../../../src/animations/voice.json";
 import { JobFormDataUI } from "@/zod/job";
-import { ApplycationType } from "@/types/applicationType";
+import { ApplicationType } from "@/types/applicationType";
 import { useRouter } from "next/navigation";
 
 
 type InterviewCheckScreenProp = {
    setShowInterviewCheck: Dispatch<SetStateAction<boolean>>,
     job : JobFormDataUI,
-    application : ApplycationType
+    application : ApplicationType
 } 
 const InterviewCheckScreen = ({
   setShowInterviewCheck,job,application

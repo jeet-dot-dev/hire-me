@@ -1,20 +1,25 @@
 "use client";
+import Lottie from "lottie-react";
+import resumeLoader from "../../src/animations/resumeLoader.json";
 
 export default function ResumeLoader() {
   return (
     <div className="w-full min-h-screen bg-black flex flex-col items-center justify-center p-6">
-      {/* Animated Circle Loader */}
-      <div className="relative">
-        {/* Outer pulse */}
-        <div className="absolute w-20 h-20 border-4 border-blue-500 rounded-full animate-ping opacity-40"></div>
-        {/* Inner spinner */}
-        <div className="w-20 h-20 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin"></div>
+      <div className="bg-black backdrop-blur-lg rounded-2xl shadow-xl p-8 flex flex-col items-center space-y-6">
+        <Lottie
+          animationData={resumeLoader}
+          loop
+          style={{ width: 500, height: 500 }}
+        />
+        <p className="text-lg md:text-xl font-medium text-center text-white">
+          <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent animate-pulse">
+            ⏳ Analyzing your resume...
+          </span>
+        </p>
+        <p className="text-sm text-gray-400 text-center">
+          This may take a few minutes. Sit tight 🚀
+        </p>
       </div>
-
-      {/* Message */}
-      <p className="text-gray-300 mt-6 text-lg font-medium text-center">
-        ⏳ It will take a few minutes, please wait...
-      </p>
     </div>
   );
 }
