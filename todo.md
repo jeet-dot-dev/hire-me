@@ -83,3 +83,7 @@
 ### Day 17 Application UI 
 - [x] Rebuild the UI apply page
 - [x] Build the permission page for the interview 
+
+### Day 18 Application UI 
+- [x] Rebuild the UI of the interview  page
+
