@@ -15,21 +15,38 @@ export type ApplicationType = {
 
 
 
-// model JobApplication {
-//   id           String     @id @default(uuid())
-//   jobId        String    
-//   candidateId  String     
+type TranscriptMessage = {
+  role: "recruiter" | "candidate";
+  text: string;
+};
 
-//   job          Job        @relation(fields: [jobId], references: [id])
-//   candidate    Candidate? @relation(fields: [candidateId], references: [id])
+export type ApplicationTypeFull = {
+  id: string;
+  jobId: string;
+  candidateId: string;
 
-//   createdAt    DateTime   @default(now())
-//   status       ApplicationStatus
-//   feedback     String?    @db.VarChar(500)
-//   resumeUrl    String  
-//   resumeText   String?  
-//   resumeOverview String? // Summary of the resume text
-//   matchedSkills String[] // Skills that matched the job requirements
-//   unmatchedSkills String[] // Skills that did not match the job requirements
-//   score        Int?      // Score based on resume matching
-// }
+  createdAt: Date;
+  status: "Pending" | "Accepted" | "Rejected";
+  feedback: string | null;
+  resumeUrl: string;
+  resumeText: string | null;
+  resumeOverview: string | null;
+  matchedSkills: string[];
+  unmatchedSkills: string[];
+  score: number | null;
+
+  // Interview fields
+  isInterviewDone: boolean;
+
+  // 👇 FIX: store as an array of TranscriptMessage
+  transcript: TranscriptMessage[] | null;
+
+  transcriptSummary: string | null;
+  interviewScore: number | null;
+  aiRecommendation: string | null;
+  strongPoints: string[];
+  weakPoints: string[];
+  aiSuggestions: string[];
+  suspiciousActivities: string[];
+  interviewDuration: number | null;
+};

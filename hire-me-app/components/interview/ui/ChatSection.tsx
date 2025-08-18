@@ -1,119 +1,180 @@
 "use client";
-import React, { useState, useRef } from "react";
-import { Mic, Send } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { ApplicationType } from "@/types/applicationType";
+import { JobFormDataUI } from "@/zod/job";
+import { useChat } from "@/hooks/chat/useChat";
+import ChatHeader from "./ChatInterViewComps/chatHeader";
+import ChatMessages from "./ChatInterViewComps/ChatMessages";
+import ChatInput from "./ChatInterViewComps/ChatInput";
+import { useRouter } from "next/navigation";
+import { playTTS } from "@/hooks/chat/playTTS";
+import ResumeLoader from "@/components/scaleton-loaders/ResumeLoader";
+import { toast } from "sonner";
 
-type messagetype = {
-  role: string;
-  text: string;
-};
+const ChatSection = ({
+  isJoining,
+  application,
+  job,
+  timeLeft,
+}: {
+  isJoining: boolean;
+  application: ApplicationType;
+  job: JobFormDataUI;
+  timeLeft: string;
+}) => {
+  const {
+    messages,
+    isRecruiterTyping,
+    input,
+    setInput,
+    isRecording,
+    startRecording,
+    stopRecording,
+    sendMessage,
+    messagesEndRef,
+    setMessages,
+    setIsRecruiterTyping,
+  } = useChat({ isJoining, job, application, timeLeft });
+  const router = useRouter();
 
-const ChatSection = () => {
-  const [messages, setMessages] = useState<messagetype[]>([]);
-  const [input, setInput] = useState("");
-  const [isRecording, setIsRecording] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  
+  // 🚀 Guard against double run (StrictMode) + refresh
+  const hasPlayedRef = useRef(false);
+  const [loading, setLoading] = useState(false);
 
-  // 🎤 Start recording
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-      mediaRecorderRef.current = mediaRecorder;
-      chunksRef.current = [];
+  // Auto scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, messagesEndRef]);
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
+  // Handle interview end
+  const hasEndedRef = useRef(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (sessionStorage.getItem("interviewEnded") === "true") {
+      router.replace(`/application/${application.id}/interview/result`);
+      return;
+    }
+
+    if (timeLeft === "00:00") {
+      if (hasEndedRef.current) return;
+      hasEndedRef.current = true;
+      sessionStorage.setItem("interviewEnded", "true");
+
+      const handleEnd = async () => {
+        try {
+          // Step 1: Play end message and update UI
+          const endMsg =
+            "Sorry your time is over. Now we are forwarding you to the result page. You will be notified if you get selected. Thank you.";
+
+          // First, add the message to chat
+          setMessages((prev) => [...prev, { role: "recruiter", text: endMsg }]);
+          
+          // Then play the audio and wait for it to complete
+          await playTTS(endMsg);
+
+          // Step 2: Show loading only after audio finishes
+          setLoading(true);
+
+          // Step 3: Save interview data
+          const suspiciousActivities = sessionStorage.getItem("suspiciousActivities");
+          const suspicious = suspiciousActivities ? JSON.parse(suspiciousActivities) : [];
+
+          const response = await fetch(`/api/interview/save`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              applicationId: application.id,
+              jobId: job.id,
+              conversation: messages,
+              suspiciousActivities: suspicious,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to save interview data');
+          }
+
+          // Clean up session storage
+          sessionStorage.removeItem("suspiciousActivities");
+          sessionStorage.clear();
+
+          // Step 4: Navigate to result page after saving is complete
+          timer = setTimeout(() => {
+            router.push(`/application/${application.id}/interview/result`);
+          }, 1000); // Small delay to show loading state
+          
+        } catch (err) {
+          toast.error("Internal server error. Please try later");
+          console.error("Failed to save interview:", err);
+          setLoading(false); // Reset loading state on error
+          hasEndedRef.current = false; // Allow retry
+          sessionStorage.removeItem("interviewEnded"); // Allow retry
         }
       };
 
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error("Mic error:", error);
+      handleEnd();
     }
-  };
 
-  // ⏹ Stop recording and send audio
-  const stopRecording = async () => {
-    return new Promise<void>((resolve) => {
-      if (!mediaRecorderRef.current) return;
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [timeLeft, application.id, job.id, messages, router, setMessages]);
 
-      mediaRecorderRef.current.onstop = async () => {
-        const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
-        const formData = new FormData();
-        formData.append("audio", audioBlob, "speech.webm");
+  // Play welcome message once per session
+  useEffect(() => {
+    const hasPlayedSession = sessionStorage.getItem("welcomePlayed");
 
-        const res = await fetch("/api/interview/stt", {
-          method: "POST",
-          body: formData,
-        });
+    if (hasPlayedRef.current || hasPlayedSession) return; // ⛔ already played
 
-        const { text } = await res.json();
-        console.log("Transcribed:", text);
+    hasPlayedRef.current = true; // ✅ block StrictMode double-run
+    sessionStorage.setItem("welcomePlayed", "true"); // ✅ block refresh replay
+    setIsRecruiterTyping(true);
+    
+    const playWelcomeMsg = async () => {
+      const welcomeMsg = `Hello, welcome to the platform Hire-me. Myself Jenny, today I am taking your interview for the 
+        ${job.companyName} for ${job.jobTitle} position. Before starting the Interview please follow these rules:
+        1. Don't turn off your mic or video. 
+        2. Don't switch tabs or minimize the application.
+        3. This interview is ${job.interviewDuration}mins long.
+        So if you are ready, let's start with your introduction.
+      `;
 
-        setInput(text);
-        setMessages((prev) => [...prev, { role: "candidate", text }]);
+      await playTTS(welcomeMsg);
+      setMessages((prev) => [...prev, { role: "recruiter", text: welcomeMsg }]);
+      setIsRecruiterTyping(false);
+    };
 
-        resolve();
-      };
+    playWelcomeMsg();
+  }, [
+    job.companyName,
+    job.jobTitle,
+    job.interviewDuration,
+    setMessages,
+    setIsRecruiterTyping,
+  ]);
 
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    });
-  };
+  const msg = ["Evaluating your interview", "It will take some time. Please wait"];
+  
+  if (loading) {
+    return <div className="w-full min-h-screen absolute">
+       <ResumeLoader msg={msg} />
+    </div>;
+  }
 
   return (
-    <div className="chat min-h-[400px] bg-[#1c1c1c] rounded-2xl shadow-2xl border border-gray-700 flex flex-col">
-      {/* Chat Header */}
-      <div className="p-4 border-b border-gray-700 flex items-center justify-between">
-        <h3 className="font-medium">Interview Chat</h3>
-        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-      </div>
-
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`p-3 rounded-xl max-w-[80%] ${
-              msg.role === "candidate"
-                ? "ml-auto bg-blue-600 text-white"
-                : "bg-gray-800 text-gray-200"
-            }`}
-          >
-            {msg.text}
-          </div>
-        ))}
-      </div>
-
-      {/* Input Section */}
-      <div className="p-4 border-t border-gray-700 flex items-center gap-2">
-        {/* Mic button */}
-        <button
-          onClick={isRecording ? stopRecording : startRecording}
-          className={`p-3 rounded-full ${
-            isRecording ? "bg-red-500 animate-pulse" : "bg-gray-700"
-          }`}
-        >
-          <Mic size={20} />
-        </button>
-
-        {/* Textarea */}
-        <textarea
-          className="flex-1 bg-gray-800 text-white rounded-xl p-2 resize-none h-12"
-          placeholder="Type your response..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-
-        {/* Send button */}
-        <button className="p-3 rounded-full bg-blue-600 hover:bg-blue-700">
-          <Send size={20} />
-        </button>
-      </div>
+    <div className="chat h-[450px] bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d] rounded-2xl shadow-2xl border border-gray-600 flex flex-col overflow-hidden">
+      <ChatHeader isRecruiterTyping={isRecruiterTyping} />
+      <ChatMessages messages={messages} messagesEndRef={messagesEndRef} />
+      <ChatInput
+        input={input}
+        setInput={setInput}
+        isRecording={isRecording}
+        startRecording={startRecording}
+        stopRecording={stopRecording}
+        sendMessage={sendMessage}
+      />
     </div>
   );
 };

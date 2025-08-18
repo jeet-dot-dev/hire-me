@@ -81,7 +81,7 @@ const VideoSection = ({ isJoining, joiningStep, joiningSteps }: Props) => {
               muted
               playsInline
             >
-              <source src="/Jammy.mp4" type="video/mp4" />
+              <source src="/Jammy2.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </motion.div>

@@ -10,20 +10,17 @@ import VideoSection from "@/components/interview/ui/VideoSection";
 import CandidateVideo from "@/components/interview/ui/CandidateVideo";
 import ChatSection from "@/components/interview/ui/ChatSection";
 import ControlSection from "@/components/interview/ui/ControlSection";
-import { ApplicationType } from "@/types/applicationType";
+import { ApplicationTypeFull } from "@/types/applicationType";
 import { JobFormDataUI } from "@/zod/job";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const Page = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [application, setApplication] = useState<ApplicationType>();
+  const [application, setApplication] = useState<ApplicationTypeFull>();
   const [job, setJob] = useState<JobFormDataUI>();
-  const [messages, setMessages] = useState<
-    { role: "recruiter" | "candidate"; text: string }[]
-  >([]);
-  const [isRecruiterTyping, setIsRecruiterTyping] = useState(false);
-  const [isCandidateTurn, setIsCandidateTurn] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+  const [alreadyDone, setAlreadyDone] = useState(false);
 
   const router = useRouter();
 
@@ -37,6 +34,44 @@ const Page = () => {
     }
   }, []);
 
+  // ✅ Mark interview as started
+  useEffect(() => {
+    if (!application?.id || application.isInterviewDone) return;
+
+    const startInterview = async () => {
+      try {
+        const res = await fetch("/api/interview/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ applicationId: application.id }),
+        });
+
+        if (!res.ok) throw new Error("Failed to mark interview as started");
+
+        const data = await res.json();
+        console.log("Interview marked as started ✅", data);
+      } catch (error) {
+        console.error("Error marking interview started:", error);
+      }
+    };
+
+    startInterview();
+  }, [application?.id, application?.isInterviewDone]);
+
+  // ✅ Check if already completed
+  useEffect(() => {
+    if (!application) return;
+
+    if (application.isInterviewDone) {
+      toast.error("Interview already completed for this application.");
+      setAlreadyDone(true);
+      router.replace("/candidate/dashboard/jobs");
+    }
+
+    setIsChecking(false);
+  }, [application, router]);
+
+  // ✅ Hooks must always run (no matter what)
   const { micOn, videoOn, toggleMic, toggleVideo } = useMediaDevices(videoRef);
   const connectionQuality = useConnectionQuality();
   const getInterviewDuration = useInterviewTimer(job);
@@ -50,21 +85,23 @@ const Page = () => {
     ],
     []
   );
-
   const { isJoining, joiningStep } = useJoiningSimulation(joiningSteps);
 
   // ✅ Detect tab switching or minimizing (cheating detection)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        toast.error(
-          "⚠️ Tab switching or minimizing detected! Please stay on the interview tab."
-        );
+        const msg =
+          "⚠️ Tab switching or minimizing detected! Please stay on the interview tab.";
+        toast.error(msg);
+        logSuspiciousActivity(msg);
       }
     };
 
     const handleBlur = () => {
-      toast.error("⚠️ Chrome minimized or switched to another app!");
+      const msg = "⚠️ Chrome minimized or switched to another app!";
+      toast.error(msg);
+      logSuspiciousActivity(msg);
     };
 
     window.addEventListener("blur", handleBlur);
@@ -76,17 +113,46 @@ const Page = () => {
     };
   }, []);
 
-  // ✅ Warn before closing or refreshing tab
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = ""; // ✅ Chrome requires empty string
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
+  const logSuspiciousActivity = (msg: string) => {
+    const existing = sessionStorage.getItem("suspiciousActivities");
+    const activities = existing ? JSON.parse(existing) : [];
 
-  // ✅ If session expired
+    activities.push({
+      message: msg,
+      timestamp: new Date().toISOString(),
+    });
+
+    sessionStorage.setItem("suspiciousActivities", JSON.stringify(activities));
+  };
+
+   if (!job || !application) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h2 className="text-xl font-bold">Session Expired</h2>
+        <p>Please re-upload your details to continue.</p>
+        <button
+          onClick={() => router.push("/candidate/dashboard/jobs")}
+          className="mt-4 px-4 py-2 bg-black text-white rounded-lg cursor-pointer"
+        >
+          Go to Jobs Page
+        </button>
+      </div>
+    );
+  }
+
+  // ✅ Handle rendering states
+  if (isChecking) {
+    return (
+      <div className="flex items-center w-full bg-black justify-center h-screen text-white">
+        <p>Sorry ! your interview is over </p>
+      </div>
+    );
+  }
+
+  if (alreadyDone) {
+    return null; // router.replace will redirect
+  }
+
   if (!job || !application) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -102,6 +168,7 @@ const Page = () => {
     );
   }
 
+  // ✅ Main UI
   return (
     <div className="w-full min-h-screen bg-black text-white">
       <NavBar connectionQuality={connectionQuality} />
@@ -117,7 +184,12 @@ const Page = () => {
           joiningSteps={joiningSteps}
         />
         <CandidateVideo ref={videoRef} micOn={micOn} videoOn={videoOn} />
-        <ChatSection />
+        <ChatSection
+          isJoining={isJoining}
+          application={application}
+          job={job}
+          timeLeft={getInterviewDuration()}
+        />
       </div>
       <ControlSection
         micOn={micOn}

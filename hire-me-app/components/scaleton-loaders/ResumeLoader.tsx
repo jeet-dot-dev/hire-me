@@ -2,7 +2,7 @@
 import Lottie from "lottie-react";
 import resumeLoader from "../../src/animations/resumeLoader.json";
 
-export default function ResumeLoader() {
+export default function ResumeLoader({msg}:{msg:string[]}) {
   return (
     <div className="w-full min-h-screen bg-black flex flex-col items-center justify-center p-6">
       <div className="bg-black backdrop-blur-lg rounded-2xl shadow-xl p-8 flex flex-col items-center space-y-6">
@@ -13,11 +13,11 @@ export default function ResumeLoader() {
         />
         <p className="text-lg md:text-xl font-medium text-center text-white">
           <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent animate-pulse">
-            ⏳ Analyzing your resume...
+            {msg[0]}
           </span>
         </p>
         <p className="text-sm text-gray-400 text-center">
-          This may take a few minutes. Sit tight 🚀
+         {msg[1]}
         </p>
       </div>
     </div>

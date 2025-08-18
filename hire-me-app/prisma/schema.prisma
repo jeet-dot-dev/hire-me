@@ -197,23 +197,43 @@ model Candidate {
 }
 
 model JobApplication {
-  id           String     @id @default(uuid())
-  jobId        String    
-  candidateId  String     
+  id                String     @id @default(uuid())
+  jobId             String    
+  candidateId       String     
 
-  job          Job        @relation(fields: [jobId], references: [id])
-  candidate    Candidate? @relation(fields: [candidateId], references: [id])
+  job               Job        @relation(fields: [jobId], references: [id])
+  candidate         Candidate? @relation(fields: [candidateId], references: [id])
 
-  createdAt    DateTime   @default(now())
-  status       ApplicationStatus
-  feedback     String?    @db.VarChar(500)
-  resumeUrl    String  
-  resumeText   String?  
-  resumeOverview String? // Summary of the resume text
-  matchedSkills String[] // Skills that matched the job requirements
-  unmatchedSkills String[] // Skills that did not match the job requirements
-  score        Int?      // Score based on resume matching
+  createdAt         DateTime   @default(now())
+  status            ApplicationStatus
+  feedback          String?    @db.VarChar(500)   // Recruiter manual feedback
+  resumeUrl         String  
+  resumeText        String?  
+  resumeOverview    String?  
+  matchedSkills     String[]
+  unmatchedSkills   String[]
+  score             Int?       // Resume matching score
+
+  // Interview fields
+  isInterviewDone   Boolean    @default(false)
+  transcript        Json?      // Full conversation JSON
+  transcriptSummary String?    // Short AI summary
+  interviewScore    Int?       // AI performance score
+  aiRecommendation  AiRecommendation?
+  strongPoints      String[]
+  weakPoints        String[]
+  aiSuggestions     String[]
+  suspiciousActivities String[] // Tab switch, minimized, etc.
+  interviewDuration Int?       // seconds
 }
+
+enum AiRecommendation {
+  STRONGLY_HIRE
+  HIRE
+  NEUTRAL
+  REJECT
+}
+
 
 model Education {
   id          String    @id @default(uuid())
