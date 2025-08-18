@@ -87,3 +87,6 @@
 ### Day 18 Application UI 
 - [x] Rebuild the UI of the interview  page
 
+### Day 19 Application UI 
+- [x] Build the complete interview flow
+- [x] Build the result page 
