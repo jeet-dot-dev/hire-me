@@ -50,3 +50,35 @@ export type ApplicationTypeFull = {
   suspiciousActivities: string[];
   interviewDuration: number | null;
 };
+
+
+export type JobType = {
+  id: string;
+  recruiterId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  expireAt: Date | null;
+  isDelete: boolean;
+
+  jobTitle: string;
+  companyName: string;
+  location: string;
+  salary: string | null;
+  jobType: "Remote" | "Onsite" | "Hybrid"; // 👈 match your enum
+  description: string;
+  skillsRequired: string[];
+  interviewDuration: number;
+  interviewInstruction: string | null;
+  tags: string[];
+  status: boolean;
+  industry: string | null;
+  jobLevel: "INTERN"|"ENTRY"|"MID"|"SENIOR"|"LEAD"|null ; // 👈 match your enum
+  experienceNeeded: number | null;
+  contact: string | null;
+  shareLink: string | null;
+};
+
+
+export type ApplicationWithJob = ApplicationTypeFull & {
+  job: JobType;
+};

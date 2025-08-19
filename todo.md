@@ -84,9 +84,13 @@
 - [x] Rebuild the UI apply page
 - [x] Build the permission page for the interview 
 
-### Day 18 Application UI 
+### Day 18 
 - [x] Rebuild the UI of the interview  page
 
-### Day 19 Application UI 
+### Day 19 
 - [x] Build the complete interview flow
 - [x] Build the result page 
+
+### Day 20 
+- [x] Build the candidate application page 
+- [x] Build the candidate dashboard page

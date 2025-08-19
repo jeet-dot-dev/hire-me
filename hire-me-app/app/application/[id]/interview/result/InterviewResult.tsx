@@ -74,15 +74,15 @@ const InterviewResult = ({application}: {application: ApplicationTypeFull}) => {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center space-y-6"
         >
-          <div className="relative p-8 rounded-2xl bg-gradient-to-br from-[#0f0f0f] to-[#1c1c1c] border border-white/10 backdrop-blur-xl">
+          <div className="relative p-8 rounded-2xl bg-[#1c1c1c] border border-white/10 backdrop-blur-xl">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent"></div>
             <div className="relative z-10">
               <AlertTriangle className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
               <h2 className="text-2xl font-bold mb-2">No Results Available</h2>
               <p className="text-gray-400 mb-6">Interview results are not yet available or failed to load.</p>
               <Button 
-                variant="ghost" 
-                className="text-white hover:bg-white/10 border border-white/20 backdrop-blur-sm"
+                variant="outline" 
+                className="text-white  border border-white/20 backdrop-blur-sm"
                 onClick={() => router.push('/candidate/dashboard') }
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
@@ -106,8 +106,8 @@ const InterviewResult = ({application}: {application: ApplicationTypeFull}) => {
         {/* Header */}
         <motion.div variants={itemVariants} className="flex items-center justify-between mb-8">
           <Button 
-            variant="ghost" 
-            className="text-white hover:bg-white/10 border border-white/20 backdrop-blur-sm flex items-center gap-2"
+            variant="secondary" 
+            className=" backdrop-blur-sm cursor-pointer flex items-center gap-2"
              onClick={() => router.push('/candidate/dashboard') }
           >
             <ChevronLeft className="w-4 h-4" />
@@ -360,10 +360,10 @@ const InterviewResult = ({application}: {application: ApplicationTypeFull}) => {
                     <CardTitle className="text-white">Interview Transcript</CardTitle>
                   </div>
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
                     onClick={() => setShowAllTranscript(!showAllTranscript)}
-                    className="text-blue-400 hover:bg-white/10 border border-white/20 backdrop-blur-sm"
+                    className='cursor-pointer'
                   >
                     {showAllTranscript ? 'Show Less' : 'Show All'}
                   </Button>
