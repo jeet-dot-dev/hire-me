@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/generic/DashboardLayout"; // this is the CLIENT component
+import DashboardLayout from "@/components/shared/DashboardLayout"; // this is the CLIENT component
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 

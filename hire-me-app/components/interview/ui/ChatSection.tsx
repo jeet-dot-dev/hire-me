@@ -8,7 +8,7 @@ import ChatMessages from "./ChatInterViewComps/ChatMessages";
 import ChatInput from "./ChatInterViewComps/ChatInput";
 import { useRouter } from "next/navigation";
 import { playTTS } from "@/hooks/chat/playTTS";
-import ResumeLoader from "@/components/scaleton-loaders/ResumeLoader";
+import ResumeLoader from "@/components/loaders/ResumeLoader";
 import { toast } from "sonner";
 
 const ChatSection = ({

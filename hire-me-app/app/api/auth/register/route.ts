@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { v4 as uuid } from "uuid";
-import { sendVerificationEmail } from "@/components/custom/Email/sendVerificationEmail";
+import { sendVerificationEmail } from "@/components/features/Email/sendVerificationEmail";
 
 export async function POST(req: Request) {
   try {

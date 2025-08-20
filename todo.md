@@ -94,3 +94,7 @@
 ### Day 20 
 - [x] Build the candidate application page 
 - [x] Build the candidate dashboard page
+
+### Day 21
+- [x] Build the recruiter application page 
+- [x] Build the recruiter dashboard page

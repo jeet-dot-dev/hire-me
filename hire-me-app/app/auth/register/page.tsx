@@ -1,4 +1,4 @@
-import SignupComp from "@/components/custom/auth/SignupComp";
+import SignupComp from "@/components/features/auth/SignupComp";
 import React from "react";
 
 const page = () => {

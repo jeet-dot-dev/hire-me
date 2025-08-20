@@ -3,8 +3,8 @@ import React, { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { CandidateProfileForm } from "@/components/custom/Candidate/Profile/CandidateProfileForm";
-import FullScreenLoader from "@/components/scaleton-loaders/FullScreenLoader";
+import { CandidateProfileForm } from "@/components/features/Candidate/Profile/CandidateProfileForm";
+import FullScreenLoader from "@/components/loaders/FullScreenLoader";
 import { CandidateProfile } from "@/types/candidate";
 
 async function CandidateProfileFormLoader() {

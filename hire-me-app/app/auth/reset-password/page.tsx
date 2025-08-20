@@ -1,4 +1,4 @@
-import ResetpasswordComp from '@/components/custom/auth/ResetpasswordComp'
+import ResetpasswordComp from '@/components/features/auth/ResetpasswordComp'
 import React from 'react'
 
 const page = () => {

@@ -1,4 +1,4 @@
-import CandidateJobComp from "@/components/custom/Candidate/jobs/CandidateJobComp";
+import CandidateJobComp from "@/components/features/Candidate/jobs/CandidateJobComp";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Bookmark } from "lucide-react";

@@ -1,14 +1,14 @@
 import { extractResumeText } from "@/components/interview/functions/extractResumeText";
 import { getResumeAnalysis } from "@/components/interview/functions/getResFromAi";
-import ErrorAnimation from "@/components/scaleton-loaders/ErrorAnimation";
+import ErrorAnimation from "@/components/loaders/ErrorAnimation";
 import { prisma } from "@/lib/prisma";
 import React from "react";
 import ResumeResult from "./resumeResult";
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
   const jobSelect = {
@@ -34,7 +34,9 @@ type Props = {
     isDelete: true,
   };
 
-const Page = async ({ params }: Props) => {
+export default async function ApplicationPage({
+  params,
+}: Props) {
   const { id } = await params;
 
   if (!id) {
@@ -126,6 +128,4 @@ const Page = async ({ params }: Props) => {
     application={updatedApplication!}
     />
   );
-};
-
-export default Page;
+}

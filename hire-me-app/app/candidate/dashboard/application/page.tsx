@@ -2,8 +2,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import React from "react";
-import ApplicatinUI from "./ApplicatinUI";
 import Link from "next/link";
+import ApplicationUI from "./ApplicationUI";
+import { ApplicationWithJob, TranscriptMessage } from "@/types/applicationType";
 
 
 
@@ -75,7 +76,13 @@ const page = async () => {
     );
   }
 
-  return <ApplicatinUI applications={applications} />;
+  // Type cast the applications to handle the transcript field properly
+  const typedApplications = applications.map(app => ({
+    ...app,
+    transcript: app.transcript as TranscriptMessage[] | null
+  })) as ApplicationWithJob[];
+
+  return <ApplicationUI applications={typedApplications} role="candidate" />;
 };
 
 export default page;

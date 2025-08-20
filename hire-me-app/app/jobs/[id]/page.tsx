@@ -1,11 +1,11 @@
-import JobViewPage from '@/components/generic/job/view/JobViewPage';
+import JobViewPage from '@/components/shared/job/view/JobViewPage';
 import { prisma } from '@/lib/prisma';
 import React from 'react'
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const page =async({ params }: Props) => {

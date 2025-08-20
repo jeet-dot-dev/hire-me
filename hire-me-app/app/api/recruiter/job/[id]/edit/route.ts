@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { jobSchema } from "@/zod/job";
 import { NextResponse } from "next/server";
 
-export async function POST (req:Request,{params}:{params:{id:string}}) {
+export async function POST (req:Request,{params}:{params:Promise<{id:string}>}) {
    try {
     const session = await auth();
     if (!session?.user?.id || session.user.role !== "RECRUITER") {
@@ -14,7 +14,7 @@ export async function POST (req:Request,{params}:{params:{id:string}}) {
     if(!parsedBody.success) {
       return NextResponse.json({ error: parsedBody.error.errors }, { status: 400 });
     }
-    const { id } = params;
+    const { id } = await params;
     if(!id) {
       return NextResponse.json({ error: "Job ID is required" }, { status: 400 });
     }

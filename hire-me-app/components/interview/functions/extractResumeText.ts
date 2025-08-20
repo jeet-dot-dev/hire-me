@@ -3,6 +3,21 @@ import { writeFile, mkdir, unlink } from "fs/promises";
 import { join, extname } from "path";
 import mammoth from "mammoth";
 
+// Helper function to extract PDF text - temporarily disabled
+async function extractPdfText(): Promise<string> {
+  try {
+    // Note: pdf-lib doesn't extract text directly, we need a different approach
+    // For now, return a placeholder
+    console.warn(
+      "PDF text extraction temporarily disabled due to library issues"
+    );
+    return "PDF file detected - text extraction temporarily unavailable. Please upload a DOCX file for full text analysis.";
+  } catch (error) {
+    console.error("PDF parsing error:", error);
+    throw new Error("Failed to parse PDF file");
+  }
+}
+
 export async function extractResumeText(key: string): Promise<string> {
   const folderPath = join(process.cwd(), "pdf");
   let savePath = "";
@@ -13,7 +28,9 @@ export async function extractResumeText(key: string): Promise<string> {
     console.log("Downloading:", resumeUrl);
 
     // 2. Download file as ArrayBuffer
-    const response = await axios.get(resumeUrl, { responseType: "arraybuffer" });
+    const response = await axios.get(resumeUrl, {
+      responseType: "arraybuffer",
+    });
 
     // 3. Ensure "pdf" folder exists
     await mkdir(folderPath, { recursive: true });
@@ -26,16 +43,23 @@ export async function extractResumeText(key: string): Promise<string> {
     await writeFile(savePath, Buffer.from(response.data));
     console.log("File saved to:", savePath);
 
-    // 6. Check extension and use mammoth if .docx
+    // 6. Check extension
     const ext = extname(savePath).toLowerCase();
-    if (ext !== ".docx") {
-      throw new Error(`Unsupported file format: ${ext}`);
+
+    if (ext === ".docx") {
+      // ✅ Extract text using mammoth
+      const result = await mammoth.extractRawText({ path: savePath });
+      return result.value.trim();
+    } else if (ext === ".pdf") {
+      // ⚠️ Temporarily return placeholder for PDF files
+      // const dataBuffer = Buffer.from(response.data);
+      const text = await extractPdfText();
+      return text.trim();
+    } else {
+      throw new Error(
+        `Unsupported file format: ${ext}. Please upload a PDF or DOCX file.`
+      );
     }
-
-    // 7. Extract text using mammoth
-    const result = await mammoth.extractRawText({ path: savePath });
-    return result.value.trim();
-
   } catch (err) {
     console.error("Error extracting resume text:", err);
     throw new Error(
@@ -44,7 +68,7 @@ export async function extractResumeText(key: string): Promise<string> {
       }`
     );
   } finally {
-    // 8. Delete file after processing
+    // 7. Delete file after processing
     if (savePath) {
       try {
         await unlink(savePath);

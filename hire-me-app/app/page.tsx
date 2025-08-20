@@ -1,92 +1,192 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { LogOut, User } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
-  const { data: session, status } = useSession(); // auth state
+  const { data: session, status } = useSession();
   const router = useRouter();
   type roleType = "candidate" | "recruiter";
   const [role, SetRole] = useState<roleType>("candidate");
+  const [menuOpen, setMenuOpen] = useState(false);
+
   /** ────────── handlers ────────── */
-  const handleSignIn = () => router.push("/auth/login"); // or signIn()
-  const handleSignUp = () => router.push("/auth/register"); // registration page
-  const handleLogout = () => signOut({ callbackUrl: "/" }); // back to landing
+  const handleSignIn = () => router.push("/auth/login");
+  const handleSignUp = () => router.push("/auth/register");
+  const handleLogout = () => signOut({ callbackUrl: "/" });
 
   const isAuthenticated = status === "authenticated";
 
-  return (
-    <nav className="fixed inset-x-0 top-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* brand */}
-        <h1 className="text-2xl font-bold text-white">Hire Me</h1>
-
-        {/* auth buttons */}
-        {isAuthenticated ? (
-          <Button
-            onClick={handleLogout}
-            className="flex items-center rounded-full px-6 py-2 bg-white/10 border border-white/20 text-white hover:bg-white/20"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        ) : (
-          <div className="flex gap-3">
-            <Button
-              variant="ghost"
-              onClick={handleSignIn}
-              className="flex items-center rounded-full px-6 py-2 text-white hover:bg-white/10"
-            >
-              <User className="mr-2 h-4 w-4" />
-              Sign In
-            </Button>
-            <Button
-              onClick={handleSignUp}
-              className="rounded-full px-6 py-2 bg-white/10 border border-white/20 text-white hover:bg-white/20"
-            >
-              Sign Up
-            </Button>
-          </div>
-        )}
-      </div>
-  
-    </nav>
-  );
-};
-
-export default function Home() {
-  const { data: session, status } = useSession(); // auth state
-  const router = useRouter();
-  type roleType = "candidate" | "recruiter";
-  const [role, SetRole] = useState<roleType>("candidate");
-  const isAuthenticated = status === "authenticated";
   useEffect(() => {
     if (!session) return;
     const Role = session?.user?.role;
     if (!Role) return;
     SetRole(Role.toLocaleLowerCase() as roleType);
   }, [session]);
+
   return (
-    <div className="min-h-screen bg-black">
-      <Navbar />
-      <main className="pt-24 flex items-center justify-center">
-        <div className="text-center text-white space-y-2">
-          <h1 className="text-4xl font-bold">Welcome</h1>
-          <p className="text-gray-400">Your content goes here</p>
-          {isAuthenticated && (
-            <div
-              className="mt-5 px-4 py-3 bg-[#2a2a2c] rounded-2xl cursor-pointer"
-              onClick={() => router.push(`${role}/dashboard`)}
-            >
-              Go to Dashboard
-            </div>
-          )}
+    <div>
+      <nav className="w-full min-h-[80px] bg-[#0a0a0a] rounded-t-2xl flex items-center justify-between px-6 relative">
+        {/* Logo */}
+        <div className="flex items-center">
+          <Image src="/logo3.png" alt="Hire-me" width={150} height={20} />
         </div>
-      </main>
+
+        {/* Center Navigation (Desktop) */}
+        <div className="hidden md:flex items-center gap-6">
+          <Button
+            variant="ghost"
+            className="text-white hover:bg-white hover:text-[#0a0a0a] rounded-4xl cursor-pointer text-[17px]"
+          >
+            Home
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-white hover:bg-white hover:text-[#0a0a0a] rounded-4xl cursor-pointer text-[17px]"
+            onClick={() => {
+              if (isAuthenticated) {
+                router.push(`/${role}/dashboard`);
+              }
+            }}
+          >
+            {isAuthenticated ? "Dashboard" : "Features"}
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-white hover:bg-white rounded-4xl cursor-pointer text-[17px]"
+          >
+            Pricing
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-white hover:bg-white rounded-4xl cursor-pointer text-[17px]"
+          >
+            How it works
+          </Button>
+        </div>
+
+        {/* Auth Button */}
+        <div className="hidden md:block">
+          <Button 
+            className="rounded-full bg-white text-[17px] text-black cursor-pointer hover:bg-gray-200 transition"
+            onClick={isAuthenticated ? handleLogout : handleSignIn}
+          >
+            {isAuthenticated ? "Logout" : "Login"}
+          </Button>
+        </div>
+
+        {/* Slide-out Mobile Menu */}
+        {/* Mobile Menu Icon */}
+        <div className="md:hidden pr-2">
+          <button
+            className="text-white flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-800 transition-colors"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? (
+              <X size={24} strokeWidth={2} className="text-white" />
+            ) : (
+              <Menu size={24} strokeWidth={2} className="text-white" />
+            )}
+          </button>
+        </div>
+
+        {/* Slide-out Mobile Menu */}
+        <div
+          className={`fixed top-0 right-0 h-full w-2/3 bg-[#0a0a0a] shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
+            menuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          {/* Close button inside menu */}
+          <div className="flex justify-end p-4">
+            <button
+              className="text-white p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              <X size={24} strokeWidth={2} />
+            </button>
+          </div>
+
+          <div className="flex flex-col items-start px-6 gap-6">
+            <Button
+              variant="ghost"
+              className="text-white text-[17px] w-full justify-start"
+              onClick={() => setMenuOpen(false)}
+            >
+              Home
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-white text-[17px] w-full justify-start"
+              onClick={() => {
+                setMenuOpen(false);
+                if (isAuthenticated) {
+                  router.push(`/${role}/dashboard`);
+                }
+              }}
+            >
+              {isAuthenticated ? "Dashboard" : "Features"}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-white text-[17px] w-full justify-start"
+              onClick={() => setMenuOpen(false)}
+            >
+              Pricing
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-white text-[17px] w-full justify-start"
+              onClick={() => setMenuOpen(false)}
+            >
+              How it works
+            </Button>
+
+            {/* Auth Buttons in Mobile */}
+            <div className="w-full space-y-3">
+              <Button 
+                className="rounded-full bg-white text-[17px] text-black cursor-pointer hover:bg-gray-200 transition w-full"
+                onClick={isAuthenticated ? handleLogout : handleSignIn}
+              >
+                {isAuthenticated ? "Logout" : "Login"}
+              </Button>
+              {!isAuthenticated && (
+                <Button 
+                  variant="outline"
+                  className="rounded-full text-[17px] text-white border-white hover:bg-white hover:text-black transition w-full"
+                  onClick={handleSignUp}
+                >
+                  Sign Up
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
     </div>
+  );
+};
+
+export default function Home() {
+  return (
+   <div className="min-h-screen bg-black">
+  <Navbar />
+
+  <section className="hero">
+    <div className="relative w-full min-h-[500px]">
+      <Image 
+        src="/hero.jpg" 
+        alt="hero"
+        fill
+        className="object-cover"
+        priority
+      />
+    </div>
+  </section>
+</div>
+
   );
 }

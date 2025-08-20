@@ -1,4 +1,4 @@
-import FullScreenLoader from '@/components/scaleton-loaders/FullScreenLoader'
+import FullScreenLoader from '@/components/loaders/FullScreenLoader'
 import React from 'react'
 
 const loading = () => {

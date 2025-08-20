@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { v4 as uuid } from "uuid";
 import { prisma } from "@/lib/prisma";
-import { sendVerificationEmail } from "@/components/custom/Email/sendVerificationEmail";
+import { sendVerificationEmail } from "@/components/features/Email/sendVerificationEmail";
 
 export async function GET(req: Request) {
   try {

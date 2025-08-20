@@ -1,4 +1,4 @@
-import RecruiterJobComp from "@/components/custom/recruiter/RecruiterJobComp";
+import RecruiterJobComp from "@/components/features/recruiter/RecruiterJobComp";
 import React from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";

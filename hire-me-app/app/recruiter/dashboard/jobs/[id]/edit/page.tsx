@@ -1,11 +1,11 @@
-import CreateJobForm from "@/components/custom/recruiter/CreateJobForm";
+import CreateJobForm from "@/components/features/recruiter/CreateJobForm";
 import { prisma } from "@/lib/prisma";
 import React from "react";
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const page = async ({ params }: Props) => {

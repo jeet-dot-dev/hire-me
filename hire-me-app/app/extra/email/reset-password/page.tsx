@@ -58,10 +58,9 @@ const Page = () => {
         toast.success("Password updated successfully.");
         router.push("/auth/login");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       const errorMessage =
-        error.response?.data?.message ||
         "Failed to update password. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);

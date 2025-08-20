@@ -1,5 +1,5 @@
 import React from 'react'
-import LoginComp from '@/components/custom/auth/LoginComp'
+import LoginComp from '@/components/features/auth/LoginComp'
 
 const page = () => {
   return (

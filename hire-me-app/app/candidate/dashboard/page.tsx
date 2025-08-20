@@ -1,8 +1,14 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ApplicationWithJob } from "@/types/applicationType";
 import { redirect } from "next/navigation";
 import React from "react";
 import DashboardUI from "./DashboardUI";
+
+type TranscriptMessage = {
+  role: "recruiter" | "candidate";
+  text: string;
+};
 
 const page = async () => {
   const session = await auth();
@@ -35,17 +41,23 @@ const page = async () => {
 
  const recentJobApplications = await prisma.jobApplication.findMany({
   where: { candidateId: candidate.id },
+  include:{
+    job: true
+  },
   orderBy: { createdAt: "desc" }
 });
 
  const recentJobPostings = await prisma.job.findMany({
-  take:5,
-  orderBy : {createdAt : "desc"}
- })
+  orderBy: { createdAt: "desc" }
+});
 
- 
- 
-  return <DashboardUI recentJobApplications={recentJobApplications} recentJobPostings={recentJobPostings} />;
+  // Type cast the Prisma results to match our TypeScript types
+  const typedApplications: ApplicationWithJob[] = recentJobApplications.map(app => ({
+    ...app,
+    transcript: app.transcript as TranscriptMessage[] | null, // Cast Prisma Json to our expected type
+  }));
+
+  return <DashboardUI recentJobApplications={typedApplications} recentJobPostings={recentJobPostings}  role="candidate" />;
 };
 
 export default page;

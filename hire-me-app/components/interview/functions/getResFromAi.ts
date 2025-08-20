@@ -114,28 +114,29 @@ export async function getResumeAnalysis(
 
 // Validate and sanitize the AI response
 function validateAnalysisResult(
-  result: any,
+  result: unknown,
   skillsRequired: string[]
 ): ResumeAnalysisResult {
+  const res = result as Record<string, unknown>;
   return {
     resumeOverview:
-      typeof result.resumeOverview === "string"
-        ? result.resumeOverview.slice(0, 300) // Limit length
+      typeof res.resumeOverview === "string"
+        ? res.resumeOverview.slice(0, 300) // Limit length
         : "Unable to generate resume overview",
 
-    matchedSkills: Array.isArray(result.matchedSkills)
-      ? result.matchedSkills.filter((skill: any) => typeof skill === "string")
+    matchedSkills: Array.isArray(res.matchedSkills)
+      ? res.matchedSkills.filter((skill: unknown) => typeof skill === "string")
       : [],
 
-    unmatchedSkills: Array.isArray(result.unmatchedSkills)
-      ? result.unmatchedSkills.filter((skill: any) => typeof skill === "string")
+    unmatchedSkills: Array.isArray(res.unmatchedSkills)
+      ? res.unmatchedSkills.filter((skill: unknown) => typeof skill === "string")
       : skillsRequired, // Default to all skills as unmatched
 
     score:
-      typeof result.score === "number" &&
-      result.score >= 0 &&
-      result.score <= 100
-        ? Math.round(result.score)
+      typeof res.score === "number" &&
+      res.score >= 0 &&
+      res.score <= 100
+        ? Math.round(res.score)
         : 0,
   };
 }

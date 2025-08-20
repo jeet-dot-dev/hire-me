@@ -1,4 +1,4 @@
-import { CandidateProfilePage } from "@/components/custom/Candidate/Profile/CandidateProfilePage";
+import { CandidateProfilePage } from "@/components/features/Candidate/Profile/CandidateProfilePage";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -27,7 +27,11 @@ export default async function page() {
     about : candidate.about,
     profilePic : candidate.ProfilePic,
     resume : candidate.resumeUrl,
-    education : candidate.education ?? [],
+    education : candidate.education.map(edu => ({
+      ...edu,
+      endYear: edu.endYear ?? undefined,
+      grade: edu.grade ?? undefined
+    })) ?? [],
     skills : candidate.skills ?? [],
     socials : candidate.socials ?? []
   }

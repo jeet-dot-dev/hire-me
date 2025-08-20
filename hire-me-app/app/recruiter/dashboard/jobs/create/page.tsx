@@ -1,4 +1,4 @@
-import CreateJobForm from "@/components/custom/recruiter/CreateJobForm";
+import CreateJobForm from "@/components/features/recruiter/CreateJobForm";
 import React from "react";
 
 const page = () => {

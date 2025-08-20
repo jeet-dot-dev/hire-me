@@ -2,7 +2,7 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import CandidateJobComp from "@/components/custom/Candidate/jobs/CandidateJobComp";
+import CandidateJobComp from "@/components/features/Candidate/jobs/CandidateJobComp";
 
 const page = async () => {
   const session = await auth();

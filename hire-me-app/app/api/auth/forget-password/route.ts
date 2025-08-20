@@ -1,4 +1,4 @@
-import { sendVerificationEmail } from "@/components/custom/Email/sendVerificationEmail";
+import { sendVerificationEmail } from "@/components/features/Email/sendVerificationEmail";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { v4 as uuid } from "uuid";

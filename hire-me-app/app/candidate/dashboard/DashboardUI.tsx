@@ -1,17 +1,18 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { ApplicationTypeFull, JobType } from "@/types/applicationType";
+import {
+  ApplicationTypeFull,
+  ApplicationWithJob,
+  JobType,
+} from "@/types/applicationType";
 import {
   Briefcase,
   TrendingUp,
   Clock,
-  MapPin,
   Building,
-  DollarSign,
   Users,
   Eye,
-  Target,
 } from "lucide-react";
 import React, { useMemo } from "react";
 import {
@@ -26,28 +27,29 @@ import {
   LineChart,
   Line,
 } from "recharts";
-
-// import utils
 import {
   calculateStats,
   getStatusData,
-  getTopApplications,
+  // getTopApplications,
   getTopJobPostings,
   getTrendData,
 } from "../../../utils/dashboardCalculations";
 import { useRouter } from "next/navigation";
 
 type DashboardUIType = {
-  recentJobApplications: ApplicationTypeFull[];
+  recentJobApplications: ApplicationWithJob[];
   recentJobPostings: JobType[];
+  role: "candidate" | "recruiter";
 };
 
 const DashboardUI = ({
   recentJobApplications,
   recentJobPostings,
+  role,
 }: DashboardUIType) => {
   const router = useRouter();
-  // ✅ useMemo for all calculations
+
+  // ✅ Stats
   const { accepted, pending, rejected, total, successRate } = useMemo(
     () => calculateStats(recentJobApplications),
     [recentJobApplications]
@@ -58,10 +60,10 @@ const DashboardUI = ({
     [accepted, pending, rejected]
   );
 
-  const topApplications = useMemo(
-    () => getTopApplications(recentJobApplications),
-    [recentJobApplications]
-  );
+  // const topApplications = useMemo(
+  //   () => getTopApplications(recentJobApplications),
+  //   [recentJobApplications]
+  // );
 
   const topJobPostings = useMemo(
     () => getTopJobPostings(recentJobPostings),
@@ -73,14 +75,12 @@ const DashboardUI = ({
     [recentJobApplications]
   );
 
-  // small helpers inside since they're cheap
   const formatDate = (date: Date) =>
     new Date(date).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
 
-  // tightened types to avoid implicit any
   const getStatusColor = (status: ApplicationTypeFull["status"]) => {
     switch (status) {
       case "Accepted":
@@ -107,44 +107,86 @@ const DashboardUI = ({
     }
   };
 
+  // ✅ Role-specific labels/messages
+  const labels = {
+    headerTitle:
+      role === "candidate"
+        ? "Your Career Command Center"
+        : "Recruitment Dashboard",
+    headerSubtitle:
+      role === "candidate"
+        ? "Track your journey to the perfect opportunity"
+        : "Manage candidates and track hiring progress",
+    card1Title: role === "candidate" ? "My Applications" : "Job Postings",
+    card1Subtitle:
+      role === "candidate"
+        ? "Total applications submitted"
+        : "Total jobs you have posted",
+    card2Title: role === "candidate" ? "Success Rate" : "Hire Rate",
+    card2Subtitle:
+      role === "candidate"
+        ? "Applications accepted"
+        : "Candidates successfully hired",
+    card3Title: role === "candidate" ? "Under Review" : "Pending Applications",
+    card3Subtitle:
+      role === "candidate" ? "Awaiting response" : "Candidates awaiting review",
+    card4Title: role === "candidate" ? "New Opportunities" : "New Applicants",
+    card4Subtitle:
+      role === "candidate" ? "Fresh job postings" : "Recent candidates applied",
+    section1Title:
+      role === "candidate"
+        ? "Recent Applications"
+        : "Latest Candidate Applications",
+    section2Title:
+      role === "candidate"
+        ? "Latest Opportunities"
+        : "Your Active Job Postings",
+  };
+
   return (
     <div className="bg-black text-white min-h-screen p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-wide bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-          Your Career Command Center
+          {labels.headerTitle}
         </h1>
         <p className="text-gray-400 mt-2 text-sm sm:text-base">
-          Track your journey to the perfect opportunity
+          {labels.headerSubtitle}
         </p>
         <Separator className="bg-gray-700 mt-4" />
       </div>
 
       {/* Stats Section */}
       <section className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        {/* Card 1 - My Applications */}
+        {/* Card 1 */}
         <div
           className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg  transition-all flex flex-col justify-between h-32 sm:h-40 cursor-pointer hover:border-[0.5px] hover:border-white group"
-          onClick={() => router.push("dashboard/application")}
+          onClick={() =>
+            router.push(
+              role === "candidate" ? "dashboard/application" : "dashboard/jobs"
+            )
+          }
         >
           <div className="flex justify-between items-center">
             <p className="text-base sm:text-lg font-semibold">
-              My Applications
+              {labels.card1Title}
             </p>
             <Briefcase className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
           </div>
           <div>
             <p className="text-2xl sm:text-4xl font-bold">{total}</p>
             <p className="text-xs sm:text-sm text-gray-400">
-              Total applications submitted
+              {labels.card1Subtitle}
             </p>
           </div>
         </div>
 
-        {/* Card 2 - Success Rate */}
+        {/* Card 2 */}
         <div className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all flex flex-col justify-between h-32 sm:h-40 group">
           <div className="flex justify-between items-center">
-            <p className="text-base sm:text-lg font-semibold">Success Rate</p>
+            <p className="text-base sm:text-lg font-semibold">
+              {labels.card2Title}
+            </p>
             <TrendingUp className="w-5 h-5 text-gray-400 group-hover:text-green-400 transition-colors" />
           </div>
           <div>
@@ -152,15 +194,17 @@ const DashboardUI = ({
               {successRate}%
             </p>
             <p className="text-xs sm:text-sm text-gray-400">
-              Applications accepted
+              {labels.card2Subtitle}
             </p>
           </div>
         </div>
 
-        {/* Card 3 - Pending Review */}
+        {/* Card 3 */}
         <div className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all flex flex-col justify-between h-32 sm:h-40 group">
           <div className="flex justify-between items-center">
-            <p className="text-base sm:text-lg font-semibold">Under Review</p>
+            <p className="text-base sm:text-lg font-semibold">
+              {labels.card3Title}
+            </p>
             <Clock className="w-5 h-5 text-gray-400 group-hover:text-yellow-400 transition-colors" />
           </div>
           <div>
@@ -168,19 +212,23 @@ const DashboardUI = ({
               {pending}
             </p>
             <p className="text-xs sm:text-sm text-gray-400">
-              Awaiting response
+              {labels.card3Subtitle}
             </p>
           </div>
         </div>
 
-        {/* Card 4 - Available Jobs */}
+        {/* Card 4 */}
         <div
           className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all flex flex-col justify-between h-32 sm:h-40 cursor-pointer hover:border-[0.5px]  hover:border-white group"
-          onClick={() => router.push("dashboard/jobs")}
+          onClick={() =>
+            router.push(
+              role === "candidate" ? "dashboard/jobs" : "dashboard/application"
+            )
+          }
         >
           <div className="flex justify-between items-center">
             <p className="text-base sm:text-lg font-semibold">
-              New Opportunities
+              {labels.card4Title}
             </p>
             <Eye className="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
           </div>
@@ -189,304 +237,166 @@ const DashboardUI = ({
               {topJobPostings.length}
             </p>
             <p className="text-xs sm:text-sm text-gray-400">
-              Fresh job postings
+              {labels.card4Subtitle}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Charts Section */}
+      {/* Graphs Section */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Application Status Pie Chart */}
+        {/* Pie Chart */}
         <div className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg">
           <h3 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            Application Status Breakdown
+            <Users className="w-5 h-5" />
+            Application Status Distribution
           </h3>
-          {total > 0 ? (
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-64 flex items-center justify-center text-gray-400">
-              <p>No applications yet. Start applying to see your progress!</p>
-            </div>
-          )}
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={statusData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label
+              >
+                {statusData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
 
-        {/* Application Trend Line Chart */}
+        {/* Line Chart */}
         <div className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg">
           <h3 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            Weekly Application Activity
+            Applications Trend (7 days)
           </h3>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="day" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#1F2937",
-                  border: "1px solid #374151",
-                  borderRadius: "8px",
-                  color: "#F9FAFB",
-                }}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <XAxis dataKey="day" stroke="#888" />
+              <YAxis stroke="#888" />
+              <Tooltip />
               <Line
                 type="monotone"
                 dataKey="applications"
-                stroke="#3B82F6"
-                strokeWidth={3}
-                dot={{ fill: "#3B82F6", strokeWidth: 2, r: 4 }}
+                stroke="#10B981"
+                strokeWidth={2}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </section>
 
-      {/* Recent Applications and Job Postings */}
+      {/* Recent Applications / Job Postings */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Recent Applications */}
+        {/* Applications */}
         <div className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg">
           <h3 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
             <Briefcase className="w-5 h-5" />
-            Recent Applications
+            {labels.section1Title}
           </h3>
-          <div className="space-y-3">
-            {topApplications.length > 0 ? (
-              topApplications.map((app, index) => (
-                <div
-                  key={app.id}
-                  className="p-3 bg-[#0f0f10] rounded-lg hover:bg-[#1a1a1c] transition-colors cursor-pointer"
-                  onClick={() =>
-                    router.push(`/application/${app.id}/interview/result`)
-                  }
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm sm:text-base truncate">
-                        Application #{index + 1}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {formatDate(app.createdAt)}
-                      </p>
-                    </div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${getStatusColor(app.status)} bg-opacity-20`}
-                    >
-                      {app.status}
-                    </span>
-                  </div>
-                  {app.score && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-full bg-gray-700 rounded-full h-2">
-                        <div
-                          className="bg-blue-400 h-2 rounded-full"
-                          style={{ width: `${app.score}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-xs text-gray-400">
-                        {app.score}%
-                      </span>
-                    </div>
-                  )}
+
+          <ul className="space-y-3">
+            {recentJobApplications.slice(0, 5).map((app) => (
+              <li
+                key={app.id}
+                className="flex justify-between items-center lg:pb-10 bg-[#202022] p-4 rounded-xl hover:bg-[#2a2a2d] transition cursor-pointer"
+                onClick={
+                  role === "candidate"
+                    ? () =>
+                        router.push(`/application/${app.id}/interview/result`)
+                    : () =>
+                        router.push(
+                          `/recruiter/dashboard/application/${app.id}`
+                        )
+                }
+              >
+                {/* Left side */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-white">
+                    {app.job.jobTitle || "Untitled Job"}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {app.job?.companyName || "Unknown Company"} •{" "}
+                    {app.job?.location || "Remote"}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Applied on {formatDate(app.createdAt)}
+                  </p>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <Briefcase className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>No applications yet</p>
-                <p className="text-sm">Start your job search journey!</p>
-              </div>
-            )}
-          </div>
+
+                {/* Right side */}
+                <span
+                  className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(
+                    app.status
+                  )}`}
+                >
+                  {app.status}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Recent Job Postings */}
+        {/* Job Postings */}
         <div className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg">
           <h3 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
             <Building className="w-5 h-5" />
-            Latest Opportunities
+            {labels.section2Title}
           </h3>
-          <div className="space-y-3">
-            {topJobPostings.length > 0 ? (
-              topJobPostings.map((job) => (
-                <div
-                  key={job.id}
-                  className="p-3 bg-[#0f0f10] rounded-lg hover:bg-[#1a1a1c] transition-colors cursor-pointer group"
-                  onClick={() => router.push(`/jobs/${job.id}`)}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm sm:text-base truncate group-hover:text-blue-400 transition-colors">
-                        {job.jobTitle}
-                      </p>
-                      <p className="text-xs text-gray-400 truncate">
-                        {job.companyName}
-                      </p>
-                    </div>
-                    <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
-                      {getJobTypeIcon(job.jobType)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-gray-400">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      <span className="truncate">{job.location}</span>
-                    </div>
-                    {job.salary && (
-                      <div className="hidden md:flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        <span className="truncate">{job.salary}</span>
-                      </div>
-                    )}
-                  </div>
-                  {job.skillsRequired.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {job.skillsRequired
-                        .slice(0, 3)
-                        .map((skill, skillIndex) => (
-                          <span
-                            key={skillIndex}
-                            className="text-xs bg-gray-700 px-2 py-1 rounded"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      {job.skillsRequired.length > 3 && (
-                        <span className="text-xs text-gray-400">
-                          +{job.skillsRequired.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  )}
+          <ul className="space-y-4">
+            {topJobPostings.slice(0, 5).map((job) => (
+              <li
+                key={job.id}
+                className="bg-[#202022] p-4 rounded-xl hover:bg-[#2a2a2d] transition cursor-pointer"
+                onClick={() => router.push(`/${role}/dashboard/jobs/${job.id}`)}
+              >
+                {/* Job title & type */}
+                <div className="flex justify-between items-center mb-2">
+                  <p className="font-semibold flex items-center gap-2 text-base">
+                    {getJobTypeIcon(job.jobType)} {job.jobTitle}
+                  </p>
+                  <span className="text-xs text-gray-400">
+                    {formatDate(job.createdAt)}
+                  </span>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <Building className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>No job postings available</p>
-                <p className="text-sm">
-                  Check back soon for new opportunities!
-                </p>
-              </div>
-            )}
-          </div>
+
+                {/* Company + Location */}
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-300">
+                    {job.companyName}
+                  </span>
+                  <span className="text-blue-400 text-sm font-medium">
+                    {job.location}
+                  </span>
+                </div>
+
+                {/* Extra details */}
+                <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                  <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
+                    💰 {job.salary || "Not Disclosed"}
+                  </span>
+                  <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
+                    🕒 {job.jobType}
+                  </span>
+                  <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
+                    👥 {0} Applicants
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
-
-      {/* Quick Actions Section */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Browse Jobs */}
-        <div
-          className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-105 group"
-          onClick={() => router.push("dashboard/jobs")}
-        >
-          <div className="flex justify-between items-center mb-3">
-            <p className="text-base sm:text-lg font-semibold">Discover Jobs</p>
-            <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          </div>
-          <div>
-            <p className="text-xl sm:text-2xl font-bold mb-1">Explore Now</p>
-            <p className="text-xs sm:text-sm text-blue-200">
-              Find your next career move
-            </p>
-          </div>
-        </div>
-
-        {/* Interview Prep */}
-        <div
-          className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-105 group"
-          onClick={() => router.push("dashboard/application")}
-        >
-          <div className="flex justify-between items-center mb-3">
-            <p className="text-base sm:text-lg font-semibold">Interview Prep</p>
-            <Users className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          </div>
-          <div>
-            <p className="text-xl sm:text-2xl font-bold mb-1">Get Ready</p>
-            <p className="text-xs sm:text-sm text-purple-200">
-              Practice makes perfect
-            </p>
-          </div>
-        </div>
-
-        {/* Profile Update */}
-        <div
-          className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-105 group sm:col-span-2 lg:col-span-1"
-          onClick={() => router.push("dashboard/profile")}
-        >
-          <div className="flex justify-between items-center mb-3">
-            <p className="text-base sm:text-lg font-semibold">Update Profile</p>
-            <Target className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          </div>
-          <div>
-            <p className="text-xl sm:text-2xl font-bold mb-1">Stay Current</p>
-            <p className="text-xs sm:text-sm text-green-200">
-              Keep your profile fresh
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Additional Insights */}
-      {total > 0 && (
-        <section className="mt-8">
-          <div className="bg-[#18181a] p-4 sm:p-6 rounded-2xl shadow-lg">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              Your Progress Insights
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-              <div className="p-3 bg-[#0f0f10] rounded-lg">
-                <p className="text-lg sm:text-xl font-bold text-green-400">
-                  {accepted}
-                </p>
-                <p className="text-xs text-gray-400">Accepted</p>
-              </div>
-              <div className="p-3 bg-[#0f0f10] rounded-lg">
-                <p className="text-lg sm:text-xl font-bold text-yellow-400">
-                  {pending}
-                </p>
-                <p className="text-xs text-gray-400">Pending</p>
-              </div>
-              <div className="p-3 bg-[#0f0f10] rounded-lg">
-                <p className="text-lg sm:text-xl font-bold text-red-400">
-                  {rejected}
-                </p>
-                <p className="text-xs text-gray-400">Rejected</p>
-              </div>
-              <div className="p-3 bg-[#0f0f10] rounded-lg">
-                <p className="text-lg sm:text-xl font-bold text-blue-400">
-                  {
-                    recentJobApplications.filter((app) => app.isInterviewDone)
-                      .length
-                  }
-                </p>
-                <p className="text-xs text-gray-400">Interviews</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   );
 };
 
 export default DashboardUI;
-//
