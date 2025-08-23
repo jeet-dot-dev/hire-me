@@ -187,9 +187,11 @@ export function CandidateProfilePage({ candidate }: candidatePropType) {
                 <Avatar className="w-24 h-24 ring-2 ring-primary/20 ring-offset-2 ring-offset-background/60">
                   <AvatarImage
                     src={
-                      `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${candidate.profilePic}` ||
-                      " "
+                      candidate.profilePic 
+                        ? `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${candidate.profilePic}`
+                        : undefined
                     }
+                    className="object-cover w-full h-full"
                   />
                   <AvatarFallback className="bg-muted/40 text-muted-foreground text-2xl">
                     <User className="w-12 h-12" />

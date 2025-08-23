@@ -37,10 +37,10 @@ export async function POST(request: Request) {
     console.log("GPT Messages:", gptMessages);
     
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // More cost-effective than gpt-4o-mini
+      model: "gpt-4o-mini",
       messages: gptMessages,
       temperature: 0.7,
-      max_tokens: 150, // Limit response length
+      max_tokens: 100,
     });
     
     console.log("GPT Completion:", completion);
