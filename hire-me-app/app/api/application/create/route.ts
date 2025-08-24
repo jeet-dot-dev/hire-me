@@ -4,18 +4,20 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { jobId, resumeUrl } = await req.json();
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { jobId, resumeUrl } = body;
+    
     if (!jobId || !resumeUrl) {
       return NextResponse.json(
         { error: "Job ID and Resume URL are required" },
         { status: 400 }
       );
-    }
-
-    const session = await auth();
-
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const candidate = await prisma.candidate.findUnique({
@@ -40,7 +42,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(application);
   } catch (error) {
-    console.log("Error parsing request body:", error);
+    console.error("Error creating application:", error);
     return NextResponse.json(
       { error: "Failed to create application" },
       { status: 500 }
