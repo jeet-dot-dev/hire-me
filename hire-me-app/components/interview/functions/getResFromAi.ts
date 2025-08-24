@@ -36,7 +36,7 @@ export async function getResumeAnalysis(
 
     // Create the analysis prompt
     const prompt = createResumeAnalysisPrompt(
-      resumeText.slice(0, 3000), // Limit resume text to avoid token limits
+      resumeText, // Limit resume text to avoid token limits
       job.description.slice(0, 1500), // Limit job description
       skillsRequired
     );

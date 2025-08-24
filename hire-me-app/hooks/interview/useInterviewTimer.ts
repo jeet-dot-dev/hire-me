@@ -28,12 +28,16 @@ export function useInterviewTimer(job: JobFormDataUI | undefined) {
     if (!job?.interviewDuration || !startTime) return "00:00";
 
     const totalSeconds = 5 * 60; // interviewDuration is in minutes
-    const elapsed = Math.floor((currentTime.getTime() - startTime.getTime()) / 1000);
+    const elapsed = Math.floor(
+      (currentTime.getTime() - startTime.getTime()) / 1000
+    );
     let remaining = totalSeconds - elapsed;
 
     if (remaining < 0) remaining = 0;
 
-    const minutes = Math.floor(remaining / 60).toString().padStart(2, "0");
+    const minutes = Math.floor(remaining / 60)
+      .toString()
+      .padStart(2, "0");
     const seconds = (remaining % 60).toString().padStart(2, "0");
 
     return `${minutes}:${seconds}`;

@@ -1,81 +1,143 @@
 import axios from "axios";
-import { writeFile, mkdir, unlink } from "fs/promises";
+import axiosRetry from "axios-retry";
+import { createWriteStream } from "fs";
+import {  mkdir, unlink } from "fs/promises";
 import { join, extname } from "path";
 import mammoth from "mammoth";
+import PDFParser from "pdf2json";
 
-// Helper function to extract PDF text - temporarily disabled
-async function extractPdfText(): Promise<string> {
-  try {
-    // Note: pdf-lib doesn't extract text directly, we need a different approach
-    // For now, return a placeholder
-    console.warn(
-      "PDF text extraction temporarily disabled due to library issues"
+// Configure axios retry
+axiosRetry(axios, {
+  retries: 3,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (error) => {
+    return (
+      axiosRetry.isNetworkError(error) ||
+      axiosRetry.isRetryableError(error) ||
+      error.code === "ETIMEDOUT"
     );
-    return "PDF file detected - text extraction temporarily unavailable. Please upload a DOCX file for full text analysis.";
-  } catch (error) {
-    console.error("PDF parsing error:", error);
-    throw new Error("Failed to parse PDF file");
-  }
-}
+  },
+});
 
-export async function extractResumeText(key: string): Promise<string> {
-  const folderPath = join(process.cwd(), "pdf");
-  let savePath = "";
+// --- PDF Extraction ---
+async function extractPdfText(filePath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const pdfParser = new PDFParser();
 
-  try {
-    // 1. Build R2 file URL
-    const resumeUrl = `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${key}`;
-    console.log("Downloading:", resumeUrl);
-
-    // 2. Download file as ArrayBuffer
-    const response = await axios.get(resumeUrl, {
-      responseType: "arraybuffer",
+    pdfParser.on("pdfParser_dataError", () => {
+      reject(new Error("Failed to parse PDF"));
     });
 
-    // 3. Ensure "pdf" folder exists
-    await mkdir(folderPath, { recursive: true });
+    pdfParser.on("pdfParser_dataReady", (pdfData: { Pages?: Array<{ Texts?: Array<{ R?: Array<{ T?: string }> }> }> }) => {
+      let fullText = "";
 
-    // 4. Determine file name & save path
-    const fileName = key.split("/").pop() || `resume_${Date.now()}`;
-    savePath = join(folderPath, fileName);
-
-    // 5. Write file to disk
-    await writeFile(savePath, Buffer.from(response.data));
-    console.log("File saved to:", savePath);
-
-    // 6. Check extension
-    const ext = extname(savePath).toLowerCase();
-
-    if (ext === ".docx") {
-      // ✅ Extract text using mammoth
-      const result = await mammoth.extractRawText({ path: savePath });
-      return result.value.trim();
-    } else if (ext === ".pdf") {
-      // ⚠️ Temporarily return placeholder for PDF files
-      // const dataBuffer = Buffer.from(response.data);
-      const text = await extractPdfText();
-      return text.trim();
-    } else {
-      throw new Error(
-        `Unsupported file format: ${ext}. Please upload a PDF or DOCX file.`
-      );
-    }
-  } catch (err) {
-    console.error("Error extracting resume text:", err);
-    throw new Error(
-      `Could not extract resume: ${
-        err instanceof Error ? err.message : String(err)
-      }`
-    );
-  } finally {
-    // 7. Delete file after processing
-    if (savePath) {
       try {
-        await unlink(savePath);
-        console.log("Deleted file:", savePath);
-      } catch (deleteErr) {
-        console.warn("Could not delete file:", deleteErr);
+        const firstPage = pdfData?.Pages?.[0];
+        const texts = firstPage?.Texts || [];
+        for (const textObj of texts) {
+          for (const run of textObj.R || []) {
+            if (run.T) {
+              try {
+                fullText += decodeURIComponent(run.T) + " ";
+              } catch {
+                fullText += run.T + " ";
+              }
+            }
+          }
+        }
+      } catch {
+        return reject(new Error("Error extracting PDF text"));
       }
+
+      resolve(fullText.replace(/\s+/g, " ").trim());
+    });
+
+    pdfParser.loadPDF(filePath);
+  });
+}
+
+// --- File Downloader with Stream ---
+async function downloadFile(url: string, savePath: string, maxSizeMB = 5): Promise<void> {
+  // First check file size
+  const head = await axios.head(url);
+  const contentLength = parseInt(head.headers["content-length"] || "0", 10);
+
+  if (contentLength > maxSizeMB * 1024 * 1024) {
+    throw new Error(`Resume too large (max ${maxSizeMB}MB allowed)`);
+  }
+
+  // Stream download
+  const response = await axios.get(url, {
+    responseType: "stream",
+    timeout: 60000, // 60s
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; resume-extractor)" },
+  });
+
+  return new Promise((resolve, reject) => {
+    const writer = createWriteStream(savePath);
+
+    response.data.pipe(writer);
+
+    writer.on("finish", resolve);
+    writer.on("error", reject);
+  });
+}
+
+// --- Main Function ---
+export async function extractResumeText(key: string): Promise<string> {
+  const folderPath = join(process.cwd(), "pdf");
+  const fileName = key.split("/").pop() || `resume_${Date.now()}`;
+  const savePath = join(folderPath, fileName);
+
+  let text = "";
+
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    if (!baseUrl) {
+      throw new Error("R2 public URL not configured");
+    }
+
+    const fullBaseUrl = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
+    const cleanKey = key.startsWith("/") ? key.slice(1) : key;
+    const resumeUrl = `${fullBaseUrl}/${cleanKey}`;
+
+    console.log("Downloading resume from:", resumeUrl);
+
+    await mkdir(folderPath, { recursive: true });
+    await downloadFile(resumeUrl, savePath);
+
+    // Extract based on file extension
+    const ext = extname(savePath).toLowerCase();
+    if (ext === ".docx") {
+      const result = await mammoth.extractRawText({ path: savePath });
+      text = result.value;
+    } else if (ext === ".pdf") {
+      text = await extractPdfText(savePath);
+    } else {
+      throw new Error(`Unsupported file format: ${ext}`);
+    }
+
+    return text.trim();
+  } catch (error) {
+    console.error("Resume extraction failed:", error);
+
+    if (axios.isAxiosError(error)) {
+      if (error.code === "ETIMEDOUT") {
+        throw new Error("Download timeout - file may be too large or server is slow");
+      } else if (error.response?.status === 404) {
+        throw new Error(`File not found at URL: ${key}`);
+      } else if (error.response?.status === 403) {
+        throw new Error(`Access denied to file: ${key}`);
+      }
+    }
+
+    throw error;
+  } finally {
+    // Cleanup temp file
+    try {
+      await unlink(savePath);
+    } catch {
+      /* ignore */
     }
   }
 }

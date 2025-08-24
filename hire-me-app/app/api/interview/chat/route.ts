@@ -1,4 +1,3 @@
-
 import { buildSystemPrompt } from "@/components/interview/prompts/recruiter";
 import openai from "@/lib/openAi/init";
 import { NextResponse } from "next/server";
@@ -6,8 +5,8 @@ import type { ChatCompletionMessageParam } from "openai/resources/chat/completio
 
 export async function POST(request: Request) {
   try {
-    const { messages, instruction, jobinfo } = await request.json();
-    
+    const { messages, instruction, jobinfo, resume } = await request.json();
+
     if (!messages || !Array.isArray(messages)) {
       return new Response(
         JSON.stringify({ error: "Invalid messages format" }),
@@ -15,14 +14,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Extract key requirements from job description (first 200 chars to save tokens)
     const jobSummary = jobinfo ? jobinfo.substring(0, 200) + "..." : "";
-    
-    // Build dynamic system prompt based on instruction and job requirements
-    const systemPrompt = buildSystemPrompt(instruction, jobSummary);
-    
-    // Keep only last 4 messages to limit token usage
-    const recentMessages = messages.slice(-4);
+    const systemPrompt = buildSystemPrompt(instruction, jobSummary, resume);
+
+    // Keep only last 3 messages to save tokens
+    const recentMessages = messages.slice(-3);
     
     const gptMessages: ChatCompletionMessageParam[] = [
       { role: "system", content: systemPrompt },
@@ -34,18 +30,14 @@ export async function POST(request: Request) {
       ),
     ];
 
-    console.log("GPT Messages:", gptMessages);
-    
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: gptMessages,
-      temperature: 0.7,
-      max_tokens: 100,
+      temperature: 0.9, // High temperature for maximum unpredictability
+      max_tokens: 60, // Very concise responses
     });
     
-    console.log("GPT Completion:", completion);
-    
-    const reply = completion.choices[0].message?.content || "Can you repeat that?";
+    const reply = completion.choices[0].message?.content || "Can you tell me more?";
 
     return NextResponse.json({ reply });
   } catch (error) {
@@ -53,4 +45,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Chat failed" }, { status: 500 });
   }
 }
-

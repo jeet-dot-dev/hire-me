@@ -41,16 +41,19 @@ const ChatInput = ({
           }`}
         >
           <Mic size={20} className="text-white" />
+          {isRecording && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
+          )}
         </button>
 
         <div className="flex-1 relative">
           {isRecording ? (
-            <div className="h-12 bg-gray-800 rounded-xl border border-gray-600 flex items-center justify-center">
+            <div className="h-12 bg-gray-800 rounded-xl border border-red-500 flex items-center justify-center">
               <Lottie animationData={voiceAnimation} loop style={{ width: 40, height: 40 }} />
               <span className="text-red-400 text-sm font-medium">Recording...</span>
             </div>
           ) : isConverting ? (
-            <div className="h-12 bg-gray-800 rounded-xl border border-gray-600 flex items-center justify-center">
+            <div className="h-12 bg-gray-800 rounded-xl border border-blue-500 flex items-center justify-center">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
                 <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse delay-100"></div>

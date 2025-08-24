@@ -125,13 +125,11 @@ const JobCardView = ({
                   >
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer"
-                   onSelect={(e) => e.preventDefault()}
+                  <DropdownMenuItem
+                    className="hover:bg-white/10 cursor-pointer"
+                    onSelect={(e) => e.preventDefault()}
                   >
-                    <DeleteJobDialog
-                      jobTitle={job.jobTitle}
-                      jobId={job.id}
-                    >
+                    <DeleteJobDialog jobTitle={job.jobTitle} jobId={job.id}>
                       <div className="w-full text-left">Delete</div>
                     </DeleteJobDialog>
                   </DropdownMenuItem>
@@ -151,9 +149,9 @@ const JobCardView = ({
                   onClick={handleWishlist}
                 />
               )}
-             <ShareJobDialog jobId={job.id}>
-               <Link className="w-5 h-5 text-muted-foreground cursor-pointer" />
-             </ShareJobDialog>
+              <ShareJobDialog jobId={job.id}>
+                <Link className="w-5 h-5 text-muted-foreground cursor-pointer" />
+              </ShareJobDialog>
             </div>
           )}
         </CardHeader>
@@ -246,28 +244,36 @@ const JobCardView = ({
             <Button
               disabled={(role === "CANDIDATE" && !job.status) || job.isDelete}
               className="cursor-pointer"
-              onClick={()=>router.push(`/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`)}
+              onClick={() =>
+                router.push(
+                  `/${role.toLocaleLowerCase()}/dashboard/jobs/${job.id}`
+                )
+              }
             >
               <Eye />
               <span>View</span>
             </Button>
 
-            <Button variant="outline" className="cursor-pointer">
-              {role === "CANDIDATE" ? (
-                <ApplyDialog job={job}>
-                  <span className=" flex justify-center items-center gap-2">
-                    Apply
-                  </span>
-                </ApplyDialog>
-              ) : (
-               <ShareJobDialog jobId={job.id}>
-                 <span className="flex justify-center items-center gap-2">
+            {role === "CANDIDATE" ? (
+              <ApplyDialog job={job}>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer flex justify-center items-center gap-2"
+                >
+                  Apply
+                </Button>
+              </ApplyDialog>
+            ) : (
+              <ShareJobDialog jobId={job.id}>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer flex justify-center items-center gap-2"
+                >
                   <Link className="w-3 h-3 text-muted-foreground" />
                   Share
-                </span>
-               </ShareJobDialog>
-              )}
-            </Button>
+                </Button>
+              </ShareJobDialog>
+            )}
           </div>
         </CardFooter>
       </Card>

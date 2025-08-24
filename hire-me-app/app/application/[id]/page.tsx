@@ -11,32 +11,30 @@ type Props = {
   }>;
 };
 
-  const jobSelect = {
-    id: true,
-    jobTitle: true,
-    companyName: true,
-    location: true,
-    salary: true,
-    jobType: true,
-    description: true,
-    skillsRequired: true,
-    interviewDuration: true,
-    interviewInstruction: true,
-    tags: true,
-    industry: true,
-    jobLevel: true,
-    experienceNeeded: true,
-    contact: true,
-    expireAt: true,
-    createdAt: true,
-    updatedAt: true,
-    status: true,
-    isDelete: true,
-  };
+const jobSelect = {
+  id: true,
+  jobTitle: true,
+  companyName: true,
+  location: true,
+  salary: true,
+  jobType: true,
+  description: true,
+  skillsRequired: true,
+  interviewDuration: true,
+  interviewInstruction: true,
+  tags: true,
+  industry: true,
+  jobLevel: true,
+  experienceNeeded: true,
+  contact: true,
+  expireAt: true,
+  createdAt: true,
+  updatedAt: true,
+  status: true,
+  isDelete: true,
+};
 
-export default async function ApplicationPage({
-  params,
-}: Props) {
+export default async function ApplicationPage({ params }: Props) {
   const { id } = await params;
 
   if (!id) {
@@ -72,27 +70,63 @@ export default async function ApplicationPage({
     application.resumeText &&
     application.resumeOverview
   ) {
-    return (
-      <ResumeResult
-        job={job}
-        application={application}
-      />
-    );
+    return <ResumeResult job={job} application={application} />;
   }
 
   // 4️⃣ Extract resume text if missing
   let resumeText = application.resumeText;
   if (!resumeText) {
-    resumeText = await extractResumeText(application.resumeUrl);
-    if (!resumeText) {
-      return (
-        <ErrorAnimation msg="Our analysis service is temporarily unavailable. Please try again in a few minutes." />
-      );
+    try {
+      resumeText = await extractResumeText(application.resumeUrl);
+     // console.log(resumeText)
+      if (!resumeText) {
+        return (
+          <ErrorAnimation msg="Could not extract text from your resume. Please try uploading a different format (DOCX recommended)." />
+        );
+      }
+      await prisma.jobApplication.update({
+        where: { id },
+        data: { resumeText },
+      });
+    } catch (error) {
+      console.error("Resume extraction failed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+
+      // Provide specific error message based on the error type
+      if (errorMessage.includes("Download timeout")) {
+        return (
+          <ErrorAnimation msg="Resume download timed out. Please check your internet connection and try again." />
+        );
+      } else if (errorMessage.includes("Resume file not found")) {
+        return (
+          <ErrorAnimation msg="Resume file not found. Please upload your resume again." />
+        );
+      } else if (errorMessage.includes("Access denied")) {
+        return (
+          <ErrorAnimation msg="Cannot access resume file. Please upload your resume again." />
+        );
+      } else if (errorMessage.includes("Unsupported file format")) {
+        return (
+          <ErrorAnimation msg="Unsupported file format. Please upload a PDF or DOCX file." />
+        );
+      } else if (errorMessage.includes("password protected")) {
+        return (
+          <ErrorAnimation msg="PDF file is password protected. Please upload an unprotected version." />
+        );
+      } else if (
+        errorMessage.includes("image-based") ||
+        errorMessage.includes("no readable text")
+      ) {
+        return (
+          <ErrorAnimation msg="PDF contains no readable text or is image-based. Please upload a text-based PDF or DOCX file." />
+        );
+      } else {
+        return (
+          <ErrorAnimation msg="Could not process your resume. Please try uploading a different file or try again later." />
+        );
+      }
     }
-    await prisma.jobApplication.update({
-      where: { id },
-      data: { resumeText },
-    });
   }
 
   // 5️⃣ Get AI analysis if missing
@@ -107,7 +141,7 @@ export default async function ApplicationPage({
     );
   }
 
- await prisma.jobApplication.update({
+  await prisma.jobApplication.update({
     where: { id },
     data: {
       score: analysisResult.score,
@@ -117,15 +151,10 @@ export default async function ApplicationPage({
     },
   });
 
-  // refetch the updated results 
+  // refetch the updated results
   const updatedApplication = await prisma.jobApplication.findUnique({
-  where: { id },
-});
+    where: { id },
+  });
   // 6️⃣ Return fresh results
-  return (
-    <ResumeResult
-    job={job}
-    application={updatedApplication!}
-    />
-  );
+  return <ResumeResult job={job} application={updatedApplication!} />;
 }

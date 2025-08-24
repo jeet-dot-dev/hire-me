@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { deleteR2ObjectSingle } from "@/lib/r2/deleteR2Object";
 
-
 type ApplyDialogProps = {
   job: JobFormDataUI;
   children?: React.ReactNode;
@@ -29,10 +28,10 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
   };
 
   const ALLOWED_TYPES = [
-  "application/pdf", // PDF
-  "application/msword", // DOC (old Word format)
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document" // DOCX
-];
+    "application/pdf", // PDF
+    "application/msword", // DOC (old Word format)
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+  ];
   const handleSubmit = async () => {
     const toastId = toast.loading("Preparing to upload your resume...");
     setUploading(true);
@@ -100,12 +99,12 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
       }
 
       const application = await appRes.json();
-     // ✅ Preload the application page before redirecting
-      router.prefetch(`/application/${application.id}`);
+      // ✅ Preload the application page before redirecting
+      router.push(`/application/${application.id}`);
       setUploading(false);
-      
-       toast.success("Application submitted successfully!", { id: toastId });
-       router.push(`/application/${application.id}`);
+
+      toast.success("Application submitted successfully!", { id: toastId });
+      router.push(`/application/${application.id}`);
     } catch (err) {
       await deleteR2ObjectSingle(deleteKey);
       setUploading(false);
@@ -246,8 +245,7 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
             >
               {uploading ? (
                 <>
-                  <span className="animate-caret-blink">      
-                  Uploading...</span>
+                  <span className="animate-caret-blink">Uploading...</span>
                 </>
               ) : (
                 "Submit Application"

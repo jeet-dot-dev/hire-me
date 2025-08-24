@@ -4,7 +4,7 @@ import resumeLoader from "../../src/animations/resumeLoader.json";
 
 export default function ResumeLoader({msg}:{msg:string[]}) {
   return (
-    <div className="w-full min-h-screen bg-black flex flex-col items-center justify-center p-6">
+    <div className="fixed inset-0 w-screen h-screen bg-black flex flex-col items-center justify-center p-6 z-50">
       <div className="bg-black backdrop-blur-lg rounded-2xl shadow-xl p-8 flex flex-col items-center space-y-6">
         <Lottie
           animationData={resumeLoader}
