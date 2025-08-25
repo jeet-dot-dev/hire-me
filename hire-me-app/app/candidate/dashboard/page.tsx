@@ -42,8 +42,17 @@ const page = async () => {
     );
   }
 
-  // Check if profile is complete
-  if (!isProfileComplete(candidate)) {
+  // Check if candidate has any applications first
+  const recentJobApplications = await prisma.jobApplication.findMany({
+    where: { candidateId: candidate.id },
+    include:{
+      job: true
+    },
+    orderBy: { createdAt: "desc" }
+  });
+
+  // Check if profile is complete OR if user has applications (has engaged with platform)
+  if (!isProfileComplete(candidate) && recentJobApplications.length === 0) {
     // Get recent jobs count for display
     const recentJobsCount = await prisma.job.count({
       where: { 
@@ -59,14 +68,6 @@ const page = async () => {
       />
     );
   }
-
- const recentJobApplications = await prisma.jobApplication.findMany({
-  where: { candidateId: candidate.id },
-  include:{
-    job: true
-  },
-  orderBy: { createdAt: "desc" }
-});
 
  const recentJobPostings = await prisma.job.findMany({
   orderBy: { createdAt: "desc" }

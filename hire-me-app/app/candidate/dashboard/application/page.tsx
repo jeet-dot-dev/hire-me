@@ -40,8 +40,17 @@ const page = async () => {
     );
   }
 
-  // If profile is incomplete, show a helpful message
-  if (!isProfileComplete(candidate)) {
+  // First check if candidate has any applications
+  const applications = await prisma.jobApplication.findMany({
+    where: { candidateId: candidate.id },
+    include: {
+      job: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  // If profile is incomplete AND no applications, show a helpful message
+  if (!isProfileComplete(candidate) && applications.length === 0) {
     return (
       <div className="min-h-screen bg-background p-6">
         <div className="max-w-4xl mx-auto">
@@ -95,14 +104,6 @@ const page = async () => {
       </div>
     );
   }
-
-  const applications = await prisma.jobApplication.findMany({
-    where: { candidateId: candidate.id },
-    include: {
-      job: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
 
   const applicationWithJob: ApplicationWithJob[] = applications.map(
     (application) => ({
