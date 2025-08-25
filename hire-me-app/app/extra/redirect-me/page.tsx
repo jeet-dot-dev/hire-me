@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function RedirectPage() {
   const session = await getServerSession(authConfig);
-
+  console.log(session);
   if (!session?.user) {
     return redirect("/auth/login");
   }
