@@ -10,7 +10,6 @@ type TranscriptMessage = {
   text: string;
 };
 
-
 const page = async () => {
   const session = await auth();
   if (!session || !session.user) {
@@ -18,7 +17,7 @@ const page = async () => {
   }
 
   const userId = session?.user?.id;
-  
+
   // Check if recruiter profile exists, if not create one
   let recruiter = await prisma.recruiter.findUnique({
     where: { userId },
@@ -26,33 +25,40 @@ const page = async () => {
 
   if (!recruiter) {
     recruiter = await prisma.recruiter.create({
-      data: { userId }
+      data: { userId },
     });
   }
 
- const recentJobApplications = await prisma.jobApplication.findMany({
-  where: { job: { recruiterId: recruiter.id } },
+  const recentJobApplications = await prisma.jobApplication.findMany({
+    where: { job: { recruiterId: recruiter.id } },
 
-  include: {
-    job: true,
-  },
-  orderBy: { createdAt: "desc" }
-});
+    include: {
+      job: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
+  const recentJobPostings = await prisma.job.findMany({
+    where: { recruiterId: recruiter.id },
 
- const recentJobPostings = await prisma.job.findMany({
-  where: { recruiterId: recruiter.id },
-
-  orderBy: { createdAt: "desc" }
- });
+    orderBy: { createdAt: "desc" },
+  });
 
   // Type cast the Prisma results to match our TypeScript types
-  const typedApplications: ApplicationWithJob[] = recentJobApplications.map(app => ({
-    ...app,
-    transcript: app.transcript as TranscriptMessage[] | null, // Cast Prisma Json to our expected type
-  }));
+  const typedApplications: ApplicationWithJob[] = recentJobApplications.map(
+    (app) => ({
+      ...app,
+      transcript: app.transcript as TranscriptMessage[] | null, // Cast Prisma Json to our expected type
+    })
+  );
 
-  return <DashboardUI recentJobApplications={typedApplications} recentJobPostings={recentJobPostings} role="recruiter" />;
+  return (
+    <DashboardUI
+      recentJobApplications={typedApplications}
+      recentJobPostings={recentJobPostings}
+      role="recruiter"
+    />
+  );
 };
 
 export default page;
