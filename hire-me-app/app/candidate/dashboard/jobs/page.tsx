@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import CandidateJobComp from "@/components/features/Candidate/jobs/CandidateJobComp";
+import { ensureCandidateProfile } from "@/lib/candidateUtils";
 
 const page = async () => {
   const session = await auth();
@@ -10,14 +11,24 @@ const page = async () => {
 
   const { id: userId, role } = session.user;
 
-  const candidate = await prisma.candidate.findUnique({
-    where: { userId },
-  });
+  // Ensure candidate profile exists, create if missing
+  const candidate = await ensureCandidateProfile(
+    userId, 
+    session.user.email || undefined, 
+    session.user.name || undefined
+  );
 
   if (!candidate) {
     return (
-      <div className="text-red-500 text-center mt-10">
-        Candidate profile not found.
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">
+            Error Creating Profile
+          </h1>
+          <p className="text-muted-foreground">
+            We encountered an error setting up your profile. Please try refreshing the page.
+          </p>
+        </div>
       </div>
     );
   }

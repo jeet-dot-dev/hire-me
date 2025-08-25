@@ -1,24 +1,47 @@
 import { CandidateProfilePage } from "@/components/features/Candidate/Profile/CandidateProfilePage";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { ensureCandidateProfile, isProfileComplete } from "@/lib/candidateUtils";
+import { IncompleteProfileWelcome } from "@/components/shared/IncompleteProfileWelcome";
 
 export default async function page() {
   const session = await auth();
   if(!session || !session.user){
     return redirect('/auth/login');
   }
+  
   const userId = session?.user?.id;
-  const candidate = await prisma.candidate.findUnique({
-    where : {userId},
-    include:{
-      education : true ,
-      skills:true,
-      socials : true
-    }
-  })
-    if (!candidate) {
-    return <div className="text-white p-10">Candidate profile not found.</div>;
+  
+  // Ensure candidate profile exists, create if missing
+  const candidate = await ensureCandidateProfile(
+    userId, 
+    session.user.email || undefined, 
+    session.user.name || undefined
+  );
+
+  if (!candidate) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-2">
+            Error Creating Profile
+          </h1>
+          <p className="text-gray-400">
+            We encountered an error setting up your profile. Please try refreshing the page.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if profile is complete enough to show the full profile page
+  if (!isProfileComplete(candidate)) {
+    return (
+      <IncompleteProfileWelcome 
+        userName={candidate.firstName || session.user.name || "there"}
+        showCompletionPrompt={true}
+      />
+    );
   }
 
   const candidateProp = {

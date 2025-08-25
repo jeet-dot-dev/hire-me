@@ -4,6 +4,8 @@ import { ApplicationWithJob } from "@/types/applicationType";
 import { redirect } from "next/navigation";
 import React from "react";
 import DashboardUI from "./DashboardUI";
+import { ensureCandidateProfile, isProfileComplete } from "@/lib/candidateUtils";
+import { SimpleDashboard } from "@/components/shared/SimpleDashboard";
 
 type TranscriptMessage = {
   role: "recruiter" | "candidate";
@@ -17,25 +19,44 @@ const page = async () => {
   }
 
   const userId = session?.user?.id;
-  const candidate = await prisma.candidate.findUnique({
-    where: { userId },
-    include: {
-      education: true,
-      skills: true,
-      socials: true,
-    },
-  });
+  
+  // Ensure candidate profile exists, create if missing
+  const candidate = await ensureCandidateProfile(
+    userId, 
+    session.user.email || undefined, 
+    session.user.name || undefined
+  );
 
   if (!candidate) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-2">
-            Profile Not Found
+            Error Creating Profile
           </h1>
-          <p className="text-gray-400">Candidate profile not found.</p>
+          <p className="text-gray-400">
+            We encountered an error setting up your profile. Please try refreshing the page.
+          </p>
         </div>
       </div>
+    );
+  }
+
+  // Check if profile is complete
+  if (!isProfileComplete(candidate)) {
+    // Get recent jobs count for display
+    const recentJobsCount = await prisma.job.count({
+      where: { 
+        status: true,
+        isDelete: false 
+      }
+    });
+
+    return (
+      <SimpleDashboard 
+        userName={candidate.firstName || session.user.name || "there"}
+        recentJobsCount={recentJobsCount}
+      />
     );
   }
 

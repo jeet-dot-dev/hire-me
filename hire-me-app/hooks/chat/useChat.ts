@@ -164,8 +164,12 @@ export function useChat({
 
   // Load saved messages
   useEffect(() => {
+
     const saved = sessionStorage.getItem("interviewMessages");
-    if (saved) setMessages(JSON.parse(saved));
+    if (saved) {
+      setMessages(JSON.parse(saved));
+      setShowChatLoading(false); // Skip loading if there are saved messages
+    }
   }, []);
 
   useEffect(() => {
