@@ -41,7 +41,7 @@ const JobCardUi = ({ job, role, styleType, index }: JobCardUiProp) => {
     setIsWishlisted(!isWishlisted);
   };
 
-  const daysRemaining = getDaysRemaining(job.expireAt?.toISOString() ?? "");
+  const daysRemaining = getDaysRemaining(job.expireAt ? new Date(job.expireAt).toISOString() : "");
   const isExpired = daysRemaining < 0;
 
   if (styleType) {

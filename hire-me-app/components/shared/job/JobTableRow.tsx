@@ -82,7 +82,7 @@ const JobTableRow = ({
                     : "text-gray-300"
               }`}
             >
-              {formatDate(job.expireAt?.toISOString() ?? "")}
+              {formatDate(job.expireAt ? new Date(job.expireAt).toISOString() : "")}
             </span>
             <span
               className={`text-xs ${

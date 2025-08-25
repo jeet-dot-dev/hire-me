@@ -155,7 +155,7 @@ const BasicInformationSection = ({
             type="date"
             value={
               formData.expireAt
-                ? formData.expireAt.toISOString().split("T")[0]
+                ? new Date(formData.expireAt).toISOString().split("T")[0]
                 : ""
             }
             onChange={(e) =>
