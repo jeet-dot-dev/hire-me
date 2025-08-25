@@ -10,14 +10,16 @@ export async function GET(request: Request) {
       });
     }
     const id = session?.user?.id;
-    const recruiter = await prisma.recruiter.findUnique({
+    
+    // Check if recruiter profile exists, if not create one
+    let recruiter = await prisma.recruiter.findUnique({
       where: { userId: id },
     });
+    
     if (!recruiter) {
-      return new Response(
-        JSON.stringify({ error: "Recruiter profile not found" }),
-        { status: 404 }
-      );
+      recruiter = await prisma.recruiter.create({
+        data: { userId: id }
+      });
     }
     const { searchParams } = new URL(request.url);
     const cursor = searchParams.get("cursor");

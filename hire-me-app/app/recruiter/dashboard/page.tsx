@@ -18,21 +18,16 @@ const page = async () => {
   }
 
   const userId = session?.user?.id;
-  const recruiter = await prisma.recruiter.findUnique({
+  
+  // Check if recruiter profile exists, if not create one
+  let recruiter = await prisma.recruiter.findUnique({
     where: { userId },
   });
 
   if (!recruiter) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-2">
-            Profile Not Found
-          </h1>
-          <p className="text-gray-400">Recruiter profile not found.</p>
-        </div>
-      </div>
-    );
+    recruiter = await prisma.recruiter.create({
+      data: { userId }
+    });
   }
 
  const recentJobApplications = await prisma.jobApplication.findMany({

@@ -33,18 +33,17 @@ export async function GET(req: Request) {
       );
     }
 
-    // candidate id 
-    const recruiter = await prisma.recruiter.findUnique({
+    // Check if recruiter profile exists, if not create one
+    let recruiter = await prisma.recruiter.findUnique({
       where: {
         userId: session.user.id,
       }}
     );
 
     if(!recruiter) {
-      return NextResponse.json(
-        { error: "Recruiter not found" },
-        { status: 404 }
-      );
+      recruiter = await prisma.recruiter.create({
+        data: { userId: session.user.id }
+      });
     }
 
     const field =

@@ -251,24 +251,38 @@ const DashboardUI = ({
             <Users className="w-5 h-5" />
             Application Status Distribution
           </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={statusData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                label
-              >
-                {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          {total === 0 ? (
+            <div className="h-[250px] flex flex-col items-center justify-center text-center">
+              <div className="w-12 h-12 mb-3 bg-gray-800 rounded-full flex items-center justify-center">
+                <Users className="w-6 h-6 text-gray-500" />
+              </div>
+              <p className="text-gray-400 text-sm mb-2">No data to display</p>
+              <p className="text-gray-500 text-xs max-w-48">
+                {role === "candidate" 
+                  ? "Apply to jobs to see your application status distribution" 
+                  : "Applications will be visualized here once candidates start applying"}
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  label
+                >
+                  {statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Line Chart */}
@@ -277,20 +291,34 @@ const DashboardUI = ({
             <TrendingUp className="w-5 h-5" />
             Applications Trend (7 days)
           </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-              <XAxis dataKey="day" stroke="#888" />
-              <YAxis stroke="#888" />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="applications"
-                stroke="#10B981"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {total === 0 ? (
+            <div className="h-[250px] flex flex-col items-center justify-center text-center">
+              <div className="w-12 h-12 mb-3 bg-gray-800 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-gray-500" />
+              </div>
+              <p className="text-gray-400 text-sm mb-2">No trend data available</p>
+              <p className="text-gray-500 text-xs max-w-48">
+                {role === "candidate" 
+                  ? "Your application activity will be tracked here over time" 
+                  : "Track application trends once candidates start applying to your jobs"}
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis dataKey="day" stroke="#888" />
+                <YAxis stroke="#888" />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="applications"
+                  stroke="#10B981"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </section>
 
@@ -303,46 +331,68 @@ const DashboardUI = ({
             {labels.section1Title}
           </h3>
 
-          <ul className="space-y-3">
-            {recentJobApplications.slice(0, 5).map((app) => (
-              <li
-                key={app.id}
-                className="flex justify-between items-center lg:pb-10 bg-[#202022] p-4 rounded-xl hover:bg-[#2a2a2d] transition cursor-pointer"
-                onClick={
-                  role === "candidate"
-                    ? () =>
-                        router.push(`/application/${app.id}/interview/result`)
-                    : () =>
-                        router.push(
-                          `/recruiter/dashboard/application/${app.id}`
-                        )
-                }
+          {recentJobApplications.length === 0 ? (
+            <div className="text-center py-12 px-4">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center">
+                <Briefcase className="w-8 h-8 text-gray-500" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-2">
+                {role === "candidate" ? "No Applications Yet" : "No Applications Received"}
+              </h4>
+              <p className="text-gray-400 text-sm mb-4 max-w-xs mx-auto">
+                {role === "candidate" 
+                  ? "Start your career journey by applying to exciting job opportunities" 
+                  : "Candidates will appear here once they start applying to your job postings"}
+              </p>
+              <button
+                onClick={() => router.push(role === "candidate" ? "dashboard/jobs" : "dashboard/jobs")}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
               >
-                {/* Left side */}
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium text-white">
-                    {app.job.jobTitle || "Untitled Job"}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {app.job?.companyName || "Unknown Company"} •{" "}
-                    {app.job?.location || "Remote"}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Applied on {formatDate(app.createdAt)}
-                  </p>
-                </div>
-
-                {/* Right side */}
-                <span
-                  className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(
-                    app.status
-                  )}`}
+                {role === "candidate" ? "Browse Jobs" : "Create Job Posting"}
+              </button>
+            </div>
+          ) : (
+            <ul className="space-y-3">
+              {recentJobApplications.slice(0, 5).map((app) => (
+                <li
+                  key={app.id}
+                  className="flex justify-between items-center lg:pb-10 bg-[#202022] p-4 rounded-xl hover:bg-[#2a2a2d] transition cursor-pointer"
+                  onClick={
+                    role === "candidate"
+                      ? () =>
+                          router.push(`/application/${app.id}/interview/result`)
+                      : () =>
+                          router.push(
+                            `/recruiter/dashboard/application/${app.id}`
+                          )
+                  }
                 >
-                  {app.status}
-                </span>
-              </li>
-            ))}
-          </ul>
+                  {/* Left side */}
+                  <div className="flex flex-col">
+                    <p className="text-sm font-medium text-white">
+                      {app.job.jobTitle || "Untitled Job"}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {app.job?.companyName || "Unknown Company"} •{" "}
+                      {app.job?.location || "Remote"}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Applied on {formatDate(app.createdAt)}
+                    </p>
+                  </div>
+
+                  {/* Right side */}
+                  <span
+                    className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(
+                      app.status
+                    )}`}
+                  >
+                    {app.status}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Job Postings */}
@@ -351,48 +401,70 @@ const DashboardUI = ({
             <Building className="w-5 h-5" />
             {labels.section2Title}
           </h3>
-          <ul className="space-y-4">
-            {topJobPostings.slice(0, 5).map((job) => (
-              <li
-                key={job.id}
-                className="bg-[#202022] p-4 rounded-xl hover:bg-[#2a2a2d] transition cursor-pointer"
-                onClick={() => router.push(`/${role}/dashboard/jobs/${job.id}`)}
+          {topJobPostings.length === 0 ? (
+            <div className="text-center py-12 px-4">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center">
+                <Building className="w-8 h-8 text-gray-500" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-2">
+                {role === "candidate" ? "No Job Opportunities" : "No Job Postings Yet"}
+              </h4>
+              <p className="text-gray-400 text-sm mb-4 max-w-xs mx-auto">
+                {role === "candidate" 
+                  ? "New job opportunities will appear here as they become available" 
+                  : "Create your first job posting to start attracting talented candidates"}
+              </p>
+              <button
+                onClick={() => router.push(role === "candidate" ? "dashboard/jobs" : "dashboard/jobs/create")}
+                className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
               >
-                {/* Job title & type */}
-                <div className="flex justify-between items-center mb-2">
-                  <p className="font-semibold flex items-center gap-2 text-base">
-                    {getJobTypeIcon(job.jobType)} {job.jobTitle}
-                  </p>
-                  <span className="text-xs text-gray-400">
-                    {formatDate(job.createdAt)}
-                  </span>
-                </div>
+                {role === "candidate" ? "Explore Jobs" : "Post Your First Job"}
+              </button>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {topJobPostings.slice(0, 5).map((job) => (
+                <li
+                  key={job.id}
+                  className="bg-[#202022] p-4 rounded-xl hover:bg-[#2a2a2d] transition cursor-pointer"
+                  onClick={() => router.push(`/${role}/dashboard/jobs/${job.id}`)}
+                >
+                  {/* Job title & type */}
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="font-semibold flex items-center gap-2 text-base">
+                      {getJobTypeIcon(job.jobType)} {job.jobTitle}
+                    </p>
+                    <span className="text-xs text-gray-400">
+                      {formatDate(job.createdAt)}
+                    </span>
+                  </div>
 
-                {/* Company + Location */}
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-300">
-                    {job.companyName}
-                  </span>
-                  <span className="text-blue-400 text-sm font-medium">
-                    {job.location}
-                  </span>
-                </div>
+                  {/* Company + Location */}
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-300">
+                      {job.companyName}
+                    </span>
+                    <span className="text-blue-400 text-sm font-medium">
+                      {job.location}
+                    </span>
+                  </div>
 
-                {/* Extra details */}
-                <div className="flex flex-wrap gap-3 text-xs text-gray-400">
-                  <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
-                    💰 {job.salary || "Not Disclosed"}
-                  </span>
-                  <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
-                    🕒 {job.jobType}
-                  </span>
-                  <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
-                    👥 {0} Applicants
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+                  {/* Extra details */}
+                  <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                    <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
+                      💰 {job.salary || "Not Disclosed"}
+                    </span>
+                    <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
+                      🕒 {job.jobType}
+                    </span>
+                    <span className="bg-[#2d2d31] px-2 py-1 rounded-lg">
+                      👥 {0} Applicants
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
     </div>
