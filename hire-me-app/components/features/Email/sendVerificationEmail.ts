@@ -30,7 +30,7 @@ export async function sendVerificationEmail({
       : VerificationEmailComp({ name, verifyUrl });
 
   const { data, error } = await resend.emails.send({
-    from: "onboarding@resend.dev",
+    from: "noreply@send.hireme.stackzy.tech",
     to: email,
     subject: "Verify your email address - Hire-me",
     react: reactMarkup,
