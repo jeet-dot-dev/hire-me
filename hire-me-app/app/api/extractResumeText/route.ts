@@ -1,38 +1,35 @@
 import { NextResponse } from "next/server";
-import axios from "axios";
-import mammoth from "mammoth";
-import { PDFDocument } from "pdf-lib";
+import { extractResumeText } from "@/components/interview/functions/extractResumeText";
 
 export async function POST(req: Request) {
-  const { key } = await req.json();
+  try {
+    const { key } = await req.json();
 
-  const resumeUrl = `https://${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${key}`;
-  const response = await axios.get(resumeUrl, { responseType: "arraybuffer" });
-  const arrayBuffer = response.data;
-
-  const ext = key.split(".").pop()?.toLowerCase();
-  let text = "";
-
-  if (ext === "pdf") {
-    try {
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
-      const pages = pdfDoc.getPages();
-      
-      // Note: pdf-lib doesn't have built-in text extraction
-      // This is a basic implementation - for better text extraction,
-      // you might want to use pdfjs-dist or another library
-      text = `PDF loaded successfully with ${pages.length} pages. Text extraction requires additional setup.`;
-    } catch (error) {
-      console.error("PDF processing error:", error);
-      return NextResponse.json({ 
-        error: "Failed to process PDF file",
-        text: "" 
-      });
+    if (!key) {
+      return NextResponse.json(
+        { error: "Missing resume key" },
+        { status: 400 }
+      );
     }
-  } else if (ext === "doc" || ext === "docx") {
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    text = result.value.trim();
-  }
 
-  return NextResponse.json({ text });
+    const text = await extractResumeText(key);
+
+    return NextResponse.json({ 
+      text,
+      success: true 
+    });
+  } catch (error) {
+    console.error("Resume extraction API error:", error);
+    
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    
+    return NextResponse.json(
+      { 
+        error: errorMessage,
+        text: "",
+        success: false 
+      },
+      { status: 500 }
+    );
+  }
 }
