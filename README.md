@@ -9,16 +9,6 @@
 
 ## 📋 Technical Documentation
 
-### Comprehensive System Documentation
-- **[Development Summary & Key Achievements](./docs/00_DEVELOPMENT_SUMMARY_ACHIEVEMENTS.md)** - Overview of all technical achievements
-- **[System Architecture Overview](./docs/01_SYSTEM_ARCHITECTURE_OVERVIEW.md)** - Microservices architecture and technology stack
-- **[API Security & Rate Limiting](./docs/02_API_SECURITY_RATE_LIMITING.md)** - Enterprise-grade security implementation
-- **[File Processing & Resume Extraction](./docs/03_FILE_PROCESSING_RESUME_EXTRACTION.md)** - Serverless file processing system
-- **[User Experience & Onboarding](./docs/04_USER_EXPERIENCE_ONBOARDING_OPTIMIZATION.md)** - UX optimization and user journey
-- **[AI Integration & Content Generation](./docs/05_AI_INTEGRATION_CONTENT_GENERATION.md)** - AI-powered features and content enhancement
-- **[Database Design & Architecture](./docs/06_DATABASE_DESIGN_ARCHITECTURE.md)** - PostgreSQL schema and optimization
-- **[Authentication & Authorization](./docs/07_AUTHENTICATION_AUTHORIZATION_SYSTEM.md)** - Security and user management
-- **[Frontend Architecture & Components](./docs/08_FRONTEND_ARCHITECTURE_COMPONENT_DESIGN.md)** - React/Next.js component design
 
 ## 🌟 Platform Overview
 
