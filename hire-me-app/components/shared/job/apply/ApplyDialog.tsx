@@ -254,7 +254,6 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
             </Button>
             <ProtectedActionButton
               onAction={handleSubmit}
-              onUpgradeRequired={() => setShowUpgradeModal(true)}
               disabled={!resume || uploading}
               className="flex-1 flex items-center justify-center gap-2 bg-white text-black hover:bg-white/90 font-semibold transition-all duration-200 text-sm sm:text-base py-2 sm:py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -273,7 +272,7 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
         <UpgradeModal 
           isOpen={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
-          creditsRemaining={0}
+          currentCredits={0}
         />
       </PopoverContent>
     </Popover>

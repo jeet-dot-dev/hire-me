@@ -57,13 +57,15 @@ const DashboardUI = ({
   useEffect(() => {
     if (role === "candidate") {
       fetch("/api/candidate/credits")
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (!data.error) {
             setInterviewCredits(data.creditsRemaining);
           }
         })
-        .catch(err => console.error("Failed to fetch interview credits:", err));
+        .catch((err) =>
+          console.error("Failed to fetch interview credits:", err)
+        );
     }
   }, [role]);
 
@@ -181,10 +183,9 @@ const DashboardUI = ({
       {/* Interview Credits Section - Only for Candidates */}
       {role === "candidate" && interviewCredits !== null && (
         <section className="mb-8">
-          <div className="max-w-md">
-            <InterviewCreditsCard 
-              creditsRemaining={interviewCredits}
-              totalCredits={3}
+          <div className="max-w-full ">
+            <InterviewCreditsCard
+              credits={interviewCredits}
               onUpgrade={handleUpgrade}
             />
           </div>
@@ -209,7 +210,9 @@ const DashboardUI = ({
             <Briefcase className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
           </div>
           <div>
-            <p className="text-2xl sm:text-4xl font-bold">{role==="recruiter"?recentJobPostings.length:total}</p>
+            <p className="text-2xl sm:text-4xl font-bold">
+              {role === "recruiter" ? recentJobPostings.length : total}
+            </p>
             <p className="text-xs sm:text-sm text-gray-400">
               {labels.card1Subtitle}
             </p>
@@ -269,7 +272,9 @@ const DashboardUI = ({
           </div>
           <div>
             <p className="text-2xl sm:text-4xl font-bold text-blue-400">
-              {role === "candidate" ? topJobPostings.length : recentJobApplications.length}
+              {role === "candidate"
+                ? topJobPostings.length
+                : recentJobApplications.length}
             </p>
             <p className="text-xs sm:text-sm text-gray-400">
               {labels.card4Subtitle}
@@ -293,8 +298,8 @@ const DashboardUI = ({
               </div>
               <p className="text-gray-400 text-sm mb-2">No data to display</p>
               <p className="text-gray-500 text-xs max-w-48">
-                {role === "candidate" 
-                  ? "Apply to jobs to see your application status distribution" 
+                {role === "candidate"
+                  ? "Apply to jobs to see your application status distribution"
                   : "Applications will be visualized here once candidates start applying"}
               </p>
             </div>
@@ -331,10 +336,12 @@ const DashboardUI = ({
               <div className="w-12 h-12 mb-3 bg-gray-800 rounded-full flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-gray-500" />
               </div>
-              <p className="text-gray-400 text-sm mb-2">No trend data available</p>
+              <p className="text-gray-400 text-sm mb-2">
+                No trend data available
+              </p>
               <p className="text-gray-500 text-xs max-w-48">
-                {role === "candidate" 
-                  ? "Your application activity will be tracked here over time" 
+                {role === "candidate"
+                  ? "Your application activity will be tracked here over time"
                   : "Track application trends once candidates start applying to your jobs"}
               </p>
             </div>
@@ -372,15 +379,21 @@ const DashboardUI = ({
                 <Briefcase className="w-8 h-8 text-gray-500" />
               </div>
               <h4 className="text-lg font-semibold text-white mb-2">
-                {role === "candidate" ? "No Applications Yet" : "No Applications Received"}
+                {role === "candidate"
+                  ? "No Applications Yet"
+                  : "No Applications Received"}
               </h4>
               <p className="text-gray-400 text-sm mb-4 max-w-xs mx-auto">
-                {role === "candidate" 
-                  ? "Start your career journey by applying to exciting job opportunities" 
+                {role === "candidate"
+                  ? "Start your career journey by applying to exciting job opportunities"
                   : "Candidates will appear here once they start applying to your job postings"}
               </p>
               <button
-                onClick={() => router.push(role === "candidate" ? "dashboard/jobs" : "dashboard/jobs")}
+                onClick={() =>
+                  router.push(
+                    role === "candidate" ? "dashboard/jobs" : "dashboard/jobs"
+                  )
+                }
                 className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
               >
                 {role === "candidate" ? "Browse Jobs" : "Create Job Posting"}
@@ -442,15 +455,23 @@ const DashboardUI = ({
                 <Building className="w-8 h-8 text-gray-500" />
               </div>
               <h4 className="text-lg font-semibold text-white mb-2">
-                {role === "candidate" ? "No Job Opportunities" : "No Job Postings Yet"}
+                {role === "candidate"
+                  ? "No Job Opportunities"
+                  : "No Job Postings Yet"}
               </h4>
               <p className="text-gray-400 text-sm mb-4 max-w-xs mx-auto">
-                {role === "candidate" 
-                  ? "New job opportunities will appear here as they become available" 
+                {role === "candidate"
+                  ? "New job opportunities will appear here as they become available"
                   : "Create your first job posting to start attracting talented candidates"}
               </p>
               <button
-                onClick={() => router.push(role === "candidate" ? "dashboard/jobs" : "dashboard/jobs/create")}
+                onClick={() =>
+                  router.push(
+                    role === "candidate"
+                      ? "dashboard/jobs"
+                      : "dashboard/jobs/create"
+                  )
+                }
                 className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
               >
                 {role === "candidate" ? "Explore Jobs" : "Post Your First Job"}
@@ -462,7 +483,9 @@ const DashboardUI = ({
                 <li
                   key={job.id}
                   className="bg-[#202022] p-4 rounded-xl hover:bg-[#2a2a2d] transition cursor-pointer"
-                  onClick={() => router.push(`/${role}/dashboard/jobs/${job.id}`)}
+                  onClick={() =>
+                    router.push(`/${role}/dashboard/jobs/${job.id}`)
+                  }
                 >
                   {/* Job title & type */}
                   <div className="flex justify-between items-center mb-2">
@@ -505,10 +528,10 @@ const DashboardUI = ({
 
       {/* Upgrade Modal */}
       {role === "candidate" && (
-        <UpgradeModal 
+        <UpgradeModal
           isOpen={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
-          creditsRemaining={interviewCredits || 0}
+          currentCredits={interviewCredits || 0}
         />
       )}
     </div>

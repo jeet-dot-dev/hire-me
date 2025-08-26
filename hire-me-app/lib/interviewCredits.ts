@@ -9,24 +9,9 @@ export interface InterviewCreditsResult {
 /**
  * Check if a candidate has remaining interview credits
  */
-export async function checkInterviewCredits(candidateId: string): Promise<InterviewCreditsResult> {
+export async function checkInterviewCredits(credits: number): Promise<InterviewCreditsResult> {
   try {
-    const candidate = await prisma.candidate.findUnique({
-      where: { id: candidateId },
-      select: { interviewCredits: true }
-    });
-
-    if (!candidate) {
-      return {
-        success: false,
-        creditsRemaining: 0,
-        message: "Candidate not found"
-      };
-    }
-
-    const creditsRemaining = candidate.interviewCredits;
-
-    if (creditsRemaining <= 0) {
+    if (credits <= 0) {
       return {
         success: false,
         creditsRemaining: 0,
@@ -36,7 +21,7 @@ export async function checkInterviewCredits(candidateId: string): Promise<Interv
 
     return {
       success: true,
-      creditsRemaining
+      creditsRemaining: credits
     };
   } catch (error) {
     console.error("Error checking interview credits:", error);
@@ -53,10 +38,26 @@ export async function checkInterviewCredits(candidateId: string): Promise<Interv
  */
 export async function consumeInterviewCredit(candidateId: string): Promise<InterviewCreditsResult> {
   try {
-    // First check if credits are available
-    const checkResult = await checkInterviewCredits(candidateId);
-    if (!checkResult.success) {
-      return checkResult;
+    // Get candidate to check credits before consuming
+    const candidate = await prisma.candidate.findUnique({
+      where: { id: candidateId },
+      select: { interviewCredits: true }
+    });
+
+    if (!candidate) {
+      return {
+        success: false,
+        creditsRemaining: 0,
+        message: "Candidate not found"
+      };
+    }
+
+    if (candidate.interviewCredits <= 0) {
+      return {
+        success: false,
+        creditsRemaining: 0,
+        message: "Free tier limit reached. Please upgrade to continue."
+      };
     }
 
     // Consume one credit
@@ -81,23 +82,6 @@ export async function consumeInterviewCredit(candidateId: string): Promise<Inter
       creditsRemaining: 0,
       message: "Error processing interview credit"
     };
-  }
-}
-
-/**
- * Get candidate's current interview credits
- */
-export async function getCandidateCredits(candidateId: string): Promise<number> {
-  try {
-    const candidate = await prisma.candidate.findUnique({
-      where: { id: candidateId },
-      select: { interviewCredits: true }
-    });
-
-    return candidate?.interviewCredits ?? 0;
-  } catch (error) {
-    console.error("Error getting candidate credits:", error);
-    return 0;
   }
 }
 

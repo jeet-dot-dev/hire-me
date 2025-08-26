@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { getCandidateCredits, getCandidateByUserId } from "@/lib/interviewCredits";
+import { getCandidateByUserId } from "@/lib/interviewCredits";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -19,7 +19,7 @@ export async function GET() {
       );
     }
 
-    const creditsRemaining = await getCandidateCredits(candidate.id);
+    const creditsRemaining = candidate.interviewCredits;
 
     return NextResponse.json({
       creditsRemaining,

@@ -93,7 +93,7 @@ export function determineRateLimitGroup(pathname: string): RateLimitGroup {
     '/api/auth/register',
     '/api/auth/login',
     '/api/auth/update-password',
-    '/api/auth/reset-password',
+    '/api/auth/forget-password',
     '/api/interview/chat',
     '/api/interview/stt',
     '/api/extractResumeText',

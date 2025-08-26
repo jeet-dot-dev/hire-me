@@ -1,95 +1,151 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useInterviewCreditsCheck } from '@/hooks/useInterviewCredits';
-import { AlertCircle, Lock } from 'lucide-react';
+import { useInterviewCredits } from '@/hooks/useInterviewCredits';
+import { UpgradeModal } from './UpgradeModal';
+import { Crown, Loader2, AlertCircle, Lock } from 'lucide-react';
 
 interface ProtectedActionButtonProps {
+  onAction: () => void | Promise<void>;
   children: React.ReactNode;
-  onAction: () => void;
-  onUpgradeRequired?: () => void;
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
-  size?: 'default' | 'sm' | 'lg';
-  className?: string;
+  requiredCredits?: number;
   disabled?: boolean;
+  className?: string;
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }
 
 export function ProtectedActionButton({
-  children,
   onAction,
-  onUpgradeRequired,
-  variant = 'default',
-  size = 'default',
-  className = '',
+  children,
+  requiredCredits = 1,
   disabled = false,
-  ...props
+  className = "",
+  variant = "default"
 }: ProtectedActionButtonProps) {
-  const { credits, loading, hasCredits, checkCreditsBeforeAction } = useInterviewCreditsCheck();
+  const { credits, loading, error } = useInterviewCredits();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const handleClick = () => {
-    if (disabled) return;
+  const currentCredits = credits?.creditsRemaining || 0;
+  const hasEnoughCredits = currentCredits >= requiredCredits;
+  const isDisabled = disabled || loading || !hasEnoughCredits;
 
-    checkCreditsBeforeAction(
-      onAction,
-      onUpgradeRequired || (() => {
-        // Show default upgrade message
-        alert('Free tier limit reached. Please upgrade to continue.');
-      })
-    );
+  const handleClick = async () => {
+    if (!hasEnoughCredits) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      await onAction();
+    } catch (error) {
+      console.error('Protected action failed:', error);
+      // Check if error is related to credits
+      if (error instanceof Error && error.message.includes('INSUFFICIENT_CREDITS')) {
+        setShowUpgradeModal(true);
+      }
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  // Show loading state
+  // Error state
+  if (error) {
+    return (
+      <Button
+        disabled
+        className={`bg-white/10 text-white/60 border-white/20 cursor-not-allowed ${className}`}
+        variant="outline"
+      >
+        <span className="text-xs sm:text-sm">Error loading credits</span>
+      </Button>
+    );
+  }
+
+  // Loading state
   if (loading) {
     return (
-      <Button 
-        variant={variant} 
-        size={size} 
-        className={className} 
-        disabled 
-        {...props}
+      <Button
+        disabled
+        className={`bg-white/10 text-white border-white/20 ${className}`}
+        variant="outline"
       >
-        Loading...
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        <span className="text-xs sm:text-sm">Checking credits...</span>
       </Button>
     );
   }
 
-  // Show credits exhausted state
-  if (!hasCredits) {
+  // No credits state
+  if (!hasEnoughCredits) {
     return (
-      <Button 
-        variant="outline" 
-        size={size} 
-        className={`${className} border-red-500/50 text-red-400 hover:bg-red-500/10`}
-        onClick={handleClick}
-        {...props}
-      >
-        <Lock className="w-4 h-4 mr-2" />
-        Upgrade to Apply
-      </Button>
+      <>
+        <Button
+          onClick={handleClick}
+          className={`bg-white/10 text-white border-white/20 hover:bg-white/20 transition-colors duration-200 ${className}`}
+          variant="outline"
+        >
+          <Crown className="w-4 h-4 mr-2" />
+          <span className="text-xs sm:text-sm">Upgrade Required</span>
+        </Button>
+        <UpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          currentCredits={currentCredits}
+        />
+      </>
     );
   }
 
-  // Show low credits warning
-  const isLowCredits = credits && credits.creditsRemaining <= 1;
+  // Normal state with credits available
+  const buttonVariants = {
+    default: "bg-white text-black hover:bg-white/90",
+    destructive: "bg-white text-black hover:bg-white/90",
+    outline: "border-white/20 text-white hover:bg-white/10",
+    secondary: "bg-white/10 text-white hover:bg-white/20",
+    ghost: "text-white hover:bg-white/10",
+    link: "text-white underline hover:text-white/80"
+  };
 
   return (
     <div className="relative">
-      <Button 
-        variant={variant} 
-        size={size} 
-        className={className}
+      <Button
         onClick={handleClick}
-        disabled={disabled}
-        {...props}
+        disabled={isDisabled || actionLoading}
+        className={`${buttonVariants[variant]} transition-colors duration-200 ${className}`}
+        variant={variant === "default" ? undefined : variant}
       >
-        {children}
+        {actionLoading ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            <span className="text-xs sm:text-sm">Processing...</span>
+          </>
+        ) : (
+          <>
+            {children}
+            {currentCredits <= 1 && currentCredits > 0 && (
+              <span className="ml-2 text-xs opacity-60">
+                ({currentCredits} left)
+              </span>
+            )}
+          </>
+        )}
       </Button>
-      {isLowCredits && (
+      
+      {/* Low credits warning indicator */}
+      {currentCredits <= 1 && currentCredits > 0 && (
         <div className="absolute -top-2 -right-2">
-          <div className="bg-yellow-500 text-black rounded-full p-1">
+          <div className="bg-white text-black rounded-full p-1">
             <AlertCircle className="w-3 h-3" />
           </div>
         </div>
       )}
+      
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        currentCredits={currentCredits}
+      />
     </div>
   );
 }
@@ -100,24 +156,32 @@ export function withCreditProtection<T extends object>(
   onInsufficientCredits?: () => void
 ) {
   return function ProtectedComponent(props: T) {
-    const { hasCredits, loading } = useInterviewCreditsCheck();
+    const { credits, loading } = useInterviewCredits();
+    const currentCredits = credits?.creditsRemaining || 0;
+    const hasCredits = currentCredits > 0;
 
     if (loading) {
-      return <div>Loading...</div>;
+      return (
+        <div className="flex items-center justify-center p-4">
+          <Loader2 className="w-6 h-6 animate-spin text-white" />
+          <span className="ml-2 text-white text-sm">Loading...</span>
+        </div>
+      );
     }
 
     if (!hasCredits) {
       return (
-        <div className="text-center p-6 bg-red-500/10 border border-red-500/20 rounded-lg">
-          <Lock className="w-8 h-8 text-red-400 mx-auto mb-2" />
-          <h3 className="text-red-400 font-semibold mb-2">Free Tier Limit Reached</h3>
-          <p className="text-red-300 text-sm mb-3">
+        <div className="text-center p-4 sm:p-6 bg-white/5 border border-white/20 rounded-lg">
+          <Lock className="w-6 h-6 sm:w-8 sm:h-8 text-white mx-auto mb-2" />
+          <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">Free Tier Limit Reached</h3>
+          <p className="text-white/60 text-xs sm:text-sm mb-3 leading-relaxed">
             You&apos;ve used all your free interview attempts. Upgrade to continue.
           </p>
           <Button 
             onClick={onInsufficientCredits || (() => alert('Upgrade feature coming soon!'))}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-white text-black hover:bg-white/90 text-xs sm:text-sm px-3 py-2 sm:px-4 sm:py-2"
           >
+            <Crown className="w-4 h-4 mr-2" />
             Upgrade Now
           </Button>
         </div>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { getCandidateByUserId, checkInterviewCredits } from "@/lib/interviewCredits";
+import { getCandidateByUserId } from "@/lib/interviewCredits";
 
 export interface AuthenticatedRequest extends NextRequest {
   candidate?: {
@@ -41,13 +41,11 @@ export async function withInterviewCreditsCheck(
     }
 
     // Check interview credits
-    const creditsCheck = await checkInterviewCredits(candidate.id);
-    
-    if (!creditsCheck.success) {
+    if (candidate.interviewCredits <= 0) {
       return NextResponse.json(
         { 
-          error: creditsCheck.message || "Free tier limit reached. Please upgrade to continue.",
-          creditsRemaining: creditsCheck.creditsRemaining,
+          error: "Free tier limit reached. Please upgrade to continue.",
+          creditsRemaining: 0,
           upgradeRequired: true
         },
         { status: 402 } // Payment Required

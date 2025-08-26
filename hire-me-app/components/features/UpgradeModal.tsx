@@ -7,116 +7,134 @@ import {
   DialogTitle 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Crown, Zap, Check, Sparkles } from 'lucide-react';
+import { Crown, Zap, Check, X, Star, Shield, Headphones } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  creditsRemaining: number;
+  currentCredits?: number;
 }
 
-export function UpgradeModal({ isOpen, onClose, creditsRemaining }: UpgradeModalProps) {
-  const features = [
-    "Unlimited AI Interview Practice",
-    "Advanced Performance Analytics",
-    "Personalized Interview Coaching",
-    "Priority Application Processing",
-    "Advanced Resume Analysis",
-    "Interview Recording & Playback"
+export function UpgradeModal({ 
+  isOpen, 
+  onClose, 
+  currentCredits = 0 
+}: UpgradeModalProps) {
+  const premiumFeatures = [
+    {
+      icon: Zap,
+      title: "Unlimited AI Interviews",
+      description: "Practice as many times as you want"
+    },
+    {
+      icon: Star,
+      title: "Advanced Analytics",
+      description: "Detailed performance insights and progress tracking"
+    },
+    {
+      icon: Shield,
+      title: "Priority Processing",
+      description: "Skip the queue with priority application processing"
+    },
+    {
+      icon: Headphones,
+      title: "Expert Coaching",
+      description: "Detailed feedback and personalized improvement suggestions"
+    }
   ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto bg-slate-900 border-slate-700">
-        <DialogHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full">
-              <Crown className="w-8 h-8 text-white" />
+      <DialogContent className="bg-black border-white/20 text-white max-w-md sm:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-4 p-0" showCloseButton={false}>
+        <DialogHeader className="space-y-3 p-6 pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-full">
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg sm:text-xl font-bold text-white">
+                  Upgrade to Premium
+                </DialogTitle>
+                <DialogDescription className="text-white/60 text-sm mt-1">
+                  Unlock unlimited potential
+                </DialogDescription>
+              </div>
             </div>
+            <Button
+              onClick={onClose}
+              variant="ghost"
+              size="sm"
+              className="text-white/60 hover:text-white hover:bg-white/10 p-2 h-8 w-8"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
-          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Upgrade to Pro
-          </DialogTitle>
-          <DialogDescription className="text-slate-300">
-            {creditsRemaining === 0 
-              ? "You've used all your free interviews. Upgrade to continue practicing!"
-              : "Unlock unlimited interviews and advanced features"
-            }
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="px-6 pb-6">
           {/* Current Status */}
-          <Card className="bg-slate-800 border-slate-700">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-yellow-500" />
-                  <span className="text-slate-200 font-medium">Free Plan</span>
-                </div>
-                <Badge variant="secondary">
-                  {creditsRemaining}/3 interviews left
-                </Badge>
-              </div>
-              {creditsRemaining === 0 && (
-                <p className="text-red-400 text-sm mt-2">
-                  ❌ No more free interviews available
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          <div className="bg-white/5 border border-white/20 rounded-lg p-4 mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/80 text-sm font-medium">Current Status</span>
+              <span className="text-white font-semibold text-sm bg-white/10 px-2 py-1 rounded">Free Tier</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-white/80 text-sm">Credits Remaining</span>
+              <span className="text-white font-bold">{currentCredits}/3</span>
+            </div>
+          </div>
 
-          {/* Pro Features */}
-          <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Crown className="w-5 h-5 text-blue-400" />
-                <span className="text-white font-semibold">Pro Plan Benefits</span>
-                <Sparkles className="w-4 h-4 text-purple-400" />
-              </div>
-              <ul className="space-y-2">
-                {features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-sm text-slate-300">
-                    <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+          {/* Premium Features */}
+          <div className="mb-4">
+            <h3 className="text-white font-semibold text-base mb-3">Premium Features</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {premiumFeatures.map((feature, index) => {
+                const IconComponent = feature.icon;
+                return (
+                  <div key={index} className="flex items-start gap-3 p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+                    <div className="p-2 bg-white/10 rounded-full flex-shrink-0">
+                      <IconComponent className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-white font-medium text-sm leading-tight mb-1">
+                        {feature.title}
+                      </h4>
+                      <p className="text-white/60 text-xs leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
+                    <Check className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Coming Soon Section */}
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-amber-400" />
-              <span className="text-amber-400 font-semibold">Coming Soon</span>
-            </div>
-            <p className="text-amber-200 text-sm">
-              We&apos;re working hard to bring you premium features. Stay tuned for updates!
+          <div className="bg-white/5 border border-white/20 rounded-lg p-4 text-center mb-4">
+            <div className="text-xl font-bold text-white mb-1">Coming Soon</div>
+            <p className="text-white/60 text-sm">
+              Premium features are being finalized. Stay tuned for launch!
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
-            <Button 
-              variant="outline" 
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={() => toast("We'll notify you when premium features are available!")}
+              className="flex-1 bg-white text-black hover:bg-white/90 cursor-pointer transition-colors duration-200 py-2.5 text-sm font-medium"
+            >
+              <Crown className="w-4 h-4 mr-2" />
+              Notify Me When Available
+            </Button>
+            <Button
               onClick={onClose}
-              className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-800"
+              variant="outline"
+              className="flex-1 border-white/20 hover:text-white hover:bg-black text-black cursor-pointer py-2.5 text-sm"
             >
               Maybe Later
-            </Button>
-            <Button 
-              onClick={() => {
-                // TODO: Implement upgrade flow
-                alert("Upgrade feature coming soon!");
-                onClose();
-              }}
-              disabled
-              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50"
-            >
-              Upgrade Now
             </Button>
           </div>
         </div>
