@@ -11,6 +11,8 @@ import { Upload, Building, FileText, X, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { deleteR2ObjectSingle } from "@/lib/r2/deleteR2Object";
+import { ProtectedActionButton } from "@/components/features/ProtectedActionButton";
+import { UpgradeModal } from "@/components/features/UpgradeModal";
 
 type ApplyDialogProps = {
   job: JobFormDataUI;
@@ -21,7 +23,9 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [resume, setResume] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const router = useRouter();
+  
   const handleCancel = () => {
     setIsOpen(false);
     setResume(null); // Clear file when cancelling
@@ -93,9 +97,19 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
         headers: { "Content-Type": "application/json" },
       });
       if (!appRes.ok) {
+        const errorData = await appRes.json().catch(() => ({ error: "Unknown error" }));
         await deleteR2ObjectSingle(data.key);
-        throw new Error(await appRes.text());
+        
+        // Handle credit-related errors
+        if (appRes.status === 402 && errorData.upgradeRequired) {
+          setUploading(false);
+          setShowUpgradeModal(true);
+          toast.error(errorData.error || "Free tier limit reached. Please upgrade to continue.", { id: toastId });
+          return;
+        }
+        
         setUploading(false);
+        throw new Error(errorData.error || "Application submission failed");
       }
 
       const application = await appRes.json();
@@ -238,10 +252,11 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
             >
               Cancel
             </Button>
-            <Button
-              onClick={handleSubmit}
+            <ProtectedActionButton
+              onAction={handleSubmit}
+              onUpgradeRequired={() => setShowUpgradeModal(true)}
               disabled={!resume || uploading}
-              className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-white text-black hover:bg-white/90 font-semibold transition-all duration-200 text-sm sm:text-base py-2 sm:py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 bg-white text-black hover:bg-white/90 font-semibold transition-all duration-200 text-sm sm:text-base py-2 sm:py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {uploading ? (
                 <>
@@ -250,9 +265,16 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
               ) : (
                 "Submit Application"
               )}
-            </Button>
+            </ProtectedActionButton>
           </div>
         </div>
+
+        {/* Upgrade Modal */}
+        <UpgradeModal 
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          creditsRemaining={0}
+        />
       </PopoverContent>
     </Popover>
   );

@@ -1,15 +1,16 @@
 import { buildSystemPrompt } from "@/components/interview/prompts/recruiter";
 import openai from "@/lib/openAi/init";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+import { withAuthCheck, AuthenticatedRequest } from "@/lib/middlewares/interviewAuth";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
-export async function POST(request: Request) {
+async function handleInterviewChat(request: AuthenticatedRequest) {
   try {
     const { messages, instruction, jobinfo, resume } = await request.json();
 
     if (!messages || !Array.isArray(messages)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid messages format" }),
+      return NextResponse.json(
+        { error: "Invalid messages format" },
         { status: 400 }
       );
     }
@@ -44,4 +45,8 @@ export async function POST(request: Request) {
     console.error("Chat API error:", error);
     return NextResponse.json({ error: "Chat failed" }, { status: 500 });
   }
+}
+
+export async function POST(request: Request) {
+  return withAuthCheck(request as NextRequest, handleInterviewChat);
 }

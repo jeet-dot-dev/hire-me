@@ -14,7 +14,7 @@ import {
   Users,
   Eye,
 } from "lucide-react";
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -35,6 +35,8 @@ import {
   getTrendData,
 } from "../../../utils/dashboardCalculations";
 import { useRouter } from "next/navigation";
+import { InterviewCreditsCard } from "@/components/features/InterviewCreditsCard";
+import { UpgradeModal } from "@/components/features/UpgradeModal";
 
 type DashboardUIType = {
   recentJobApplications: ApplicationWithJob[];
@@ -48,6 +50,26 @@ const DashboardUI = ({
   role,
 }: DashboardUIType) => {
   const router = useRouter();
+  const [interviewCredits, setInterviewCredits] = useState<number | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  // Fetch interview credits for candidates
+  useEffect(() => {
+    if (role === "candidate") {
+      fetch("/api/candidate/credits")
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setInterviewCredits(data.creditsRemaining);
+          }
+        })
+        .catch(err => console.error("Failed to fetch interview credits:", err));
+    }
+  }, [role]);
+
+  const handleUpgrade = () => {
+    setShowUpgradeModal(true);
+  };
 
   // ✅ Stats
   const { accepted, pending, rejected, total, successRate } = useMemo(
@@ -155,6 +177,19 @@ const DashboardUI = ({
         </p>
         <Separator className="bg-gray-700 mt-4" />
       </div>
+
+      {/* Interview Credits Section - Only for Candidates */}
+      {role === "candidate" && interviewCredits !== null && (
+        <section className="mb-8">
+          <div className="max-w-md">
+            <InterviewCreditsCard 
+              creditsRemaining={interviewCredits}
+              totalCredits={3}
+              onUpgrade={handleUpgrade}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Stats Section */}
       <section className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -467,6 +502,15 @@ const DashboardUI = ({
           )}
         </div>
       </section>
+
+      {/* Upgrade Modal */}
+      {role === "candidate" && (
+        <UpgradeModal 
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          creditsRemaining={interviewCredits || 0}
+        />
+      )}
     </div>
   );
 };

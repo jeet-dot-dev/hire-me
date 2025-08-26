@@ -1,7 +1,8 @@
 import openai from "@/lib/openAi/init";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+import { withAuthCheck, AuthenticatedRequest } from "@/lib/middlewares/interviewAuth";
 
-export async function POST(req: Request) {
+async function handleTTS(req: AuthenticatedRequest) {
   try {
     const { text } = await req.json();
     if (!text) {
@@ -25,4 +26,8 @@ export async function POST(req: Request) {
     console.error("TTS API error:", error);
     return NextResponse.json({ error: "TTS failed" }, { status: 500 });
   }
+}
+
+export async function POST(req: Request) {
+  return withAuthCheck(req as NextRequest, handleTTS);
 }

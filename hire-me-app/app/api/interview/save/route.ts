@@ -1,7 +1,9 @@
 import { getAiRecommendations } from "@/components/interview/functions/getAiRecomendations";
 import { prisma } from "@/lib/prisma";
+import { withAuthCheck, AuthenticatedRequest } from "@/lib/middlewares/interviewAuth";
+import { NextResponse, NextRequest } from "next/server";
 
-export async function POST(req: Request) {
+async function handleInterviewSave(req: AuthenticatedRequest) {
   try {
     const {
       applicationId,
@@ -10,21 +12,32 @@ export async function POST(req: Request) {
       suspiciousActivities,
       description,
     } = await req.json();
+
     if (!applicationId || !jobId || !conversation) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
-        {
-          status: 400,
-        }
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
       );
     }
+
     const application = await prisma.jobApplication.findUnique({
       where: { id: applicationId },
+      select: { candidateId: true }
     });
+
     if (!application) {
-      return new Response(JSON.stringify({ error: "Application not found" }), {
-        status: 404,
-      });
+      return NextResponse.json(
+        { error: "Application not found" },
+        { status: 404 }
+      );
+    }
+
+    // Verify the application belongs to the authenticated candidate
+    if (application.candidateId !== req.candidate!.id) {
+      return NextResponse.json(
+        { error: "Unauthorized access to application" },
+        { status: 403 }
+      );
     }
 
     const {
@@ -53,13 +66,16 @@ export async function POST(req: Request) {
       },
     });
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.log("Error saving interview:", error);
-    return new Response(JSON.stringify({ error: "Failed to save interview" }), {
-      status: 500,
-    });
+    return NextResponse.json(
+      { error: "Failed to save interview" },
+      { status: 500 }
+    );
   }
+}
+
+export async function POST(req: Request) {
+  return withAuthCheck(req as NextRequest, handleInterviewSave);
 }

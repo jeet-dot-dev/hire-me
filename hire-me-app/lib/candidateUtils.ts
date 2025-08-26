@@ -29,6 +29,7 @@ export async function ensureCandidateProfile(userId: string, userEmail?: string,
           ProfilePic: null,
           resumeUrl: null,
           wishListedJobs: [],
+          interviewCredits: 3, // Default free tier credits
         },
         include: {
           education: true,

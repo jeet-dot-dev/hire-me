@@ -666,8 +666,10 @@ const PricingSection = () => {
                         ? "bg-green-600 hover:bg-green-700"
                         : "bg-gray-800 hover:bg-gray-700"
                     } text-white`}
+                    disabled
+                    onClick={() => alert("Coming soon...")}
                   >
-                    Get Started
+                    Coming Soon...
                   </Button>
                 </CardContent>
               </Card>

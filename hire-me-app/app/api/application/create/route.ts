@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { checkInterviewCredits } from "@/lib/interviewCredits";
 
 export async function POST(req: Request) {
   try {
@@ -31,6 +32,19 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check if candidate has interview credits before allowing application
+    const creditsCheck = await checkInterviewCredits(candidate.id);
+    if (!creditsCheck.success) {
+      return NextResponse.json(
+        { 
+          error: creditsCheck.message || "Free tier limit reached. Please upgrade to continue.",
+          creditsRemaining: creditsCheck.creditsRemaining,
+          upgradeRequired: true
+        },
+        { status: 402 } // Payment Required
+      );
+    }
+
     const application = await prisma.jobApplication.create({
       data: {
         jobId,
@@ -40,7 +54,10 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json(application);
+    return NextResponse.json({
+      ...application,
+      creditsRemaining: creditsCheck.creditsRemaining
+    });
   } catch (error) {
     console.error("Error creating application:", error);
     return NextResponse.json(

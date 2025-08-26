@@ -192,6 +192,7 @@ model Candidate {
   updatedAt  DateTime @updatedAt
 
   wishListedJobs String[]
+  interviewCredits Int @default(3) // Free tier interview attempts
 
   JobApplication JobApplication[]
 }

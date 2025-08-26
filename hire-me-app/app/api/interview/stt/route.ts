@@ -1,6 +1,8 @@
 import openai from "@/lib/openAi/init";
+import { NextRequest } from "next/server";
+import { withAuthCheck, AuthenticatedRequest } from "@/lib/middlewares/interviewAuth";
 
-export async function POST(req: Request) {
+async function handleSTT(req: AuthenticatedRequest) {
   const formData = await req.formData();
   const audioFile = formData.get("audio") as File;
 
@@ -21,4 +23,8 @@ export async function POST(req: Request) {
     console.error("Error during transcription:", error);
     return new Response("Error during transcription", { status: 500 });
   }
+}
+
+export async function POST(req: Request) {
+  return withAuthCheck(req as NextRequest, handleSTT);
 }
