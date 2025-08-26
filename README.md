@@ -1,80 +1,79 @@
-# 💼 Hire Me – AI-Powered Interview Platform
+# 💼 HireMe – Modern Job Recruitment Platform
 
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-hireme.stackzy.tech-blue?style=for-the-badge)](https://hireme.stackzy.tech)
-[![Next.js](https://img.shields.io/badge/Next.js-15.3.4-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat&logo=prisma)](https://www.prisma.io/)
 
-**Hire Me** is a comprehensive AI-powered job interview platform that revolutionizes the hiring process for both candidates and recruiters. Built with modern web technologies, it offers realistic interview simulations, intelligent resume analysis, and data-driven insights.
+**HireMe** is a comprehensive, modern job recruitment platform that connects candidates with recruiters through intelligent job matching, AI-powered content generation, and enterprise-grade security. Built with cutting-edge technologies and microservices architecture for scalability and performance.
 
-## 🌟 What is Hire Me?
+## 📋 Technical Documentation
 
-Hire Me bridges the gap between job seekers and recruiters by providing:
-- **For Candidates**: AI-powered interview practice, resume optimization, and job matching
-- **For Recruiters**: Intelligent candidate screening, automated interviews, and comprehensive analytics
+### Comprehensive System Documentation
+- **[Development Summary & Key Achievements](./docs/00_DEVELOPMENT_SUMMARY_ACHIEVEMENTS.md)** - Overview of all technical achievements
+- **[System Architecture Overview](./docs/01_SYSTEM_ARCHITECTURE_OVERVIEW.md)** - Microservices architecture and technology stack
+- **[API Security & Rate Limiting](./docs/02_API_SECURITY_RATE_LIMITING.md)** - Enterprise-grade security implementation
+- **[File Processing & Resume Extraction](./docs/03_FILE_PROCESSING_RESUME_EXTRACTION.md)** - Serverless file processing system
+- **[User Experience & Onboarding](./docs/04_USER_EXPERIENCE_ONBOARDING_OPTIMIZATION.md)** - UX optimization and user journey
+- **[AI Integration & Content Generation](./docs/05_AI_INTEGRATION_CONTENT_GENERATION.md)** - AI-powered features and content enhancement
+- **[Database Design & Architecture](./docs/06_DATABASE_DESIGN_ARCHITECTURE.md)** - PostgreSQL schema and optimization
+- **[Authentication & Authorization](./docs/07_AUTHENTICATION_AUTHORIZATION_SYSTEM.md)** - Security and user management
+- **[Frontend Architecture & Components](./docs/08_FRONTEND_ARCHITECTURE_COMPONENT_DESIGN.md)** - React/Next.js component design
 
-## 🎯 Why Choose Hire Me?
+## 🌟 Platform Overview
 
-- **🤖 AI-Driven Interviews**: Conduct realistic interviews with AI-powered conversation flow
-- **📄 Intelligent Resume Analysis**: Automated skill matching and resume optimization
-- **🎨 Modern UI/UX**: Clean, responsive design built with cutting-edge technologies
-- **📊 Real-time Analytics**: Comprehensive dashboards with actionable insights
-- **🔒 Secure & Scalable**: Enterprise-grade security with scalable architecture
-- **🌐 Real-time Communication**: Live video interviews with AI moderation
+**HireMe** is an advanced job recruitment platform featuring:
 
-## ✨ Key Features
-
-### For Candidates
-- **Smart Profile Builder** - Create compelling profiles with AI assistance
-- **Resume Analysis** - Get detailed feedback on your resume with skill matching
-- **Mock Interviews** - Practice with AI-powered interview simulations
-- **Job Recommendations** - Personalized job suggestions based on your profile
-- **Application Tracking** - Monitor your application status in real-time
-- **Interview Preparation** - Comprehensive prep tools and practice sessions
-
-### For Recruiters
-- **AI Candidate Screening** - Automated initial screening with intelligent ranking
-- **Bulk Job Posting** - Create and manage multiple job listings efficiently
-- **Interview Scheduling** - Streamlined scheduling with calendar integration
-- **Application Management** - Complete ATS system for managing candidates
-- **Analytics Dashboard** - Data-driven insights into hiring performance
-- **Collaborative Hiring** - Team-based recruitment workflows
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **Framework**: Next.js 15.3.4 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS + ShadCN UI
-- **Animations**: Framer Motion + Lottie React
-- **State Management**: React Hooks + Context API
-- **Charts**: Recharts for analytics visualization
-
-### Backend
-- **Runtime**: Node.js
-- **Framework**: Next.js API Routes + Hono (for AI backend)
+### 🏗️ **Microservices Architecture**
+- **Main Backend**: Next.js API routes for core business logic
+- **AI Backend**: Hono.js microservice for AI-powered features
 - **Database**: PostgreSQL with Prisma ORM
-- **File Storage**: Cloudflare R2
-- **Deployment**: Cloudflare Workers (AI backend)
+- **File Storage**: Cloudflare R2 for resumes and documents
 
-### Authentication & Security
-- **Auth**: NextAuth.js with JWT strategy
-- **Providers**: Google, GitHub, and Email/Password
-- **Session Management**: Secure session handling with role-based access
+### 🔐 **Enterprise Security**
+- **Multi-tier Rate Limiting**: Intelligent protection against abuse
+- **OAuth Authentication**: Google, GitHub, Email/Password
+- **Role-based Access Control**: Candidate vs Recruiter permissions
+- **JWT Session Management**: Secure, stateless authentication
+
+### 🤖 **AI-Powered Features**
+- **Content Generation**: Professional job descriptions with AI
+- **Resume Analysis**: Intelligent text extraction and skill matching
+- **Skill Tagging**: Automated skill extraction from job descriptions
+- **Fallback Systems**: Multiple AI providers for reliability
+
+### 📊 **Performance & UX**
+- **Server Components**: Optimized React performance
+- **Responsive Design**: Mobile-first, accessible interface
+- **Smart Onboarding**: Auto profile creation and guided setup
+- **File Processing**: Serverless PDF/DOCX handling
+
+## 🛠️ Technical Stack
+
+### Frontend Excellence
+```typescript
+Next.js 14 (App Router)    // Server-side rendering & performance
+TypeScript                 // Full type safety
+Tailwind CSS + shadcn/ui   // Modern design system
+React Hook Form + Zod      // Type-safe form validation
+```
+
+### Backend Infrastructure
+```typescript
+Next.js API Routes         // RESTful API endpoints
+Hono.js                   // Lightweight AI microservice
+PostgreSQL + Prisma       // Type-safe database operations
+Redis (Upstash)           // Caching and rate limiting
+```
 
 ### AI & Processing
-- **AI Models**: OpenAI GPT-4o-mini, Gemini API
-- **Speech Processing**: OpenAI Whisper for speech-to-text
-- **Resume Processing**: PDF.js, Mammoth.js for document parsing
-- **Real-time Communication**: WebRTC for video interviews
+```typescript
+OpenAI GPT-4             // Primary content generation
+Google Gemini            // Fallback AI provider
+Serverless Functions     // File processing (PDF/DOCX)
+```
 
-### DevOps & Deployment
-- **Database Hosting**: PostgreSQL (Production)
-- **File Storage**: Cloudflare R2
-- **Email Service**: Resend
-- **Monitoring**: Built-in error tracking and logging
-
-## 📁 Project Structure
+## 📁 Project Architecture
 
 ```
 hire-me/
