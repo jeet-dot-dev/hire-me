@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Badge } from "../ui/badge";
 
-import { AnimatedTestimonials } from "@/src/components/ui/animated-testimonials"; 
+import { AnimatedTestimonials } from "@/src/components/ui/animated-testimonials";
 
 export function AnimatedTestimonialsDemo({ role }: { role: string }) {
   const candidateTestimonials = [
@@ -11,7 +11,7 @@ export function AnimatedTestimonialsDemo({ role }: { role: string }) {
         "HireMe transformed my job search experience. The AI-powered matching connected me with my dream role in just 2 weeks. The interview preparation tools were incredibly helpful!",
       name: "Sarah Chen",
       designation: "Software Engineer at TechFlow",
-      src: "https://images.unsplash.com/photo-1494790108755-2616b612b494?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      src: "/testimonials/recruiter1.jpg",
     },
     {
       quote:
@@ -81,11 +81,11 @@ export function AnimatedTestimonialsDemo({ role }: { role: string }) {
     },
   ];
 
-  const testimonials = role === "Candidate" ? candidateTestimonials : recruiterTestimonials;
-  
+  const testimonials =
+    role === "Candidate" ? candidateTestimonials : recruiterTestimonials;
+
   return <AnimatedTestimonials testimonials={testimonials} />;
 }
-
 
 const Testimonials = () => {
   const [role, setRole] = useState("Candidate");
@@ -125,11 +125,10 @@ const Testimonials = () => {
             >
               Recruiter
             </div>
-           
           </div>
-           <div className="">
-                <AnimatedTestimonialsDemo role={role} />
-            </div>
+          <div className="">
+            <AnimatedTestimonialsDemo role={role} />
+          </div>
         </div>
       </div>
     </div>
