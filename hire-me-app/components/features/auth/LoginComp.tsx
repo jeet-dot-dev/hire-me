@@ -72,14 +72,14 @@ export default function LoginPage() {
 
       // Redirect user based on their role
       if (role === "RECRUITER") {
-        toast.success("Logged in!");
+        toast.success("Welcome back! Redirecting to your dashboard...");
         router.push("/recruiter/dashboard");
       } else if (role === "CANDIDATE") {
-        toast.success("Logged in!");
+        toast.success("Welcome back! Redirecting to your dashboard...");
         router.push("/candidate/dashboard");
       } else {
         // User exists but has no role assigned
-        toast.error("No role assigned to this account.");
+        toast.error("Account setup incomplete. Please contact support.");
       }
     }
 
@@ -90,9 +90,16 @@ export default function LoginPage() {
   const handleOAuthLogin = (provider: "google" | "github") => {
     // Make sure user selected a role first
     if (!selectedRole) {
-      toast.error("Please select a role first.");
+      toast.error("Please select a role first");
       return;
     }
+
+    // Show loading toast to indicate authentication process started
+    const providerName = provider === "google" ? "Google" : "GitHub";
+    toast.loading(`Connecting to ${providerName}...`, {
+      description: "Please wait while we redirect you to authenticate"
+    });
+    setLoading(true);
 
     // Store the selected role in a short-lived cookie (6 minutes)
     // This helps the OAuth callback know what role the user intended
@@ -269,25 +276,34 @@ export default function LoginPage() {
               variant="secondary"
               className="w-full flex cursor-pointer  items-center justify-center gap-2 bg-white hover:text-white text-black border-white hover:bg-[#1a1a1a]"
             >
-              <svg className="w-5 h-5" viewBox="0 0 48 48">
-                <path
-                  fill="#EA4335"
-                  d="M24 9.5c3.7 0 6.3 1.6 7.8 3L36.3 9C33.2 6.2 29.1 4.5 24 4.5 15.7 4.5 8.8 9.8 6.3 17.1l6.9 5.3C14.6 16.4 18.8 13.5 24 13.5z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M24 43.5c5.4 0 9.8-1.8 13.1-4.8l-6.4-5c-1.7 1.1-4 1.9-6.7 1.9-5.2 0-9.5-3.4-11.1-8.1l-6.9 5.3C8.9 38.4 15.8 43.5 24 43.5z"
-                />
-                <path
-                  fill="#4A90E2"
-                  d="M43.6 24.5c0-1.3-.1-2.3-.3-3.5H24v7h11.1c-.5 2.3-1.9 4.2-3.8 5.5l6.4 5C41.9 35.7 43.6 30.4 43.6 24.5z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M12.9 28.4c-.4-1.1-.7-2.2-.7-3.4s.3-2.3.7-3.4l-6.9-5.3c-1.4 2.8-2.3 6-2.3 9.3s.9 6.5 2.3 9.3l6.9-5.3z"
-                />
-              </svg>
-              Sign in with Google
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Connecting to Google...</span>
+                </div>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" viewBox="0 0 48 48">
+                    <path
+                      fill="#EA4335"
+                      d="M24 9.5c3.7 0 6.3 1.6 7.8 3L36.3 9C33.2 6.2 29.1 4.5 24 4.5 15.7 4.5 8.8 9.8 6.3 17.1l6.9 5.3C14.6 16.4 18.8 13.5 24 13.5z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M24 43.5c5.4 0 9.8-1.8 13.1-4.8l-6.4-5c-1.7 1.1-4 1.9-6.7 1.9-5.2 0-9.5-3.4-11.1-8.1l-6.9 5.3C8.9 38.4 15.8 43.5 24 43.5z"
+                    />
+                    <path
+                      fill="#4A90E2"
+                      d="M43.6 24.5c0-1.3-.1-2.3-.3-3.5H24v7h11.1c-.5 2.3-1.9 4.2-3.8 5.5l6.4 5C41.9 35.7 43.6 30.4 43.6 24.5z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M12.9 28.4c-.4-1.1-.7-2.2-.7-3.4s.3-2.3.7-3.4l-6.9-5.3c-1.4 2.8-2.3 6-2.3 9.3s.9 6.5 2.3 9.3l6.9-5.3z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
+                </>
+              )}
             </Button>
 
             <Button
@@ -296,10 +312,19 @@ export default function LoginPage() {
               variant="outline"
               className="w-full flex items-center cursor-pointer justify-center gap-2 bg-[#1a1a1a] text-white border border-zinc-700 hover:bg-white"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.37 0 0 5.37 0 12a12 12 0 008.21 11.44c.6.11.82-.26.82-.58v-2.26c-3.34.73-4.04-1.61-4.04-1.61a3.18 3.18 0 00-1.34-1.76c-1.09-.75.08-.74.08-.74a2.52 2.52 0 011.84 1.23 2.56 2.56 0 003.49 1 2.53 2.53 0 01.76-1.6c-2.66-.3-5.46-1.33-5.46-5.93a4.64 4.64 0 011.23-3.21 4.3 4.3 0 01.12-3.17s1-.32 3.3 1.23a11.43 11.43 0 016 0c2.28-1.55 3.28-1.23 3.28-1.23a4.3 4.3 0 01.12 3.17 4.63 4.63 0 011.23 3.21c0 4.61-2.8 5.62-5.48 5.92a2.86 2.86 0 01.82 2.22v3.3c0 .32.21.7.82.58A12 12 0 0024 12c0-6.63-5.37-12-12-12z" />
-              </svg>
-              Sign in with GitHub
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Connecting to GitHub...</span>
+                </div>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.37 0 0 5.37 0 12a12 12 0 008.21 11.44c.6.11.82-.26.82-.58v-2.26c-3.34.73-4.04-1.61-4.04-1.61a3.18 3.18 0 00-1.34-1.76c-1.09-.75.08-.74.08-.74a2.52 2.52 0 011.84 1.23 2.56 2.56 0 003.49 1 2.53 2.53 0 01.76-1.6c-2.66-.3-5.46-1.33-5.46-5.93a4.64 4.64 0 011.23-3.21 4.3 4.3 0 01.12-3.17s1-.32 3.3 1.23a11.43 11.43 0 016 0c2.28-1.55 3.28-1.23 3.28-1.23a4.3 4.3 0 01.12 3.17 4.63 4.63 0 011.23 3.21c0 4.61-2.8 5.62-5.48 5.92a2.86 2.86 0 01.82 2.22v3.3c0 .32.21.7.82.58A12 12 0 0024 12c0-6.63-5.37-12-12-12z" />
+                  </svg>
+                  <span>Continue with GitHub</span>
+                </>
+              )}
             </Button>
           </div>
 

@@ -21,12 +21,12 @@ const EmailVerifyLogin = () => {
         try {
             const res = await fetch(`/api/email/resend-email?email=${email}`);
             if (res.ok) {
-                toast.success("Verification email sent again!");
+                toast.success("Verification email sent! Please check your inbox and spam folder");
             } else {
-                toast.error("Could not resend email");
+                toast.error("Could not send verification email. Please try again");
             }
         } catch {
-            toast.error("Something went wrong");
+            toast.error("Network error. Please check your connection and try again");
         } finally {
             setIsLoading(false);
         }

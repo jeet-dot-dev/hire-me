@@ -32,6 +32,11 @@ class InMemoryRateLimiter {
     const now = Date.now();
     const windowStart = now - (config.window * 1000);
     
+    // Periodic cleanup to prevent memory leaks
+    if (Math.random() < 0.1) { // 10% chance to clean up on each request
+      this.cleanup();
+    }
+    
     // Get existing requests for this identifier
     const existingRequests = this.requests.get(identifier) || [];
     
@@ -74,8 +79,7 @@ class InMemoryRateLimiter {
 // Global rate limiter instance
 const rateLimiter = new InMemoryRateLimiter();
 
-// Cleanup old entries every 5 minutes
-setInterval(() => rateLimiter.cleanup(), 5 * 60 * 1000);
+// Note: Cleanup is handled within the checkLimit method to avoid global scope issues
 
 /**
  * Get rate limit configuration for a specific route group

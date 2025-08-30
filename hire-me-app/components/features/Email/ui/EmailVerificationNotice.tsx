@@ -62,12 +62,12 @@ export default function EmailVerificationNotice({
       const res = await fetch(`/api/email/resend-email?email=${email}`);
       if (res.ok) {
         // Show success toast
-        toast.success("A resend link has been sent to your email");
+        toast.success("Verification email sent! Please check your inbox and spam folder");
 
         setCanResend(false);
         setTimeLeft(30);
       } else {
-        toast.error("Could not resend email");
+        toast.error("Could not send verification email. Please try again.");
       }
     } catch (error: unknown) {
       console.log(error);

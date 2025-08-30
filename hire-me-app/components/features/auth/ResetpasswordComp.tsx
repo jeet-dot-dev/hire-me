@@ -26,14 +26,14 @@ const ResetPasswordComp = () => {
             // In real app, this would be the actual API call:
             const response = await axios.post('/api/auth/forget-password', { email })
             if (response.status === 200) {
-                toast.success("Password reset email sent successfully. Please check your inbox.")
+                toast.success("Reset link sent! Please check your email inbox and spam folder.")
                 setEmail("")
             }
             
             //alert("Password reset email sent successfully. Please check your inbox.");
             setEmail("")
         } catch (error) {
-            toast.error("Failed to send password reset email. Please try again.");
+            toast.error("Failed to send reset email. Please try again or contact support.");
             console.error("Reset password error:", error)
         } finally {
             setLoading(false)

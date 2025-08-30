@@ -114,7 +114,7 @@ export const Navbar = () => {
 
       {/* Slide-out Mobile Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 max-w-[80vw] bg-black border-l border-gray-700/30 shadow-2xl transform transition-transform duration-300 ease-in-out z-50 md:hidden ${
+        className={`fixed top-0 right-0 h-screen w-80 max-w-[80vw] bg-black border-l border-gray-700/30 shadow-2xl transform transition-transform duration-300 ease-in-out z-50 md:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
@@ -134,7 +134,7 @@ export const Navbar = () => {
           </button>
         </div>
 
-        <div className="flex flex-col items-start px-6 py-6 gap-4 bg-black">
+        <div className="flex flex-col items-start justify-between px-6 py-6 gap-4 bg-black">
           <Button
             variant="ghost"
             className="text-white text-lg w-full justify-start hover:bg-white/10  cursor-pointer hover:text-white rounded-lg py-3 transition-all duration-300"

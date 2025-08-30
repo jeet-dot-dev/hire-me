@@ -13,9 +13,15 @@ const getTagsFromOpenai = async (c: Context) => {
       return c.json({ error: "Missing required fields" }, 400);
     }
 
+    // Check if GEMINI_API_KEY_NEW is available
+    if (!c.env.GEMINI_API_KEY_NEW) {
+      console.error("GEMINI_API_KEY_NEW is not set");
+      return c.json({ error: "AI service configuration error" }, 500);
+    }
+
     const prompt = tagsPrompt(body);
 
-    const aiResponse = await callGemini(prompt, c.env.GEMINI_API_KEY);
+    const aiResponse = await callGemini(prompt, c.env.GEMINI_API_KEY_NEW);
 
     console.log("Raw AI Response:", aiResponse);
 
@@ -59,7 +65,8 @@ const getTagsFromOpenai = async (c: Context) => {
     return c.json({ result: parsedTags });
   } catch (error) {
     console.error("AI Error (tags):", error);
-    return c.json({ error: "Failed to generate tags" }, 500);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    return c.json({ error: `Failed to generate tags: ${errorMessage}` }, 500);
   }
 };
 

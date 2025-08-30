@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserPlus, BookOpen, BrainCircuit, Heart } from "lucide-react";
+import { toast } from "sonner";
 
 interface IncompleteProfileWelcomeProps {
   userName?: string;
@@ -71,7 +72,14 @@ export function IncompleteProfileWelcome({
               <p className="text-muted-foreground text-sm">
                 Practice with our AI-powered interview system to improve your skills.
               </p>
-              <Button variant="outline" size="sm" disabled>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => toast.info("🤖 AI-powered interviews are launching soon!", {
+                  description: "We're building an amazing interview experience just for you"
+                })}
+                className="cursor-pointer"
+              >
                 Coming Soon
               </Button>
             </div>

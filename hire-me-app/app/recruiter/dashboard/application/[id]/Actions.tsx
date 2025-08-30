@@ -67,7 +67,7 @@ const Actions = ({
       }
     } catch (err) {
         console.log("Error updating status:", err);
-      toast.error("Something went wrong");
+      toast.error("Failed to update application status. Please try again");
     } finally {
       setLoading(null);
       setOpen(false);

@@ -3,6 +3,7 @@ import React from "react";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
 import {
   Github,
   Twitter,
@@ -104,7 +105,20 @@ const Footer = () => {
                   placeholder="Enter your email"
                   className="flex-1 px-4 py-2 bg-gray-900/50 border border-gray-700/50 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-[#94725d] transition-colors"
                 />
-                <Button className="rounded-full bg-gradient-to-r from-[#94725d] to-[#896a59] hover:from-[#896a59] hover:to-[#94725d] transition-all duration-300 px-6">
+                <Button 
+                  className="rounded-full bg-gradient-to-r from-[#94725d] to-[#896a59] hover:from-[#896a59] hover:to-[#94725d] transition-all duration-300 px-6"
+                  onClick={() => {
+                    const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
+                    if (emailInput && emailInput.value) {
+                      toast.success("Thanks for subscribing! We'll keep you updated.", {
+                        description: "You'll be the first to know about new features"
+                      });
+                      emailInput.value = '';
+                    } else {
+                      toast.error("Please enter a valid email address");
+                    }
+                  }}
+                >
                   <ArrowRight size={18} />
                 </Button>
               </div>

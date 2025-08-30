@@ -123,7 +123,9 @@ export function UpgradeModal({
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
-              onClick={() => toast("We'll notify you when premium features are available!")}
+              onClick={() => toast.info("🚀 We'll notify you as soon as premium features are available!", {
+                description: "Get ready for unlimited interviews and advanced AI features"
+              })}
               className="flex-1 bg-white text-black hover:bg-white/90 cursor-pointer transition-colors duration-200 py-2.5 text-sm font-medium"
             >
               <Crown className="w-4 h-4 mr-2" />

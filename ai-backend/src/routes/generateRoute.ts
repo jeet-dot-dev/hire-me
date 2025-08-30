@@ -7,7 +7,7 @@ const generateRoute = new Hono<{
   Bindings: {
     OPENAI_API_KEY: string;
     APP_URL: string;
-    GEMINI_API_KEY:string
+    GEMINI_API_KEY_NEW: string;
   };
 }>();
 

@@ -123,7 +123,7 @@ const ApplyDialog = ({ job, children }: ApplyDialogProps) => {
       await deleteR2ObjectSingle(deleteKey);
       setUploading(false);
       console.error("Error:", err);
-      toast.error("Something went wrong while applying.", { id: toastId });
+      toast.error("Failed to submit application. Please try again", { id: toastId });
     }
   };
 

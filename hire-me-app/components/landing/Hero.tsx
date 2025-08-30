@@ -63,7 +63,7 @@ const Hero = () => {
   const router = useRouter();
   return (
     <section id="home">
-      <div className="w-full min-h-[600px] pt-10 md:pt-0 sm:min-h-[700px] md:min-h-[800px] bg-black relative flex items-center justify-center">
+      <div className="w-full min-h-screen bg-black relative flex items-center justify-center">
         <Image
           src="/assets/hero2.png"
           alt="Hero Image"
@@ -72,50 +72,45 @@ const Hero = () => {
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-black/50"></div>
 
         {/* Main content container - perfectly centered */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center min-h-[600px] sm:min-h-[700px] md:min-h-[800px] py-8 sm:py-12">
-          <Badge className="px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-3 rounded-3xl font-bold mb-4 sm:mb-6 text-xs sm:text-sm">
-            <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-[#94725d] mr-1 sm:mr-2 animate-pulse"></span>
-            <span className="hidden sm:inline">Saas AI Driven Interview</span>
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 flex flex-col items-center justify-center text-center min-h-screen py-16 sm:py-20">
+          <Badge className="px-4 mt-5 py-3 rounded-full font-bold mb-8 text-sm bg-[#896a59]/20 border border-[#896a59]/30">
+            <span className="w-2 h-2 rounded-full bg-[#94725d] mr-2 animate-pulse"></span>
+            <span className="hidden sm:inline ">SaaS AI Driven Interview</span>
             <span className="sm:hidden">AI Interview</span>
           </Badge>
 
-          <div className="w-full max-w-6xl">
-            <h1 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-6xl xl:text-7xl font-bold mb-3 sm:mb-4 leading-tight drop-shadow-lg px-2">
+          <div className="w-full max-w-5xl space-y-8">
+            <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight drop-shadow-2xl">
               The Future of <span style={{ color: "#896a59" }}>Hiring</span> is
               Here
             </h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-medium max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto drop-shadow-md mb-6 sm:mb-8 px-2">
-              <span className="text-gray-200">
-                Transform your recruitment process with{" "}
-              </span>
+            <p className="text-gray-200 text-base sm:text-lg md:text-xl lg:text-2xl font-medium max-w-4xl mx-auto drop-shadow-lg leading-relaxed">
+              Transform your recruitment process with{" "}
               <span
                 style={{ color: "#896a59" }}
-                className="font-bold text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl"
+                className="font-bold"
               >
                 intelligent AI interviews
               </span>
-              <span className="text-gray-200">
-                {" "}
-                and instant candidate insights
-              </span>
+              {" "}and instant candidate insights
             </p>
 
-            <div className="mb-8 sm:mb-10 md:mb-12 flex justify-center px-2">
+            <div className="pt-4">
               <ShimmerButton
                 onClick={() => router.push("/auth/login")}
-                className="shadow-2xl bg-gradient-to-r from-[#8d675a] to-[#896a59] hover:from-[#896a59] hover:to-[#8d675a] transition-all duration-300 w-full max-w-xs sm:w-auto"
+                className="shadow-2xl bg-gradient-to-r from-[#8d675a] to-[#896a59] hover:from-[#896a59] hover:to-[#8d675a] transition-all duration-300 w-full max-w-sm mx-auto"
               >
-                <span className="whitespace-pre-wrap py-2 px-4 sm:px-6 text-center text-sm sm:text-base font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+                <span className="whitespace-pre-wrap py-3 px-8 text-center text-base font-semibold leading-none tracking-tight text-white lg:text-lg">
                   Get Started Free
                 </span>
               </ShimmerButton>
             </div>
 
             {/* Stats section - centered */}
-            <div className="w-full flex justify-center px-2">
+            <div className="w-full hidden lg:flex justify-center px-2">
               <div className="bg-black/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-gray-700/30 w-full max-w-5xl">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                   {heroObj.map((item, index) => {

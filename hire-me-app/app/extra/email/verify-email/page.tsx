@@ -32,7 +32,7 @@ const Page = () => {
         }
       } catch (error) {
         setStatus("error");
-        setMessage("Something went wrong during verification");
+        setMessage("Network error occurred during email verification. Please try again");
         console.log(error);
       }
     };

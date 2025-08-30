@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Zap, Crown } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface InterviewCreditsCardProps {
   credits: number;
@@ -14,6 +15,15 @@ export function InterviewCreditsCard({
   onUpgrade,
   className = ""
 }: InterviewCreditsCardProps) {
+  const handleUpgradeClick = () => {
+    if (onUpgrade) {
+      onUpgrade();
+    } else {
+      toast.info("🚀 Premium features launching soon!", {
+        description: "Get ready for unlimited interviews and advanced AI features"
+      });
+    }
+  };
   return (
     <Card className={`bg-black border-white/20 ${className} w-full`}>
       <CardContent className="p-4 md:p-6">
@@ -59,7 +69,7 @@ export function InterviewCreditsCard({
             )}
             
             <Button 
-              onClick={onUpgrade || (() => alert("Upgrade feature coming soon!"))}
+              onClick={handleUpgradeClick}
               className="w-full md:w-auto cursor-pointer bg-white text-black hover:bg-white/90 transition-colors duration-200 flex items-center justify-center gap-2 px-6 py-3 shrink-0"
             >
               <Crown className="w-4 h-4" />

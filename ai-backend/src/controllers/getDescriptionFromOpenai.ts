@@ -47,10 +47,16 @@ const getDescriptionFromOpenai = async (c: Context) => {
       return c.json({ error: "skillsRequired must be an array" }, 400);
     }
 
+    // Check if GEMINI_API_KEY_NEW is available
+    if (!c.env.GEMINI_API_KEY_NEW) {
+      console.error("GEMINI_API_KEY_NEW is not set");
+      return c.json({ error: "AI service configuration error" }, 500);
+    }
+
     const prompt = jobDescriptionPrompt(body);
 
     //const Rawresult = await callOpenAI(prompt, c.env.OPENAI_API_KEY);
-    const Rawresult = await callGemini(prompt, c.env.GEMINI_API_KEY);
+    const Rawresult = await callGemini(prompt, c.env.GEMINI_API_KEY_NEW);
     //console.log(c.env.GEMINI_API_KEY)
 
     const result = cleanMarkdownResponse(Rawresult);
@@ -60,8 +66,9 @@ const getDescriptionFromOpenai = async (c: Context) => {
     });
   } catch (error) {
     console.error("AI error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
     return c.json(
-      { error: "Something went wrong while generating the description." },
+      { error: `Something went wrong while generating the description: ${errorMessage}` },
       500
     );
   }

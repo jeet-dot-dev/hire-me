@@ -44,8 +44,8 @@ const Page = () => {
       setLoading(true);
       setError("");
       if (formData.password !== formData.confirmPassword) {
-        setError("Passwords don't match");
-        toast.error("Passwords don't match");
+        setError("Passwords do not match. Please try again");
+        toast.error("Passwords do not match. Please try again");
         setLoading(false);
         return;
       }
@@ -55,13 +55,13 @@ const Page = () => {
         token,
       });
       if (response.status === 200) {
-        toast.success("Password updated successfully.");
+        toast.success("Password updated successfully! Redirecting to login...");
         router.push("/auth/login");
       }
     } catch (error) {
       console.log(error);
       const errorMessage =
-        "Failed to update password. Please try again.";
+        "Failed to update password. Please check your internet connection and try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

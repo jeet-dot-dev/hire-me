@@ -1,15 +1,34 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function callGemini(prompt: string, apiKey: string): Promise<string> {
-  const genAI = new GoogleGenerativeAI(apiKey);
+  try {
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not provided");
+    }
 
-  // ✅ Use "models/gemini-2.5-flash" for the full model path
-  const model = genAI.getGenerativeModel({
-    model: "models/gemini-2.5-flash",
-  });
+    const genAI = new GoogleGenerativeAI(apiKey);
 
-  const result = await model.generateContent(prompt);
-  const response = result.response;
+    // Use the correct model name for Gemini
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
 
-  return response.text().trim();
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+
+    if (!response) {
+      throw new Error("No response from Gemini API");
+    }
+
+    const text = response.text();
+    if (!text) {
+      throw new Error("Empty response from Gemini API");
+    }
+
+    return text.trim();
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Gemini API failed: ${errorMessage}`);
+  }
 }
