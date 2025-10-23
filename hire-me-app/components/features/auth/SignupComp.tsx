@@ -10,6 +10,7 @@ import EmailVerificationNotice from "../Email/ui/EmailVerificationNotice"; // âœ
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
      import { ArrowLeft } from "lucide-react"; // if not imported already
 import Link from "next/link";
 import {
@@ -277,15 +278,14 @@ export default function SignupComp() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-zinc-200">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
                 required
-                  className="text-white"
+                className="text-white"
                 placeholder="********"
               />
             </div>
@@ -293,9 +293,8 @@ export default function SignupComp() {
               <Label htmlFor="confirmPassword" className="text-zinc-200">
                 Confirm Password
               </Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 value={formData.confirmPassword}
                 onChange={(e) =>
                   setFormData({
