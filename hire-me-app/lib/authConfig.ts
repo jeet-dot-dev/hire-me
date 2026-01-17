@@ -73,6 +73,8 @@ export const authConfig: NextAuthOptions = {
   },
   pages: {
     signIn: "/auth/login",
+    // Custom error page to surface friendly messages (e.g. OAuthAccountNotLinked)
+    error: "/auth/error",
   },
   callbacks: {
     async jwt({ token, user }) {
